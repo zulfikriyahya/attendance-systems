@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
                 'name' => 'Administrator',
                 'username' => 'administrator',
                 'email' => 'admin@mtsn1pandeglang.sch.id',
-                'password' => 'P@ssw0rd_administrator',
+                'password' => 'P@ssw0rd',
                 'avatar' => 'avatar/administrator.png',
                 'role' => ['super_admin'],
             ],
