@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+@import "../../../../vendor/filament/filament/resources/css/base.css";
+
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+
+:root {
+    --primary: #0E9F6E;
+    /* Hijau MTsN */
+    --primary-hover: #0C8A5E;
+    /* Hijau lebih gelap */
+    --bg-light: #ffffff;
+    --bg-dark: #111827;
+    --text-dark: #1f2937;
+    --text-light: #f9fafb;
+}
+
+.dark .auth-card {
+    background-color: var(--bg-dark) !important;
+    border: 1px solid #374151;
+    color: var(--text-light);
+}
+
+.dark .auth-card .fi-form {
+    background-color: transparent !important;
+}
+
+.dark .auth-empty-panel {
+    background-color: #1f2937 !important;
+    border-left: 1px solid #374151;
+}
+
+.dark .auth-empty-panel img {
+    filter: drop-shadow(0 4px 6px rgba(255, 255, 255, 0.1));
+}
+
+.auth-card {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    color: var(--text-dark);
+}
+
+.auth-card .fi-form {
+    background-color: transparent !important;
+}
+
+.auth-empty-panel {
+    background-color: #f9fafb !important;
+    border-left: 1px solid #e5e7eb;
+}
+
+.auth-empty-panel img {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.fi-input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.fi-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(14, 159, 110, 0.4);
+}
+
+.fi-btn-primary {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-radius: 0.5rem;
+    transition: all 0.25s ease-in-out;
+}
+
+.fi-btn-primary:hover {
+    background-color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 159, 110, 0.4);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .auth-card {
+        margin: 1rem;
+        border-radius: 1rem;
+    }
+}
