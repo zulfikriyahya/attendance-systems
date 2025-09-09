@@ -1,0 +1,36 @@
+<?php
+
+use App\Http\Controllers\LaporanAllPegawaiController;
+use App\Http\Controllers\LaporanAllSiswaController;
+use App\Http\Controllers\LaporanSinglePegawaiController;
+use App\Http\Controllers\LaporanSingleSiswaController;
+use App\Http\Controllers\VerifikasiLaporanPegawaiController;
+use App\Http\Controllers\VerifikasiLaporanSiswaController;
+use Illuminate\Support\Facades\Route;
+
+// Route::get('/', function () {
+//     return view('index');
+// });
+Route::get('/', function () {
+    return redirect('/presensi');
+});
+
+// Pegawai
+Route::get('/pegawai/{pegawai}/presensi/print', [LaporanSinglePegawaiController::class, 'print'])
+    ->name('laporan.single.pegawai');
+
+Route::get('/laporan/pegawai/print-all', [LaporanAllPegawaiController::class, 'printAll'])
+    ->name('laporan.all.pegawai');
+
+Route::get('/laporan/pegawai/verifikasi/{id}', [VerifikasiLaporanPegawaiController::class, 'verifikasi'])
+    ->name('laporan.pegawai.verifikasi');
+
+// Siswa
+Route::get('/siswa/{siswa}/presensi/print', [LaporanSingleSiswaController::class, 'print'])
+    ->name('laporan.single.siswa');
+
+Route::get('/laporan/siswa/print-all', [LaporanAllSiswaController::class, 'printAll'])
+    ->name('laporan.all.siswa');
+
+Route::get('/laporan/siswa/verifikasi/{id}', [VerifikasiLaporanSiswaController::class, 'verifikasi'])
+    ->name('laporan.siswa.verifikasi');
