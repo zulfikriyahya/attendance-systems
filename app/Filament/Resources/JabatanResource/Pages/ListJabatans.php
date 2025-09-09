@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\JabatanResource\Pages;
 
-use App\Filament\Resources\JabatanResource;
 use Filament\Actions;
+use Filament\Actions\CreateAction;
+use Filament\Support\Colors\Color;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\JabatanResource;
 
 class ListJabatans extends ListRecords
 {
@@ -13,7 +15,11 @@ class ListJabatans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\CreateAction::make(),
+            CreateAction::make()
+                ->label('Tambah Jabatan')
+                ->outlined()
+                ->icon('heroicon-o-plus-circle')
+                ->color(Color::Emerald),
         ];
     }
 }

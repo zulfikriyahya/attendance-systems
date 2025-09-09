@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Instansi;
+use Illuminate\Support\Str;
 use App\Models\JadwalPresensi;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class JadwalPresensiSeeder extends Seeder
 {
@@ -22,13 +22,13 @@ class JadwalPresensiSeeder extends Seeder
         $data = [
             'Siswa Unggulan' => [
                 'jamDatang' => '07:15:00',
-                'jamPulang' => '15:30:00',
+                'jamPulang' => '16:20:00',
                 'deskripsi' => 'Presensi Siswa Unggulan hari Senin - Kamis',
                 'status' => true,
             ],
             'Siswa Reguler' => [
                 'jamDatang' => '07:15:00',
-                'jamPulang' => '15:00:00',
+                'jamPulang' => '15:20:00',
                 'deskripsi' => 'Presensi Siswa Reguler hari Senin - Kamis',
                 'status' => true,
             ],

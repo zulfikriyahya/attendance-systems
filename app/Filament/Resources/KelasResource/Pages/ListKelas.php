@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\KelasResource\Pages;
 
-use App\Filament\Resources\KelasResource;
 use Filament\Actions;
+use Filament\Actions\CreateAction;
+use Filament\Support\Colors\Color;
+use App\Filament\Resources\KelasResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListKelas extends ListRecords
@@ -13,7 +15,11 @@ class ListKelas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make()
+                ->label('Tambah Kelas')
+                ->outlined()
+                ->icon('heroicon-o-plus-circle')
+                ->color(Color::Emerald),
         ];
     }
 }

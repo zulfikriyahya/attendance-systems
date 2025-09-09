@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Instansi;
 use App\Models\Jurusan;
-use Illuminate\Database\Seeder;
+use App\Models\Instansi;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 
 class JurusanSeeder extends Seeder
 {
@@ -20,8 +20,8 @@ class JurusanSeeder extends Seeder
         }
 
         $jurusanList = [
-            ['nama' => 'Unggulan', 'deskripsi' => 'Kelas Unggulan'],
-            ['nama' => 'Reguler', 'deskripsi' => 'Kelas Reguler'],
+            ['nama' => 'Unggulan', 'deskripsi' => 'Jurusan Kelas Unggulan.'],
+            ['nama' => 'Reguler', 'deskripsi' => 'Jurusan Kelas Reguler.'],
         ];
 
         foreach ($jurusanList as $jurusan) {

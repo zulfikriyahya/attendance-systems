@@ -2,33 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages;
-use App\Models\PengajuanKartu;
-use App\Models\User;
-use App\Services\WhatsappService;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\User;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
+use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PengajuanKartuResource\Pages;
 
 class PengajuanKartuResource extends Resource
 {
@@ -56,12 +56,12 @@ class PengajuanKartuResource extends Resource
                     ->required()
                     ->searchable(PengajuanKartu::all()->count() > 10)
                     ->preload()
-                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
-                    ->default(fn () => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id()),
+                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
+                    ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id()),
 
                 TextInput::make('nomorPengajuanKartu')
                     ->label('Nomor Pengajuan')
-                    ->disabled()
+                    // ->disabled()
                     ->dehydrated(false),
 
                 DateTimePicker::make('tanggalPengajuanKartu')
@@ -87,7 +87,7 @@ class PengajuanKartuResource extends Resource
                     ])
                     ->default('Pending')
                     ->required()
-                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
             ]);
     }
 
@@ -169,7 +169,7 @@ class PengajuanKartuResource extends Resource
 
                         Notification::make()
                             ->title('Pengajuan Berhasil')
-                            ->body('Pengajuan kartu baru Anda telah berhasil disubmit dengan nomor: '.$pengajuanKartu->nomorPengajuanKartu)
+                            ->body('Pengajuan kartu baru Anda telah berhasil disubmit dengan nomor: ' . $pengajuanKartu->nomorPengajuanKartu)
                             ->success()
                             ->duration(5000)
                             ->send();
@@ -225,20 +225,20 @@ class PengajuanKartuResource extends Resource
                         'Selesai' => 'Selesai',
                     ])
                     ->multiple()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
 
                 SelectFilter::make('user')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
 
                 TrashedFilter::make()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
 
                 Action::make('approve')
                     ->label('Setujui')
@@ -246,7 +246,7 @@ class PengajuanKartuResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(
-                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
                             $record->status === 'Pending'
                     )
                     ->action(function (PengajuanKartu $record) {
@@ -265,7 +265,7 @@ class PengajuanKartuResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(
-                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
                             $record->status === 'Proses'
                     )
                     ->action(function (PengajuanKartu $record) {
@@ -280,7 +280,7 @@ class PengajuanKartuResource extends Resource
                         // Notifikasi ke user
                         Notification::make()
                             ->title('Kartu Siap Diambil di Ruang PTSP')
-                            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' telah selesai diproses. (Biaya pembuatan kartu Rp. 15.000).')
+                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' telah selesai diproses. (Biaya pembuatan kartu Rp. 15.000).')
                             ->success()
                             ->sendToDatabase($record->user);
 
@@ -297,11 +297,11 @@ class PengajuanKartuResource extends Resource
 
                         if ($phoneNumber) {
                             $whatsappService = new WhatsappService;
-                            $message = "🎉 *Kartu Siap Diambil di Ruang PTSP*\n\n".
-                                "Halo {$userName},\n\n".
-                                "Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.\n\n".
-                                "📍 Silakan ambil di Ruang PTSP\n".
-                                "💰 Biaya pembuatan kartu: Rp. 15.000\n\n".
+                            $message = "🎉 *Kartu Siap Diambil di Ruang PTSP*\n\n" .
+                                "Halo {$userName},\n\n" .
+                                "Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.\n\n" .
+                                "📍 Silakan ambil di Ruang PTSP\n" .
+                                "💰 Biaya pembuatan kartu: Rp. 15.000\n\n" .
                                 'Terima kasih! 🙏';
                             $whatsappService->send($phoneNumber, $message);
                         }
@@ -310,13 +310,13 @@ class PengajuanKartuResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
 
                     ForceDeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
 
                     RestoreBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -385,7 +385,7 @@ class PengajuanKartuResource extends Resource
         foreach ($adminUsers as $admin) {
             Notification::make()
                 ->title('Pengajuan Kartu Baru')
-                ->body('User '.Auth::user()->name.' mengajukan kartu baru dengan alasan: '.$alasan)
+                ->body('User ' . Auth::user()->name . ' mengajukan kartu baru dengan alasan: ' . $alasan)
                 ->info()
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('lihat')

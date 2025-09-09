@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             JadwalPresensiSeeder::class,
             JabatanSeeder::class,
             JurusanSeeder::class,
+            ShieldSeeder::class,
         ]);
     }
 }

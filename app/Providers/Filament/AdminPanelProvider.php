@@ -2,34 +2,34 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\EditProfileCustom;
-use App\Filament\Pages\Auth\LoginCustom;
-use App\Filament\Pages\DashboardAdmin;
-use App\Filament\Resources\UserResource;
-use App\Filament\Widgets\PresensiMasukPegawaiChart;
-use App\Filament\Widgets\PresensiMasukSiswaChart;
-use App\Filament\Widgets\PresensiPulangPegawaiChart;
-use App\Filament\Widgets\PresensiPulangSiswaChart;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
-use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
-use Filament\Enums\ThemeMode;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Pages\DashboardAdmin;
+use App\Filament\Pages\Auth\LoginCustom;
+use App\Filament\Resources\UserResource;
+use Filament\Http\Middleware\Authenticate;
+use App\Filament\Pages\Auth\EditProfileCustom;
+use Illuminate\Session\Middleware\StartSession;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use App\Filament\Widgets\PresensiMasukSiswaChart;
+use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Widgets\PresensiPulangSiswaChart;
+use App\Filament\Widgets\PresensiMasukPegawaiChart;
+use App\Filament\Widgets\PresensiPulangPegawaiChart;
+use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -49,17 +49,17 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->unsavedChangesAlerts()
             ->databaseNotifications()
-            ->defaultThemeMode(ThemeMode::Dark)
+            ->defaultThemeMode(ThemeMode::Light)
             ->favicon(asset('/favicon.ico'))
             ->darkModeBrandLogo(asset('/images/brand-darkmode.png'))
             ->brandLogo(asset('/images/brand-lightmode.png'))
-            ->brandLogoHeight('2.6rem')
+            ->brandLogoHeight('2.2rem')
             ->userMenuItems([
                 MenuItem::make()
                     ->label('Manajemen Pengguna')
-                    ->url(fn (): string => UserResource::getUrl())
+                    ->url(fn(): string => UserResource::getUrl())
                     ->icon('heroicon-o-identification')
-                    ->visible(fn (): bool => Auth::user()->username === 'administrator'),
+                    ->visible(fn(): bool => Auth::user()->username === 'administrator'),
             ])
             ->font('Ubuntu')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

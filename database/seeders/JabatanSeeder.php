@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Instansi;
 use App\Models\Jabatan;
+use App\Models\Instansi;
+use Illuminate\Support\Str;
 use App\Models\JadwalPresensi;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class JabatanSeeder extends Seeder
 {
@@ -25,7 +25,8 @@ class JabatanSeeder extends Seeder
             ['nama' => 'Manajemen'],
             ['nama' => 'Staf'],
             ['nama' => 'Guru'],
-            ['nama' => 'Siswa'],
+            ['nama' => 'Siswa Unggulan'],
+            ['nama' => 'Siswa Reguler'],
             ['nama' => 'Wali Kelas'],
         ];
 

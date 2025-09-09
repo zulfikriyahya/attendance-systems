@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\JurusanResource\Pages;
 
-use App\Filament\Resources\JurusanResource;
 use Filament\Actions;
+use Filament\Actions\CreateAction;
+use Filament\Support\Colors\Color;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\JurusanResource;
 
 class ListJurusans extends ListRecords
 {
@@ -13,7 +15,11 @@ class ListJurusans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make()
+                ->label('Tambah Jurusan')
+                ->outlined()
+                ->icon('heroicon-o-plus-circle')
+                ->color(Color::Emerald),
         ];
     }
 }

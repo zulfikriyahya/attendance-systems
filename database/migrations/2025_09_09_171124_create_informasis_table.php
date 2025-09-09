@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('informasis', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('judul');
             $table->text('isi');
-            $table->dateTime('tanggal');
+            $table->datetime('tanggal');
             $table->enum('status', ['Draft', 'Publish', 'Archive'])->default('Draft');
             $table->string('lampiran')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
