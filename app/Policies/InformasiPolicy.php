@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\PresensiPegawai;
+use App\Models\Informasi;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PresensiPegawaiPolicy
+class InformasiPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class PresensiPegawaiPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_presensi::pegawai');
+        return $user->can('view_any_informasi');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, PresensiPegawai $presensiPegawai): bool
+    public function view(User $user, Informasi $informasi): bool
     {
-        return $user->can('view_presensi::pegawai');
+        return $user->can('view_informasi');
     }
 
     /**
@@ -31,23 +31,23 @@ class PresensiPegawaiPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_presensi::pegawai');
+        return $user->can('create_informasi');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, PresensiPegawai $presensiPegawai): bool
+    public function update(User $user, Informasi $informasi): bool
     {
-        return $user->can('update_presensi::pegawai');
+        return $user->can('update_informasi');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, PresensiPegawai $presensiPegawai): bool
+    public function delete(User $user, Informasi $informasi): bool
     {
-        return $user->can('delete_presensi::pegawai');
+        return $user->can('delete_informasi');
     }
 
     /**
@@ -55,15 +55,15 @@ class PresensiPegawaiPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_presensi::pegawai');
+        return $user->can('delete_any_informasi');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, PresensiPegawai $presensiPegawai): bool
+    public function forceDelete(User $user, Informasi $informasi): bool
     {
-        return $user->can('force_delete_presensi::pegawai');
+        return $user->can('force_delete_informasi');
     }
 
     /**
@@ -71,15 +71,15 @@ class PresensiPegawaiPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_presensi::pegawai');
+        return $user->can('force_delete_any_informasi');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, PresensiPegawai $presensiPegawai): bool
+    public function restore(User $user, Informasi $informasi): bool
     {
-        return $user->can('restore_presensi::pegawai');
+        return $user->can('restore_informasi');
     }
 
     /**
@@ -87,13 +87,13 @@ class PresensiPegawaiPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_presensi::pegawai');
+        return $user->can('restore_any_informasi');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, PresensiPegawai $presensiPegawai): bool
+    public function replicate(User $user, Informasi $informasi): bool
     {
         return $user->can('{{ Replicate }}');
     }

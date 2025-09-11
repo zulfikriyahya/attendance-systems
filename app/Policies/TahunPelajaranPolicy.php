@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\TahunPelajaran;
 use App\Models\User;
+use App\Models\TahunPelajaran;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TahunPelajaranPolicy
