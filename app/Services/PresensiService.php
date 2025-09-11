@@ -11,7 +11,6 @@ use App\Models\PresensiSiswa;
 use App\Models\JadwalPresensi;
 use App\Models\PresensiPegawai;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use App\Jobs\SendWhatsappNotification;
 
