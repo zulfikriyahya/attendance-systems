@@ -7,6 +7,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
@@ -146,6 +147,7 @@ class UserResource extends Resource
         $searchable = User::count() > 10;
         return $table
             ->headerActions([
+                ActionGroup::make([
                 ImportAction::make('import')
                     ->label('Impor Data')
                     ->outlined()
@@ -180,6 +182,12 @@ class UserResource extends Resource
                     ->action(function (array $data) {
                         self::extractZipToStorage($data);
                     }),
+                            ])
+                ->hiddenLabel()
+                ->icon('heroicon-o-rectangle-group')
+                ->color(Color::Emerald)
+                // ->button()
+                // ->outlined()
             ])
 
             ->columns([

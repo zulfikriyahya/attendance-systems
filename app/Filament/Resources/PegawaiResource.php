@@ -161,6 +161,7 @@ class PegawaiResource extends Resource
 
         return $table
             ->headerActions([
+                ActionGroup::make([
                 ImportAction::make('import')
                     ->label('Impor Data')
                     ->outlined()
@@ -195,6 +196,12 @@ class PegawaiResource extends Resource
                     ->action(function (array $data) {
                         self::extractZipToStorage($data);
                     }),
+                            ])
+                ->hiddenLabel()
+                ->icon('heroicon-o-rectangle-group')
+                ->color(Color::Emerald)
+                // ->button()
+                // ->outlined()
             ])
             ->columns([
                 ImageColumn::make('user.avatar')

@@ -2,54 +2,54 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Siswa;
+use App\Models\Jabatan;
+use App\Models\Instansi;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Exports\PresensiSiswaExport;
-use App\Filament\Resources\PresensiSiswaResource\Pages\EditPresensiSiswa;
-use App\Filament\Resources\PresensiSiswaResource\Pages\ListPresensiSiswas;
-use App\Filament\Resources\PresensiSiswaResource\Pages\ViewPresensiSiswa;
-use App\Models\Instansi;
-use App\Models\Jabatan;
 use App\Models\PresensiSiswa;
-use App\Models\Siswa;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Form;
-use Filament\Notifications\Actions\Action as NotificationAction;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Exports\PresensiSiswaExport;
+use Filament\Forms\Components\Radio;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
+use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TimePicker;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Actions\Action as NotificationAction;
+use App\Filament\Resources\PresensiSiswaResource\Pages\EditPresensiSiswa;
+use App\Filament\Resources\PresensiSiswaResource\Pages\ViewPresensiSiswa;
+use App\Filament\Resources\PresensiSiswaResource\Pages\ListPresensiSiswas;
 
 class PresensiSiswaResource extends Resource
 {
@@ -120,6 +120,7 @@ class PresensiSiswaResource extends Resource
     {
         return $table
             ->headerActions([
+                ActionGroup::make([
                 // Set Hadir Siswa
                 Action::make('set-hadir')
                     ->label('Set Hadir')
@@ -1248,7 +1249,14 @@ class PresensiSiswaResource extends Resource
                             });
                         }
                     }),
-            ])
+            
+                ])
+                ->hiddenLabel()
+                ->icon('heroicon-o-rectangle-group')
+                ->color(Color::Emerald)
+            // ->button()
+            // ->outlined()
+        ])
             ->columns([
                 ImageColumn::make('siswa.user.avatar')
                     ->label('Foto')

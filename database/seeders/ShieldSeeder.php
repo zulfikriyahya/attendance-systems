@@ -18,8 +18,7 @@ class ShieldSeeder extends Seeder
         {"name":"guru","guard_name":"web","permissions":["view_any_presensi::pegawai"]},
         {"name":"staf","guard_name":"web","permissions":["view_any_presensi::pegawai"]},
         {"name":"wali_kelas","guard_name":"web","permissions":["view_any_presensi::pegawai","view_any_presensi::siswa"]},
-        {"name":"siswa_unggulan","guard_name":"web","permissions":["view_any_presensi::siswa"]},
-        {"name":"siswa_reguler","guard_name":"web","permissions":["view_any_presensi::siswa"]}]';
+        {"name":"siswa","guard_name":"web","permissions":["view_any_presensi::siswa"]}]';
         $directPermissions = '[]';
 
         static::makeRolesWithPermissions($rolesWithPermissions);

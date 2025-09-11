@@ -49,6 +49,21 @@ class PengajuanKartuResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $user = Auth::user();
+
+        if (! $user || ! $user->hasRole('super_admin')) {
+            return null; // hanya admin yang bisa lihat badge
+        }
+        return static::getModel()::where('status', 'Pending')->count();
+    }
+    
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
