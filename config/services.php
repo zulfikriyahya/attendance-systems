@@ -24,8 +24,23 @@ return [
     ],
 
     'whatsapp' => [
-        'endpoint' => env('WHATSAPP_API_URL'),
+        'endpoints' => [
+            'api1' => env('WHATSAPP_API_URL_1'),
+            'api2' => env('WHATSAPP_API_URL_2'),
+            'api3' => env('WHATSAPP_API_URL_3'),
+            'api4' => env('WHATSAPP_API_URL_4'),
+            'api5' => env('WHATSAPP_API_URL_5'),
+            'api6' => env('WHATSAPP_API_URL_6'),
+            'api7' => env('WHATSAPP_API_URL_7'),
+            'api8' => env('WHATSAPP_API_URL_8'),
+            'api9' => env('WHATSAPP_API_URL_9'),
+            'api10' => env('WHATSAPP_API_URL_10'),
+        ],
+        'timeout' => 15,
+        'connect_timeout' => 5,
+        'retry_timeout' => 5, // minutes before retry down endpoint
     ],
+    
     'api' => [
         'secret' => env('API_SECRET'),
     ],
