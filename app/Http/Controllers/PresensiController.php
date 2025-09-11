@@ -2,64 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JadwalPresensi;
-use App\Models\Pegawai;
-use App\Models\PresensiPegawai;
-use App\Models\PresensiSiswa;
 use App\Models\Siswa;
-use App\Services\PresensiService;
-use App\Services\WhatsappService;
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
+use App\Models\PresensiSiswa;
+use App\Models\JadwalPresensi;
+use App\Models\PresensiPegawai;
+use App\Services\PresensiService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PresensiController extends Controller
 {
-    public function __construct(protected WhatsappService $whatsapp) {}
-
-    protected function getNamaInstansi(Pegawai|Siswa $user): string
-    {
-        return collect([$user->jabatan?->instansi?->nama])
-            ->filter()
-            ->unique()
-            ->implode(', ') ?: 'Instansi';
-    }
-
-    protected function sendNotifikasiWa(?string $nomor, string $jenis, string $status, string $waktu, string $nama, bool $isSiswa, string $instansi): void
-    {
-        if (! $nomor) {
-            return;
-        }
-        $ikon = $jenis === 'Presensi Masuk' ? '📥' : '📤';
-        $tanggal = now()->translatedFormat('d F Y');
-        $penutup = $isSiswa
-            ? ($jenis === 'Presensi Masuk' ? 'Semangat belajar! 📚' : 'Sampai jumpa besok 👋')
-            : ($jenis === 'Presensi Masuk' ? 'Selamat bekerja! 💼' : 'Terima kasih atas kinerjanya 🙌');
-        $pesan = <<<TEXT
-        *Presensi Online (POL)*
-    
-        *{$ikon} {$jenis}*
-        Nama    : {$nama}
-        Status  : *{$status}*
-        Tanggal : {$tanggal}
-        Waktu   : {$waktu} WIB
-    
-        {$penutup}
-        *{$instansi}*
-
-        _*Informasi lebih lanjut dapat diakses melalui link berikut :*_
-        https://drive.mtsn1pandeglang.sch.id/
-        TEXT;
-        try {
-            $this->whatsapp->send($nomor, $pesan);
-        } catch (\Exception $e) {
-            Log::error('Failed to send WhatsApp notification', [
-                'nomor' => $nomor,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
     public function getJadwalHariIni()
     {
         $now = now();
