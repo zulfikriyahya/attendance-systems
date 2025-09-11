@@ -18,7 +18,6 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            // Indexes untuk performance
             $table->index(['user_id', 'status']);
             $table->index('nomorPengajuanKartu');
         });
