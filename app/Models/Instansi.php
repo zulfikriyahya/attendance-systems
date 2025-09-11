@@ -11,6 +11,13 @@ class Instansi extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            'nipPimpinan' => 'encrypted',
+        ];
+    }
+
     public function jabatan()
     {
         return $this->hasMany(Jabatan::class);
