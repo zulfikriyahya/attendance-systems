@@ -55,9 +55,18 @@ class PengajuanKartuResource extends Resource
         ->schema([
             Select::make('user_id')
                 ->label('Pengguna')
-                ->relationship('user', 'name')
+                ->options(function ($get) {
+                    $currentUserId = $get('user_id');
+
+                    return User::where('status', true)
+                        ->where('username', '!=', 'administrator')
+                        ->whereDoesntHave('roles', function ($q) {
+                            $q->whereIn('name', ['administrator']);
+                        })
+                        ->pluck('name', 'id');
+                })
                 ->required()
-                ->searchable(PengajuanKartu::all()->count() > 10)
+                ->searchable()
                 ->preload()
                 ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
                 ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
@@ -390,9 +399,6 @@ class PengajuanKartuResource extends Resource
         return "PK-{$today}-{$userIdPadded}-{$sequencePadded}";
     }
 
-    /**
-     * Send notification to admins
-     */
     private static function sendNotificationToAdmins(PengajuanKartu $pengajuanKartu, string $alasan): void
     {
         $adminUsers = User::whereHas('roles', function ($query) {
