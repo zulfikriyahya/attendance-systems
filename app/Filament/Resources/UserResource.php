@@ -213,8 +213,7 @@ class UserResource extends Resource
             ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([
-                TrashedFilter::make()
-                    ->visible(Auth::user()->hasRole('super_admin') && User::all()->count() > 10),
+                TrashedFilter::make(),
             ])
             ->actions([
                 ActionGroup::make([

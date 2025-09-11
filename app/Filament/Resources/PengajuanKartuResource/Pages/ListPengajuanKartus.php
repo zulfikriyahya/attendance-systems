@@ -16,7 +16,7 @@ class ListPengajuanKartus extends ListRecords
     {
         return [
             CreateAction::make()
-                ->label('Tambah Pengajuan')
+                ->label('Buat Pengajuan')
                 ->outlined()
                 ->icon('heroicon-o-plus-circle')
                 ->color(Color::Emerald),

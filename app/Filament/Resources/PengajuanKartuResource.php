@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Closure;
 use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
 use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\HtmlString;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -21,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Forms\Components\DateTimePicker;
@@ -49,46 +52,63 @@ class PengajuanKartuResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
-                    ->required()
-                    ->searchable(PengajuanKartu::all()->count() > 10)
-                    ->preload()
-                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
-                    ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id()),
+        ->schema([
+            Select::make('user_id')
+                ->label('Pengguna')
+                ->relationship('user', 'name')
+                ->required()
+                ->searchable(PengajuanKartu::all()->count() > 10)
+                ->preload()
+                ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
+                ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
+                ->rules([
+                    'required',
+                    function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            if ($value) {
+                                $existingPengajuan = PengajuanKartu::where('user_id', $value)
+                                    ->whereIn('status', ['Pending', 'Proses'])
+                                    ->exists();
 
-                TextInput::make('nomorPengajuanKartu')
-                    ->label('Nomor Pengajuan')
-                    // ->disabled()
-                    ->dehydrated(false),
+                                if ($existingPengajuan) {
+                                    $fail('Pengguna ini masih memiliki pengajuan kartu yang sedang diproses.');
+                                }
+                            }
+                        };
+                    }
+                ]),
 
-                DateTimePicker::make('tanggalPengajuanKartu')
-                    ->label('Tanggal Pengajuan')
-                    ->required()
-                    ->displayFormat('l, d F Y H:i')
-                    ->native(false)
-                    ->default(now())
-                    ->maxDate(now()),
+            // TextInput::make('nomorPengajuanKartu')
+            //     ->label('Nomor Pengajuan')
+            //     ->disabled()
+            //     ->dehydrated(false),
 
-                Textarea::make('alasanPengajuanKartu')
-                    ->label('Alasan Pengajuan')
-                    ->required()
-                    ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
-                    ->rows(3),
-
-                Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Pending' => 'Pending',
-                        'Proses' => 'Proses',
-                        'Selesai' => 'Selesai',
-                    ])
-                    ->default('Pending')
-                    ->required()
-                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
-            ]);
+            DateTimePicker::make('tanggalPengajuanKartu')
+                ->label('Tanggal Pengajuan')
+                ->required()
+                ->displayFormat('l, d F Y H:i')
+                ->native(false)
+                ->default(now())
+                ->maxDate(now()),
+                
+            Select::make('status')
+                ->label('Status')
+                ->options([
+                    'Pending' => 'Pending',
+                    'Proses' => 'Proses',
+                    'Selesai' => 'Selesai',
+                ])
+                ->default('Pending')
+                ->required()
+                ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+                
+            Textarea::make('alasanPengajuanKartu')
+                ->label('Alasan Pengajuan')
+                ->required()
+                ->columnSpanFull()
+                ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
+                ->rows(3),
+        ])->columns(3);
     }
 
     public static function table(Table $table): Table
@@ -347,9 +367,6 @@ class PengajuanKartuResource extends Resource
         return $query;
     }
 
-    /**
-     * Generate unique nomor pengajuan
-     */
     private static function generateNomorPengajuan(int $userId): string
     {
         $today = now()->format('Ymd');

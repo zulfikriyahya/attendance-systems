@@ -2,33 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\KelasResource\Pages\CreateKelas;
+use App\Models\Kelas;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\KelasResource\Pages\EditKelas;
 use App\Filament\Resources\KelasResource\Pages\ListKelas;
 use App\Filament\Resources\KelasResource\Pages\ViewKelas;
-use App\Models\Kelas;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\KelasResource\Pages\CreateKelas;
 
 class KelasResource extends Resource
 {
@@ -78,14 +78,14 @@ class KelasResource extends Resource
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('jurusan.instansi.nama')
                     ->label('Nama Instansi')
-                    ->searchable(),
+                    ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('nama')
                     ->label('Kelas')
                     ->badge()
-                    ->searchable(),
+                    ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('jurusan.nama')
                     ->label('Jurusan')
-                    ->searchable(),
+                    ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->wrap(),

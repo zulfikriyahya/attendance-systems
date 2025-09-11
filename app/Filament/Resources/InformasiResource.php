@@ -32,7 +32,17 @@ class InformasiResource extends Resource
 {
     protected static ?string $model = Informasi::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static bool $shouldRegisterNavigation = true;
+
+    protected static ?string $navigationGroup = 'Data Master';
+
+    protected static ?string $navigationLabel = 'Informasi';
+
+    protected static ?int $navigationSort = 8;
+
+    protected static ?string $slug = 'informasi';
+
+    protected static ?string $navigationIcon = 'heroicon-o-information-circle';
 
     public static function form(Form $form): Form
     {
@@ -44,7 +54,10 @@ class InformasiResource extends Resource
                 DateTimePicker::make('tanggal')
                     ->label('Tanggal Informasi')
                     ->required()
-                    ->default(now()),
+                    ->displayFormat('l, d F Y H:i')
+                    ->native(false)
+                    ->default(now())
+                    ->maxDate(now()),
                 Select::make('status')
                     ->options([
                         'Draft' => 'Draft',
@@ -88,9 +101,6 @@ class InformasiResource extends Resource
             ->columns([
                 TextColumn::make('judul')
                     ->searchable(Informasi::all()->count() > 10),
-                TextColumn::make('tanggal')
-                    ->dateTime()
-                    ->sortable(),
                 TextColumn::make('isi')
                     ->label('Uraian')
                     ->limit(50)
@@ -102,6 +112,9 @@ class InformasiResource extends Resource
 
                         return $state;
                     }),
+                TextColumn::make('tanggal')
+                ->dateTime('l, d F Y')
+                ->sortable(),
                 TextColumn::make('status'),
                 TextColumn::make('lampiran'),
             ])
