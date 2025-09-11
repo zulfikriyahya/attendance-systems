@@ -15,8 +15,7 @@ class UserSeeder extends Seeder
         $filamentUserRole = Role::firstOrCreate(['name' => 'manajemen']);
         $filamentUserRole = Role::firstOrCreate(['name' => 'staf']);
         $filamentUserRole = Role::firstOrCreate(['name' => 'guru']);
-        $filamentUserRole = Role::firstOrCreate(['name' => 'siswa_unggulan']);
-        $filamentUserRole = Role::firstOrCreate(['name' => 'siswa_reguler']);
+        $filamentUserRole = Role::firstOrCreate(['name' => 'siswa']);
         $filamentUserRole = Role::firstOrCreate(['name' => 'wali_kelas']);
 
         $users = [
@@ -58,7 +57,7 @@ class UserSeeder extends Seeder
                 'email' => 'siswaunggulan@mtsn1pandeglang.sch.id',
                 'password' => 'P@ssw0rd',
                 'avatar' => 'avatar/siswaunggulan.png',
-                'role' => ['siswa_unggulan'],
+                'role' => ['siswa'],
             ],
             [
                 'name' => 'Siswa Reguler',
@@ -66,7 +65,7 @@ class UserSeeder extends Seeder
                 'email' => 'siswareguler@mtsn1pandeglang.sch.id',
                 'password' => 'P@ssw0rd',
                 'avatar' => 'avatar/siswareguler.png',
-                'role' => ['siswa_reguler'],
+                'role' => ['siswa'],
             ],
         ];
 

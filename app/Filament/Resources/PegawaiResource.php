@@ -235,7 +235,8 @@ class PegawaiResource extends Resource
             ->paginationPageOptions([5, 10, 25])
             ->filters([
                 TrashedFilter::make()
-                    ->visible(Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                    ->visible(Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0)
+                    ->native(false),
             ])
             ->actions([
                 ActionGroup::make([
@@ -246,7 +247,7 @@ class PegawaiResource extends Resource
                     ForceDeleteAction::make(),
                 ]),
                 Action::make('download')
-                    ->label('Unduh')
+                    ->label('Kartu')
                     ->button()
                     ->outlined()
                     ->icon('heroicon-o-arrow-down-tray')
