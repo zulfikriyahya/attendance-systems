@@ -56,14 +56,19 @@ class PengajuanKartuResource extends Resource
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('super_admin')) {
-            return null; // hanya admin yang bisa lihat badge
+            return 'Fitur Baru';
         }
         return static::getModel()::where('status', 'Pending')->count();
     }
     
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        $user = Auth::user();
+
+        if (! $user || ! $user->hasRole('super_admin')) {
+        return 'success';
+        }
+        return 'primary';
     }
 
     public static function form(Form $form): Form
