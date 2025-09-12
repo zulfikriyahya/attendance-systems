@@ -23,12 +23,15 @@ class ListPegawais extends ListRecords
     }
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make()
-                ->label('Tambah Pegawai')
-                ->outlined()
-                ->icon('heroicon-o-plus-circle')
-                ->color(Color::Emerald),
-        ];
+        if (Auth::user()->hasRole('super_admin')) {
+            return [
+                CreateAction::make()
+                    ->label('Tambah Pegawai')
+                    ->outlined()
+                    ->icon('heroicon-o-plus-circle')
+                    ->color(Color::Emerald),
+            ];
+        }
+        return [];
     }
 }

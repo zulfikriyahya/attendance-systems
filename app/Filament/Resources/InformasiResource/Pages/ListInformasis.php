@@ -24,12 +24,15 @@ class ListInformasis extends ListRecords
     }
     protected function getHeaderActions(): array
     {
-        return [
+        if (Auth::user()->hasRole('super_admin')) {
+            return [
             CreateAction::make()
                 ->label('Tambah Informasi')
                 ->outlined()
                 ->icon('heroicon-o-plus-circle')
                 ->color(Color::Emerald),
         ];
+    }
+    return [];
     }
 }

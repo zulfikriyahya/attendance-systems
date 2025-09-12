@@ -7,6 +7,7 @@ use App\Enums\StatusPresensi;
 use App\Models\PresensiPegawai;
 use Filament\Actions\CreateAction;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
@@ -108,12 +109,15 @@ class ListPresensiPegawais extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make()
-                ->label('Tambah Presensi')
-                ->outlined()
-                ->icon('heroicon-o-plus-circle')
-                ->color(Color::Emerald),
-        ];
+        if (Auth::user()->hasRole('super_admin')) {
+            return [
+                CreateAction::make()
+                    ->label('Tambah Presensi')
+                    ->outlined()
+                    ->icon('heroicon-o-plus-circle')
+                    ->color(Color::Emerald),
+            ];
+        }
+        return [];
     }
 }
