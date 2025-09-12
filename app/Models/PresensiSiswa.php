@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PresensiSiswa extends Model
 {
@@ -38,5 +38,10 @@ class PresensiSiswa extends Model
     public function siswa(): BelongsTo
     {
         return $this->belongsTo(Siswa::class);
+    }
+
+    public function getSiswaUserNameAttribute(): ?string
+    {
+        return $this->siswa?->user?->name;
     }
 }

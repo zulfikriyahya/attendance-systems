@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Filament\Resources\PengajuanKartuResource\Widgets;
+
+use App\Models\PengajuanKartu;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+
+class StatsOverview extends BaseWidget
+{
+    protected static bool $isLazy = false;
+
+    protected function getStats(): array
+    {
+        return [
+            Stat::make('Status Pending', PengajuanKartu::where('status', 'Pending')->count())
+                ->chartColor(Color::Orange)
+                ->chart([7, 2, 10, 3, 15, 4, 10]),
+            Stat::make('Status Proses', PengajuanKartu::where('status', 'Proses')->count())
+                ->chartColor(Color::Violet)
+                ->chart([10, 2, 7, 3, 15, 4, 17]),
+            Stat::make('Status Selesai', PengajuanKartu::where('status', 'Selesai')->count())
+                ->chartColor(Color::Green)
+                ->chart([7, 2, 10, 3, 15, 4, 10]),
+        ];
+    }
+}

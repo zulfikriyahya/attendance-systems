@@ -43,6 +43,8 @@ class TahunPelajaranResource extends Resource
     protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Tahun Pelajaran';
+    
+    protected static ?string $recordTitleAttribute = 'nama';
 
     protected static ?int $navigationSort = 3;
 

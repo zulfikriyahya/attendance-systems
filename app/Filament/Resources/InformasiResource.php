@@ -38,6 +38,8 @@ class InformasiResource extends Resource
 
     protected static ?string $navigationLabel = 'Informasi';
 
+    protected static ?string $recordTitleAttribute = 'judul';
+
     protected static ?int $navigationSort = 8;
 
     protected static ?string $slug = 'informasi';

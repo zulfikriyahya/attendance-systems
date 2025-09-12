@@ -27,6 +27,11 @@ class Siswa extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getUserNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
     public function jabatan(): BelongsTo
     {
         return $this->belongsTo(Jabatan::class);

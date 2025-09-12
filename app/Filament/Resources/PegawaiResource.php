@@ -56,6 +56,8 @@ class PegawaiResource extends Resource
 
     protected static ?string $navigationLabel = 'Pegawai';
 
+    protected static ?string $recordTitleAttribute = 'user_name';
+    
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'pegawai';

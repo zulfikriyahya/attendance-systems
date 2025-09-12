@@ -24,6 +24,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Models\KelasSiswaTahunPelajaran;
 use Filament\Forms\Components\TextInput;
@@ -60,6 +61,8 @@ class SiswaResource extends Resource
     protected static ?string $navigationGroup = 'Data Siswa';
 
     protected static ?string $navigationLabel = 'Siswa';
+
+    protected static ?string $recordTitleAttribute = 'user_name';
 
     protected static ?int $navigationSort = 1;
 

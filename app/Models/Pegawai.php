@@ -26,6 +26,11 @@ class Pegawai extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getUserNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
     public function presensiPegawai(): HasMany
     {
         return $this->hasMany(PresensiPegawai::class);

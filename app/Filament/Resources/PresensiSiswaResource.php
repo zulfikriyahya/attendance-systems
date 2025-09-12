@@ -61,6 +61,8 @@ class PresensiSiswaResource extends Resource
 
     protected static ?string $navigationLabel = 'Riwayat Presensi Siswa';
 
+    protected static ?string $recordTitleAttribute = 'siswa_user_name';
+
     protected static ?int $navigationSort = 3;
 
     protected static ?string $slug = 'riwayat-siswa';

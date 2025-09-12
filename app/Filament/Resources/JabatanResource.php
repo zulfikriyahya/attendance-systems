@@ -41,6 +41,8 @@ class JabatanResource extends Resource
 
     protected static ?string $navigationLabel = 'Jabatan';
 
+    protected static ?string $recordTitleAttribute = 'nama';
+
     protected static ?int $navigationSort = 6;
 
     protected static ?string $slug = 'jabatan';

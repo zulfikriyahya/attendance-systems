@@ -59,6 +59,8 @@ class PresensiPegawaiResource extends Resource
 
     protected static ?string $navigationLabel = 'Riwayat Presensi Pegawai';
 
+    protected static ?string $recordTitleAttribute = 'pegawai_user_name';
+
     protected static ?int $navigationSort = 3;
 
     protected static ?string $slug = 'riwayat-pegawai';

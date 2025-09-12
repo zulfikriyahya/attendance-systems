@@ -2,13 +2,13 @@
 
 namespace App\Filament\Widgets;
 
+use Flowframe\Trend\Trend;
 use App\Enums\StatusPresensi;
+use Illuminate\Support\Carbon;
+use Flowframe\Trend\TrendValue;
+use Filament\Widgets\ChartWidget;
 use App\Models\PresensiPegawai as PresensiPegawaiModel;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
-use Filament\Widgets\ChartWidget;
-use Flowframe\Trend\Trend;
-use Flowframe\Trend\TrendValue;
-use Illuminate\Support\Carbon;
 
 class PresensiMasukPegawaiChart extends ChartWidget
 {
@@ -74,6 +74,6 @@ class PresensiMasukPegawaiChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line'; // atau 'line'
+        return 'bar'; // atau 'line'
     }
 }

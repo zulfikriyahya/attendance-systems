@@ -2,22 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RoleResource\Pages;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
-use BezhanSalleh\FilamentShield\Support\Utils;
-use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rules\Unique;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Pages\SubNavigationPosition;
+use Filament\Tables\Enums\ActionsPosition;
+use Illuminate\Contracts\Support\Arrayable;
+use App\Filament\Resources\RoleResource\Pages;
+use BezhanSalleh\FilamentShield\Support\Utils;
+use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
 
 class RoleResource extends Resource implements HasShieldPermissions
 {
@@ -93,14 +95,14 @@ class RoleResource extends Resource implements HasShieldPermissions
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->weight('font-medium')
+                    // ->weight('font-medium')
                     ->label(__('filament-shield::filament-shield.column.name'))
                     ->formatStateUsing(fn ($state): string => Str::headline($state)),
                 // ->searchable(),
                 Tables\Columns\TextColumn::make('guard_name')
                     ->badge()
-                    ->color('warning')
-                    ->label(__('filament-shield::filament-shield.column.guard_name')),
+                    ->color('primary')
+                    ->label('Penjaga'),
                 Tables\Columns\TextColumn::make('team.name')
                     ->default('Global')
                     ->badge()
@@ -114,19 +116,22 @@ class RoleResource extends Resource implements HasShieldPermissions
                     ->counts('permissions')
                     ->colors(['success']),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('filament-shield::filament-shield.column.updated_at'))
-                    ->dateTime(),
+                    ->label('Diubah')
+                    ->dateTime('l, d F Y H:i')
+                    ->sinceTooltip(),
             ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                // Tables\Actions\DeleteAction::make(),
-            ])
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    ]),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                // Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -141,8 +146,8 @@ class RoleResource extends Resource implements HasShieldPermissions
     {
         return [
             'index' => Pages\ListRoles::route('/'),
-            // 'create' => Pages\CreateRole::route('/create'),
-            // 'view' => Pages\ViewRole::route('/{record}'),
+            'create' => Pages\CreateRole::route('/create'),
+            'view' => Pages\ViewRole::route('/{record}'),
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
     }
@@ -172,17 +177,20 @@ class RoleResource extends Resource implements HasShieldPermissions
         return Utils::isResourceNavigationRegistered();
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return Utils::isResourceNavigationGroupEnabled()
-            ? __('filament-shield::filament-shield.nav.group')
-            : '';
-    }
+    // public static function getNavigationGroup(): ?string
+    // {
+    //     return Utils::isResourceNavigationGroupEnabled()
+    //         ? __('filament-shield::filament-shield.nav.group')
+    //         : '';
+    // }
 
-    public static function getNavigationLabel(): string
-    {
-        return __('filament-shield::filament-shield.nav.role.label');
-    }
+    // public static function getNavigationLabel(): string
+    // {
+    //     return __('filament-shield::filament-shield.nav.role.label');
+    // }
+    protected static ?string $navigationGroup = 'Data Master';
+
+    protected static ?string $navigationLabel = 'Peran';
 
     public static function getNavigationIcon(): string
     {

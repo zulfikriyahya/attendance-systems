@@ -55,12 +55,29 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Pengguna';
+    
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'user';
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';
+
+    public static function getNavigationBadge(): ?string
+    {
+        $user = Auth::user();
+
+        if (! $user || ! $user->hasRole('super_admin')) {
+            return null; // hanya admin yang bisa lihat badge
+        }
+        return static::getModel()::where('status', true)->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
 
     public static function form(Form $form): Form
     {

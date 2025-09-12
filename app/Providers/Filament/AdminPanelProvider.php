@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->topNavigation()
             ->login(LoginCustom::class)
-            ->passwordReset()
+            // ->passwordReset()
             ->profile(EditProfileCustom::class)
             ->globalSearch(false)
             ->maxContentWidth(MaxWidth::Full)
@@ -59,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Manajemen Pengguna')
                     ->url(fn(): string => UserResource::getUrl())
                     ->icon('heroicon-o-identification')
-                    ->visible(fn(): bool => Auth::user()->username === 'administrator'),
+                    ->visible(fn(): bool => Auth::user()->hasRole('super_admin')),
             ])
             ->font('Ubuntu')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

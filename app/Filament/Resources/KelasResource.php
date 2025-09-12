@@ -40,6 +40,8 @@ class KelasResource extends Resource
 
     protected static ?string $navigationLabel = 'Kelas';
 
+    protected static ?string $recordTitleAttribute = 'nama';
+
     protected static ?int $navigationSort = 5;
 
     protected static ?string $slug = 'kelas';

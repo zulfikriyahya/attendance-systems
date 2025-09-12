@@ -40,6 +40,8 @@ class JurusanResource extends Resource
 
     protected static ?string $navigationLabel = 'Jurusan';
 
+    protected static ?string $recordTitleAttribute = 'nama';
+
     protected static ?int $navigationSort = 4;
 
     protected static ?string $slug = 'jurusan';

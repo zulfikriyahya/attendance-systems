@@ -43,6 +43,8 @@ class PengajuanKartuResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengajuan Kartu';
 
+    protected static ?string $recordTitleAttribute = 'nomorPengajuanKartu';
+    
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'pengajuan-kartu';

@@ -41,6 +41,8 @@ class InstansiResource extends Resource
 
     protected static ?string $navigationLabel = 'Instansi';
 
+    protected static ?string $recordTitleAttribute = 'nama';
+
     protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'instansi';
