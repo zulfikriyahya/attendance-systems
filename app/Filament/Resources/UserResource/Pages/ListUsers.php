@@ -4,13 +4,23 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use Filament\Actions;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\UserResource\Widgets\StatsOverview;
 
 class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
-
+    protected function getHeaderWidgets(): array
+    {
+        if (Auth::user()->hasRole('super_admin')) {
+            return [
+                StatsOverview::class,
+            ];
+        }
+        return [];
+    }
     protected function getHeaderActions(): array
     {
         return [
