@@ -18,7 +18,7 @@ class Siswa extends Model
     {
         return [
             'status' => 'boolean',
-            'nisn' => 'encrypted',
+            // 'nisn' => 'encrypted',
         ];
     }
 

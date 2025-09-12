@@ -14,7 +14,7 @@ class Instansi extends Model
     protected function casts(): array
     {
         return [
-            'nipPimpinan' => 'encrypted',
+            // 'nipPimpinan' => 'encrypted',
         ];
     }
 

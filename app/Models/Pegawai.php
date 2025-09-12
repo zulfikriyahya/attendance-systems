@@ -17,7 +17,7 @@ class Pegawai extends Model
     {
         return [
             'status' => 'boolean',
-            'nip' => 'encrypted',
+            // 'nip' => 'encrypted',
         ];
     }
 

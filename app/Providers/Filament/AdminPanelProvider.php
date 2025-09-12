@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->id('admin')
-            ->path('presensi')
+            ->path('admin')
             ->default()
             ->spa()
             ->breadcrumbs(false)

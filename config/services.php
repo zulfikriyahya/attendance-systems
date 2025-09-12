@@ -23,6 +23,9 @@ return [
         ],
     ],
 
+    // 'whatsapp' => [
+    //     'endpoint' => env('WHATSAPP_API_URL'),
+    // ],
     'whatsapp' => [
         'endpoints' => [
             'api1' => env('WHATSAPP_API_URL_1'),
