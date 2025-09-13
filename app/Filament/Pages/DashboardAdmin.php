@@ -30,15 +30,12 @@ class DashboardAdmin extends BaseDashboard
             return '';
         }
 
-        // Pisah berdasarkan koma, simpan sisanya apa adanya
         $parts = array_map('trim', explode(',', $name));
 
-        // Jika ada setidaknya satu bagian, ubah bagian pertama jadi Title Case
         if (count($parts) > 0 && $parts[0] !== '') {
             $parts[0] = mb_convert_case(mb_strtolower($parts[0]), MB_CASE_TITLE, 'UTF-8');
         }
 
-        // Gabungkan kembali dengan koma + spasi
         return implode(', ', $parts);
     }
 
