@@ -13,6 +13,7 @@ use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
 use App\Models\PresensiSiswa;
+use GuzzleHttp\Promise\Create;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
@@ -50,6 +51,7 @@ use Filament\Notifications\Actions\Action as NotificationAction;
 use App\Filament\Resources\PresensiSiswaResource\Pages\EditPresensiSiswa;
 use App\Filament\Resources\PresensiSiswaResource\Pages\ViewPresensiSiswa;
 use App\Filament\Resources\PresensiSiswaResource\Pages\ListPresensiSiswas;
+use App\Filament\Resources\PresensiSiswaResource\Pages\CreatePresensiSiswa;
 
 class PresensiSiswaResource extends Resource
 {
@@ -1481,6 +1483,7 @@ class PresensiSiswaResource extends Resource
         return [
             'index' => ListPresensiSiswas::route('/'),
             // 'view' => ViewPresensiSiswa::route('/{record}'),
+            'create' => CreatePresensiSiswa::route('/create'),
             'edit' => EditPresensiSiswa::route('/{record}/edit'),
         ];
     }

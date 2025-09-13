@@ -12,7 +12,8 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PresensiPegawaiResource;
-use App\Filament\Resources\PresensiPegawaiResource\Widgets\PresensiPegawaiStats;
+use App\Filament\Resources\PresensiPegawaiResource\Widgets\AllStatsOverview;
+use App\Filament\Resources\PresensiPegawaiResource\Widgets\BulanStatsOverview;
 
 class ListPresensiPegawais extends ListRecords
 {
@@ -32,7 +33,8 @@ class ListPresensiPegawais extends ListRecords
             ->groupBy('statusPulang')
             ->pluck('jumlah', 'statusPulang');
 
-        return [
+        if (Auth::user()->hasRole('super_admin')) {
+            return [
             // Status Presensi
             'tahun' => Tab::make('Semua')
                 ->modifyQueryUsing(
@@ -104,9 +106,20 @@ class ListPresensiPegawais extends ListRecords
                 ->badge($countPulang[StatusPulang::Mangkir->value] ?? 0)
                 ->badgeColor('danger')
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('statusPulang', StatusPulang::Mangkir->value)->whereDate('tanggal', today())),
-        ];
+            ];
+        }
+        return [];
     }
-
+    protected function getHeaderWidgets(): array
+    {
+        if (! Auth::user()->hasRole('super_admin')) {
+            return [
+                AllStatsOverview::class,
+                BulanStatsOverview::class,
+            ];
+        }
+        return [];
+    }
     protected function getHeaderActions(): array
     {
         if (Auth::user()->hasRole('super_admin')) {

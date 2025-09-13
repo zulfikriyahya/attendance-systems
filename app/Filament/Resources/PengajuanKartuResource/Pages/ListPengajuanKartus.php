@@ -24,7 +24,7 @@ class ListPengajuanKartus extends ListRecords
     }
     protected function getHeaderActions(): array
     {
-        if (Auth::user()->hasRole('super_admin')) {
+        if (!Auth::user()->hasRole('super_admin')) {
             return [
                 CreateAction::make()
                     ->label('Buat Pengajuan')

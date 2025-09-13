@@ -14,12 +14,7 @@ class PresensiPulangPegawaiChart extends ChartWidget
 {
     use HasWidgetShield;
 
-    protected function getExtraAttributes(): array
-    {
-        return [
-            'style' => 'max-height: 75%;', // atau sesuaikan tinggi sesuai kebutuhan
-        ];
-    }
+    protected static ?string $maxHeight = '250px';
 
     protected static ?string $heading = 'Statistik Presensi Pulang Pegawai';
 
@@ -28,9 +23,9 @@ class PresensiPulangPegawaiChart extends ChartWidget
         $labels = [];
         $datasets = [];
         $colorMap = [
-            'Pulang' => '#22c55e',  // green-500
-            'PulangCepat' => '#f97316',  // orange-500
-            'Mangkir' => '#ef4444',  // red-500
+            'Pulang' => '#22c55e',     // green-500
+            'PulangCepat' => '#f97316', // orange-500
+            'Mangkir' => '#ef4444',    // red-500
         ];
 
         foreach (StatusPulang::cases() as $status) {
@@ -45,19 +40,19 @@ class PresensiPulangPegawaiChart extends ChartWidget
                 ->perMonth()
                 ->count();
 
-            // Ambil label sekali
+            // Ambil label sekali saja
             if (empty($labels)) {
                 $labels = $data->map(
-                    fn (TrendValue $value) => Carbon::parse($value->date)->translatedFormat('F Y')
+                    fn(TrendValue $value) => Carbon::parse($value->date)->translatedFormat('F Y')
                 )->toArray();
             }
 
             $datasets[] = [
                 'label' => $status->name,
-                'data' => $data->map(fn (TrendValue $value) => $value->aggregate)->toArray(),
-                'backgroundColor' => $colorMap[$status->name] ?? '#9ca3af', // default abu-abu
-                'borderColor' => '#cce6e6',
-                'borderWidth' => 1,
+                'data' => $data->map(fn(TrendValue $value) => $value->aggregate)->toArray(),
+                'borderColor' => $colorMap[$status->name] ?? '#9ca3af',
+                'fill' => false, // jangan diisi background
+                'tension' => 0.3, // biar garis smooth
             ];
         }
 
@@ -69,6 +64,6 @@ class PresensiPulangPegawaiChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar'; // atau 'line'
+        return 'line';
     }
 }
