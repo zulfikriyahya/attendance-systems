@@ -2,12 +2,12 @@
 
 namespace App\Filament\Pages\Auth;
 
-use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
+use Filament\Pages\Auth\Login;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Pages\Auth\Login;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Validation\ValidationException;
+use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
 
 class LoginCustom extends Login
 {
@@ -91,7 +91,7 @@ class LoginCustom extends Login
     protected function getLoginFormComponent(): Component
     {
         return TextInput::make('login')
-            ->label(__('NIK/NIP/NISN'))
+            ->label(__('Username/Email'))
             ->required()
             ->suffixIcon('heroicon-o-lock-closed')
             ->autocomplete()

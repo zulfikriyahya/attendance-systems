@@ -2,18 +2,19 @@
 
 namespace App\Filament\Pages\Auth;
 
-use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Pages\Auth\EditProfile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Intervention\Image\ImageManager;
+use Filament\Forms\Components\Textarea;
 use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\Component;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Validation\Rules\Password;
 use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
+use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
 
 class EditProfileCustom extends EditProfile
 {
@@ -29,8 +30,8 @@ class EditProfileCustom extends EditProfile
                         $this->getNameFormComponent(),
                         $this->getUsernameFormComponent(),
                         $this->getEmailFormComponent(),
-                        $this->getTelephoneFormComponent(), // Tambahan field nomor telepon
-                        $this->getAlamatFormComponent(), // Tambahan field alamat
+                        $this->getTelephoneFormComponent(),
+                        $this->getAlamatFormComponent(),
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),
                     ])
@@ -46,7 +47,6 @@ class EditProfileCustom extends EditProfile
     {
         $user = $this->getUser();
 
-        // Ambil data telepon dan alamat dari relasi pegawai atau siswa
         if ($user->pegawai) {
             $data['telepon'] = $user->pegawai->telepon ?? '';
             $data['alamat'] = $user->pegawai->alamat ?? '';
@@ -54,7 +54,6 @@ class EditProfileCustom extends EditProfile
             $data['telepon'] = $user->siswa->telepon ?? '';
             $data['alamat'] = $user->siswa->alamat ?? '';
         }
-
         return $data;
     }
 
@@ -129,7 +128,7 @@ class EditProfileCustom extends EditProfile
             ->maxLength(100)
             ->autofocus()
             ->dehydrateStateUsing(function ($state) {
-                // Pisahkan berdasarkan koma
+                // Pisahkan berdasarkan koma (untuk penulisan gelar akademik)
                 $parts = explode(',', $state, 2);
 
                 // Kapital penuh sebelum koma
@@ -145,16 +144,20 @@ class EditProfileCustom extends EditProfile
     protected function getUsernameFormComponent(): Component
     {
         return TextInput::make('username')
-            ->label(__('NISN/NIP'))
+            ->label(__('Username/NISN/NIP'))
             ->suffixIcon('heroicon-o-identification')
-            // ->disabled();
+            ->disabled(Auth::user()->hasRole('super_admin'))
             ->required()
+            ->minLength(6)
+            ->maxLength(18)
             ->unique(ignoreRecord: true)
             ->rule(fn ($record) => $record === null ? 'unique:users,username' : 'unique:users,username,'.$record->id)
             ->dehydrateStateUsing(fn ($state) => $state ? $state : null)
             ->validationMessages([
                 'unique' => 'Username tersebut sudah pernah di isi.',
                 'required' => 'Form ini wajib diisi.',
+                'min' => 'Masukkan minimal 6 Karakter.',
+                'max' => 'Masukkan maksimal 18 Karakter.',
             ]);
     }
 
