@@ -30,6 +30,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Filament\Resources\UserResource\Widgets\StatsOverview as UserStats;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -68,12 +69,13 @@ class AdminPanelProvider extends PanelProvider
                 DashboardAdmin::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                PresensiMasukPegawaiChart::class,
-                PresensiPulangPegawaiChart::class,
-                PresensiMasukSiswaChart::class,
-                PresensiPulangSiswaChart::class,
-            ])
+            // ->widgets([
+            //     UserStats::class,
+            //     PresensiMasukPegawaiChart::class,
+            //     PresensiPulangPegawaiChart::class,
+            //     PresensiMasukSiswaChart::class,
+            //     PresensiPulangSiswaChart::class,
+            // ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
