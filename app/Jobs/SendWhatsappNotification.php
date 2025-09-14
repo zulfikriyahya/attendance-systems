@@ -2,12 +2,12 @@
 
 namespace App\Jobs;
 
-use App\Services\WhatsappService;
 use Illuminate\Bus\Queueable;
+use App\Services\WhatsappService;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class SendWhatsappNotification implements ShouldQueue
 {
@@ -51,21 +51,20 @@ class SendWhatsappNotification implements ShouldQueue
                 : 'Terima kasih atas dedikasi dan kinerja Anda hari ini.');
 
         $pesan = <<<TEXT
-        *Presensi Online (POL)*
-        _Dikembangkan dan dikelola oleh MTs Negeri 1 Pandeglang_
-
-        —————————————
-        *{$ikon}*
+        *PTSP MTSN 1 PANDEGLANG*
+        
+        ———————————————————
+        *Presensi {$ikon}*
+        ———————————————————
         Nama    : {$this->nama}
         Status  : *{$this->status}*
         Tanggal : {$tanggal}
         Waktu   : {$this->waktu} WIB
-        —————————————
+        ———————————————————
 
         {$penutup}
-        *{$this->instansi}*
         
-        _Sistem ini dikelola secara resmi oleh tim internal madrasah._
+        *© 2022 - 2025 {$this->instansi}*
         TEXT;
 
         $whatsapp->send($this->nomor, $pesan);

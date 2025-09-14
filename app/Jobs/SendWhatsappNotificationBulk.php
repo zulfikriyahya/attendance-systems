@@ -51,22 +51,20 @@ class SendWhatsappNotificationBulk implements ShouldQueue
                 : 'Status presensi ini tercatat secara otomatis karena tidak terdeteksi melakukan presensi pulang.');
 
         $pesan = <<<TEXT
-        *Presensi Online (POL)*
-        _Dikembangkan dan dikelola oleh MTs Negeri 1 Pandeglang_
-
-        —————————————
-        *{$ikon}*
+        *PTSP MTSN 1 PANDEGLANG*
+        
+        ———————————————————
+        *Presensi {$ikon}*
+        ———————————————————
         Nama    : {$this->nama}
         Status  : *{$this->status}*
         Tanggal : {$tanggal}
         Waktu   : {$this->waktu} WIB
-        —————————————
+        ———————————————————
 
         {$penutup}
-        _Jika ada kendala atau kesalahan teknis, silakan laporkan kepada kami. :)_
         
-        *{$this->instansi}*
-        _Sistem ini dikelola secara resmi oleh tim internal madrasah._
+        *© 2022 - 2025 {$this->instansi}*
         TEXT;
 
         $whatsapp->send($this->nomor, $pesan);
