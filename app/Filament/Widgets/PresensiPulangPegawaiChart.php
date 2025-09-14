@@ -14,7 +14,7 @@ class PresensiPulangPegawaiChart extends ChartWidget
 {
     use HasWidgetShield;
 
-    protected static ?string $maxHeight = '250px';
+    protected static ?string $maxHeight = '180px';
 
     protected static ?string $heading = 'Statistik Presensi Pulang Pegawai';
 

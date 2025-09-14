@@ -11,6 +11,9 @@ use App\Filament\Widgets\PresensiPulangSiswaChart;
 use App\Filament\Widgets\PresensiMasukPegawaiChart;
 use App\Filament\Widgets\PresensiPulangPegawaiChart;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use App\Filament\Resources\InformasiResource\Widgets\InformasiList;
+use App\Filament\Resources\PresensiSiswaResource\Widgets\FirstRecordSiswa;
+use App\Filament\Resources\PresensiPegawaiResource\Widgets\FirstRecordPegawai;
 use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview as KartuStats;
 
 class DashboardAdmin extends BaseDashboard
@@ -66,14 +69,34 @@ class DashboardAdmin extends BaseDashboard
             PresensiPulangPegawaiChart::class,
             PresensiMasukSiswaChart::class,
             PresensiPulangSiswaChart::class,
+            FirstRecordPegawai::class,
+            FirstRecordSiswa::class,
+            InformasiList::class,
+
         ];
     }
 
     public function getHeaderWidgets(): array
     {
-        
         return [
             KartuStats::class,
+        ];
+    }
+    public function getFooterWidgets(): array
+    {
+        if (Auth::user()->hasRole('siswa') || Auth::user()->hasRole('siswa_unggulan') || Auth::user()->hasRole('siswa_reguler')) {
+            return [
+                FirstRecordSiswa::class,
+            ];
+        } elseif (Auth::user()->hasRole('guru') || Auth::user()->hasRole('staf') || Auth::user()->hasRole('manajemen') || Auth::user()->hasRole('wali_kelas')) {
+            return [
+                FirstRecordPegawai::class,
+            ];
+        }
+        return [
+            FirstRecordPegawai::class,
+            FirstRecordSiswa::class,
+            InformasiList::class,
         ];
     }
 }

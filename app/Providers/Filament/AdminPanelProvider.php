@@ -50,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->unsavedChangesAlerts()
             ->databaseNotifications()
+            ->darkMode(false)
             ->defaultThemeMode(ThemeMode::Light)
             ->favicon(asset('/favicon.ico'))
             ->darkModeBrandLogo(asset('/images/brand-darkmode.png'))
