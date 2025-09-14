@@ -19,6 +19,7 @@ class FirstRecordSiswa extends BaseWidget
                 PresensiSiswa::query()
                     ->with('siswa')
                     ->latest('tanggal')
+                    ->whereNotIn('statusPresensi', ['Izin', 'Alfa', 'Sakit', 'Dispen', 'Libur'])
                     ->limit(5)
             )
             ->columns([

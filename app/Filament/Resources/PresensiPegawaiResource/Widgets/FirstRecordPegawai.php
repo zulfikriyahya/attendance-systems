@@ -17,7 +17,8 @@ class FirstRecordPegawai extends BaseWidget
             ->query(
                 PresensiPegawai::query()
                     ->with('pegawai')
-                    ->latest('tanggal')
+                    ->latest('tanggal') 
+                    ->whereNotIn('statusPresensi', ['Izin', 'Alfa', 'Sakit', 'Dinas Luar', 'Libur'])
                     ->limit(5)
             )
             ->columns([
