@@ -348,12 +348,21 @@ class PengajuanKartuResource extends Resource
 
                         if ($phoneNumber) {
                             $whatsappService = new WhatsappService;
-                            $message = "🎉 *Kartu Siap Diambil di Ruang PTSP*\n\n" .
-                                "Halo {$userName},\n\n" .
-                                "Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.\n\n" .
-                                "📍 Silakan ambil di Ruang PTSP\n" .
-                                "💰 Biaya pembuatan kartu: Rp. 15.000\n\n" .
-                                'Terima kasih! 🙏';
+                            $message = <<<TEXT
+                            *PTSP MTSN 1 PANDEGLANG*
+                            
+                            ———————————————————
+                            🎉 *Kartu Siap Diambil di Ruang PTSP*
+                            ———————————————————
+                            Halo {$userName},
+                            Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.
+                            📍 Silakan ambil di Ruang PTSP
+                            💰 Biaya pembuatan kartu: Rp. 15.000
+                            Terima kasih! 🙏
+                            ———————————————————
+                            
+                            *© 2022 - 2025 MTs Negeri 1 Pandeglang*
+                            TEXT;
                             $whatsappService->send($phoneNumber, $message);
                         }
                     }),
