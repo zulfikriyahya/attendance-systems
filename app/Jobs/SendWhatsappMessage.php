@@ -1,9 +1,5 @@
 <?php
 
-// ====================================================
-// 1. SINGLE WHATSAPP JOB (Replace all 3 jobs)
-// ====================================================
-
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;

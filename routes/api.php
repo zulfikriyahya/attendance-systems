@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\PresensiController;
+use App\Services\WhatsappService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PresensiController;
 
 Route::middleware(['api.secret'])->prefix('presensi')->name('presensi.')->group(function () {
 
@@ -41,5 +42,8 @@ Route::middleware(['api.secret'])->prefix('presensi')->name('presensi.')->group(
     Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::get('/summary', [PresensiController::class, 'getDailySummary'])->name('admin.summary');
         Route::get('/export', [PresensiController::class, 'exportPresensi'])->name('admin.export');
+    });
+    Route::get('/whatsapp/health', function () {
+        return app(WhatsappService::class)->getHealthStatus();
     });
 });

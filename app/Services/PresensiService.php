@@ -1,9 +1,5 @@
 <?php
 
-// ====================================================
-// 4. UPDATED PRESENSI SERVICE (Use new job)
-// ====================================================
-
 namespace App\Services;
 
 use Carbon\Carbon;
@@ -14,10 +10,10 @@ use App\Enums\StatusPresensi;
 use App\Models\PresensiSiswa;
 use App\Models\JadwalPresensi;
 use App\Models\PresensiPegawai;
+use App\Jobs\SendWhatsappMessage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Services\WhatsappDelayService;
-use App\Jobs\SendWhatsappMessage; // New unified job
 
 class PresensiService
 {

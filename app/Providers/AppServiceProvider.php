@@ -3,12 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Http\Request;
-use Filament\Facades\Filament;
 use Illuminate\Support\Carbon;
+use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
+use App\Services\WhatsappDelayService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
-use Filament\Navigation\NavigationGroup;
 use Illuminate\Cache\RateLimiting\Limit;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\RateLimiter;
@@ -17,7 +17,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(WhatsappDelayService::class);
+        $this->app->singleton(WhatsappService::class, function ($app) {
+            return new WhatsappService();
+        });
     }
     public function boot(): void
     {
@@ -42,5 +45,13 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('bulk-sync', function (Request $request) {
             return Limit::perHour(20)->by($request->ip());
         });
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \App\Console\Commands\MonitorWhatsappQueue::class,
+                \App\Console\Commands\WhatsappMaintenance::class,
+                // Add other commands here
+            ]);
+        }
     }
 }

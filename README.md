@@ -162,3 +162,30 @@ Untuk informasi lebih lanjut, saran, atau kerja sama pengembangan sistem:
 [adm@mtsn1pandeglang.sch.id](mailto:adm@mtsn1pandeglang.sch.id)
 [https://mtsn1pandeglang.sch.id](https://mtsn1pandeglang.sch.id)
 Jl. Raya Labuan Km. 5.7 - Kaduhejo, Pandeglang, Banten
+
+---
+
+```bash
+# Monitor queue
+php artisan whatsapp:monitor
+
+# Clear cache
+php artisan whatsapp:monitor --clear-cache
+
+# Health check
+php artisan whatsapp:maintenance health-check
+
+# View statistics
+php artisan whatsapp:maintenance stats --hours=6
+
+# Clear failed jobs
+php artisan whatsapp:maintenance clear-failed --force
+
+# Retry failed jobs
+php artisan whatsapp:maintenance retry-failed --limit=50
+
+# Manage workers
+php artisan whatsapp:worker start --workers=5
+php artisan whatsapp:worker status
+php artisan whatsapp:worker restart
+```

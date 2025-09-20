@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 
 class WhatsappDelayService
 {
-    /**
+    /** 
      * Hitung delay untuk real-time notifications (presensi normal)
      */
     public function calculateRealtimeDelay(string $status): Carbon

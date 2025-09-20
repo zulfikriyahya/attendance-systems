@@ -11,6 +11,7 @@ use App\Models\PresensiSiswa;
 use Illuminate\Bus\Queueable;
 use App\Models\JadwalPresensi;
 use App\Models\PresensiPegawai;
+use App\Services\WhatsappDelayService;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,6 +20,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class ProcessKetidakhadiran implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected WhatsappDelayService $delayService;
+
+    public function __construct()
+    {
+        $this->delayService = app(WhatsappDelayService::class);
+    }
 
     public function handle(): void
     {
@@ -43,7 +51,6 @@ class ProcessKetidakhadiran implements ShouldQueue
 
         if (! $jadwal) {
             info('❌ Tidak ada jadwal presensi aktif hari ini.');
-
             return;
         }
 
@@ -64,6 +71,7 @@ class ProcessKetidakhadiran implements ShouldQueue
 
         $notifCounter = 0; // Counter untuk delay calculation
 
+        // Process Pegawai
         Pegawai::with('jabatan.instansi', 'user')
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
@@ -79,17 +87,21 @@ class ProcessKetidakhadiran implements ShouldQueue
                     $nama = $pegawai->user?->name ?? $pegawai->nama;
                     $instansi = $pegawai->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
 
-                    // Hitung delay untuk distribusi merata
-                    $delay = $this->calculateBulkDelay($notifCounter, 'alfa');
+                    // Use centralized delay service
+                    $delay = $this->delayService->calculateBulkDelay($notifCounter, 'alfa');
 
-                    SendWhatsappNotificationBulk::dispatch(
+                    // Use unified job with correct type
+                    SendWhatsappMessage::dispatch(
                         $pegawai->telepon,
-                        'Presensi Masuk',
-                        StatusPresensi::Alfa->value,
-                        '-',
-                        $nama,
-                        false,
-                        $instansi
+                        'presensi_bulk', // Use bulk type
+                        [
+                            'jenis' => 'Presensi Masuk',
+                            'status' => StatusPresensi::Alfa->value,
+                            'waktu' => '-',
+                            'nama' => $nama,
+                            'isSiswa' => false,
+                            'instansi' => $instansi,
+                        ]
                     )->delay($delay);
 
                     $notifCounter++;
@@ -97,6 +109,7 @@ class ProcessKetidakhadiran implements ShouldQueue
                 }
             });
 
+        // Process Siswa
         Siswa::with('jabatan.instansi', 'user')
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
@@ -112,17 +125,21 @@ class ProcessKetidakhadiran implements ShouldQueue
                     $nama = $siswa->user?->name ?? $siswa->nama;
                     $instansi = $siswa->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
 
-                    // Hitung delay untuk distribusi merata
-                    $delay = $this->calculateBulkDelay($notifCounter, 'alfa');
+                    // Use centralized delay service
+                    $delay = $this->delayService->calculateBulkDelay($notifCounter, 'alfa');
 
-                    SendWhatsappNotificationBulk::dispatch(
+                    // Use unified job with correct type
+                    SendWhatsappMessage::dispatch(
                         $siswa->telepon,
-                        'Presensi Masuk',
-                        StatusPresensi::Alfa->value,
-                        '-',
-                        $nama,
-                        true,
-                        $instansi
+                        'presensi_bulk', // Use bulk type
+                        [
+                            'jenis' => 'Presensi Masuk',
+                            'status' => StatusPresensi::Alfa->value,
+                            'waktu' => '-',
+                            'nama' => $nama,
+                            'isSiswa' => true,
+                            'instansi' => $instansi,
+                        ]
                     )->delay($delay);
 
                     $notifCounter++;
@@ -152,6 +169,7 @@ class ProcessKetidakhadiran implements ShouldQueue
 
         $notifCounter = 0; // Counter untuk delay calculation
 
+        // Process Pegawai Mangkir
         PresensiPegawai::with('pegawai.user', 'pegawai.jabatan.instansi')
             ->whereDate('tanggal', $tanggal)
             ->whereNull('jamPulang')
@@ -167,17 +185,21 @@ class ProcessKetidakhadiran implements ShouldQueue
                     $nama = $pegawai->user?->name ?? $pegawai->nama;
                     $instansi = $pegawai->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
 
-                    // Hitung delay untuk distribusi merata
-                    $delay = $this->calculateBulkDelay($notifCounter, 'mangkir');
+                    // Use centralized delay service
+                    $delay = $this->delayService->calculateBulkDelay($notifCounter, 'mangkir');
 
-                    SendWhatsappNotificationBulk::dispatch(
+                    // Use unified job
+                    SendWhatsappMessage::dispatch(
                         $pegawai->telepon,
-                        'Presensi Pulang',
-                        $statusPulang,
-                        '-',
-                        $nama,
-                        false,
-                        $instansi
+                        'presensi_bulk',
+                        [
+                            'jenis' => 'Presensi Pulang',
+                            'status' => $statusPulang,
+                            'waktu' => '-',
+                            'nama' => $nama,
+                            'isSiswa' => false,
+                            'instansi' => $instansi,
+                        ]
                     )->delay($delay);
 
                     $notifCounter++;
@@ -185,6 +207,7 @@ class ProcessKetidakhadiran implements ShouldQueue
                 }
             });
 
+        // Process Siswa Bolos
         PresensiSiswa::with('siswa.user', 'siswa.jabatan.instansi')
             ->whereDate('tanggal', $tanggal)
             ->whereNull('jamPulang')
@@ -200,17 +223,21 @@ class ProcessKetidakhadiran implements ShouldQueue
                     $nama = $siswa->user?->name ?? $siswa->nama;
                     $instansi = $siswa->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
 
-                    // Hitung delay untuk distribusi merata
-                    $delay = $this->calculateBulkDelay($notifCounter, 'bolos');
+                    // Use centralized delay service
+                    $delay = $this->delayService->calculateBulkDelay($notifCounter, 'bolos');
 
-                    SendWhatsappNotificationBulk::dispatch(
+                    // Use unified job
+                    SendWhatsappMessage::dispatch(
                         $siswa->telepon,
-                        'Presensi Pulang',
-                        $statusPulang,
-                        '-',
-                        $nama,
-                        true,
-                        $instansi
+                        'presensi_bulk',
+                        [
+                            'jenis' => 'Presensi Pulang',
+                            'status' => $statusPulang,
+                            'waktu' => '-',
+                            'nama' => $nama,
+                            'isSiswa' => true,
+                            'instansi' => $instansi,
+                        ]
                     )->delay($delay);
 
                     $notifCounter++;
@@ -218,47 +245,4 @@ class ProcessKetidakhadiran implements ShouldQueue
                 }
             });
     }
-
-    /**
-     * Hitung delay untuk bulk notification agar tidak burst
-     */
-    private function calculateBulkDelay(int $counter, string $type): Carbon
-    {
-        $now = now();
-
-        // Rate yang aman untuk bulk notification (lebih konservatif)
-        $messagesPerMinute = 20; // Lebih pelan karena ini bulk/mass notification
-
-        // Hitung delay berdasarkan counter
-        $minuteSlot = floor($counter / $messagesPerMinute);
-
-        // Base delay + slot delay
-        $baseDelaySeconds = rand(10, 30); // Delay dasar
-        $slotDelaySeconds = $minuteSlot * 60; // 1 menit per slot
-        $randomSpread = rand(0, 60); // Random spread lebih besar
-
-        // Priority untuk different types
-        switch ($type) {
-            case 'alfa':
-                // Alfa notification: delay normal
-                $priorityOffset = 0;
-                break;
-            case 'mangkir':
-            case 'bolos':
-                // Mangkir/Bolos: delay sedikit lebih lama (bukan urgent)
-                $priorityOffset = rand(60, 180); // 1-3 menit extra
-                break;
-            default:
-                $priorityOffset = 0;
-        }
-
-        $totalDelaySeconds = $baseDelaySeconds + $slotDelaySeconds + $randomSpread + $priorityOffset;
-
-        // Maksimal delay 2 jam untuk bulk notification
-        $maxDelaySeconds = 2 * 60 * 60; // 2 jam
-        $totalDelaySeconds = min($totalDelaySeconds, $maxDelaySeconds);
-
-        return $now->addSeconds($totalDelaySeconds);
-    }
-
 }
