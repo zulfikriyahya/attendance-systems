@@ -83,13 +83,11 @@ class PresensiPegawaiResource extends Resource
                 DateTimePicker::make('jamDatang')
                     ->displayFormat('H:i:s')
                     ->format('H:i:s')
-                    ->withoutDate()
-                    ->disabledOn('edit'),
+                    ->withoutDate(),
                 DateTimePicker::make('jamPulang')
                     ->displayFormat('H:i:s')
                     ->format('H:i:s')
-                    ->withoutDate()
-                    ->disabledOn('edit'),
+                    ->withoutDate(),
                 DatePicker::make('tanggal')
                     ->default(now())
                     ->disabledOn('edit'),

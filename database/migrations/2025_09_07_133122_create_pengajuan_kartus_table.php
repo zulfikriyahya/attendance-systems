@@ -15,9 +15,10 @@ return new class extends Migration
             $table->datetime('tanggalPengajuanKartu');
             $table->text('alasanPengajuanKartu');
             $table->enum('status', ['Pending', 'Proses', 'Selesai'])->default('Pending');
+            $table->integer('biaya')->nullable();
+            $table->boolean('statusAmbil')->default(false);
             $table->softDeletes();
             $table->timestamps();
-
             $table->index(['user_id', 'status']);
             $table->index('nomorPengajuanKartu');
         });

@@ -89,6 +89,7 @@ class PegawaiResource extends Resource
                     })
                     ->when(User::count() > 10, fn($field) => $field->searchable())
                     ->preload()
+                    ->disabledOn('edit')
                     ->required()
                     ->validationMessages([
                         'required' => 'Form ini wajib diisi.',
@@ -98,6 +99,7 @@ class PegawaiResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->numeric()
                     ->required()
+                    ->autofocus()
                     ->minLength(10)
                     ->maxLength(10)
                     ->validationMessages([
@@ -249,7 +251,7 @@ class PegawaiResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
+                    // ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                     RestoreAction::make(),

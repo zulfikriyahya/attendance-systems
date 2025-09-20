@@ -95,6 +95,7 @@ class SiswaResource extends Resource
                     })
                     ->when(User::count() > 10, fn ($field) => $field->searchable())
                     ->preload()
+                    ->disabledOn('edit')
                     ->required()
                     ->validationMessages([
                         'required' => 'Form ini wajib diisi.',
@@ -103,6 +104,7 @@ class SiswaResource extends Resource
                     ->label('RFID')
                     ->unique(ignoreRecord: true)
                     ->numeric()
+                    ->autofocus()
                     ->required()
                     ->minLength(10)
                     ->maxLength(10)
@@ -274,7 +276,7 @@ class SiswaResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
+                    // ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                     RestoreAction::make(),

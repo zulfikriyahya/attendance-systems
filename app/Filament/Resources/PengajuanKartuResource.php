@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use Closure;
 use Carbon\Carbon;
-use Filament\Forms;
 use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -12,7 +11,6 @@ use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
 use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\HtmlString;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -21,9 +19,9 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Forms\Components\DateTimePicker;
@@ -31,6 +29,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 use App\Filament\Resources\PengajuanKartuResource\Pages;
 
 class PengajuanKartuResource extends Resource
@@ -44,7 +43,7 @@ class PengajuanKartuResource extends Resource
     protected static ?string $navigationLabel = 'Pengajuan Kartu';
 
     protected static ?string $recordTitleAttribute = 'nomorPengajuanKartu';
-    
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'pengajuan-kartu';
@@ -60,13 +59,13 @@ class PengajuanKartuResource extends Resource
         }
         return static::getModel()::where('status', 'Pending')->count();
     }
-    
+
     public static function getNavigationBadgeColor(): ?string
     {
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('super_admin')) {
-        return 'success';
+            return 'success';
         }
         return 'primary';
     }
@@ -74,72 +73,83 @@ class PengajuanKartuResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            Select::make('user_id')
-                ->label('Pengguna')
-                ->options(function ($get) {
-                    $currentUserId = $get('user_id');
+            ->schema([
+                Select::make('user_id')
+                    ->label('Pengguna')
+                    ->options(function ($get) {
+                        $currentUserId = $get('user_id');
 
-                    return User::where('status', true)
-                        ->where('username', '!=', 'administrator')
-                        ->whereDoesntHave('roles', function ($q) {
-                            $q->whereIn('name', ['administrator']);
-                        })
-                        ->pluck('name', 'id');
-                })
-                ->required()
-                ->searchable()
-                ->preload()
-                ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
-                ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
-                ->rules([
-                    'required',
-                    function () {
-                        return function (string $attribute, $value, \Closure $fail) {
-                            if ($value) {
-                                $existingPengajuan = PengajuanKartu::where('user_id', $value)
-                                    ->whereIn('status', ['Pending', 'Proses'])
-                                    ->exists();
+                        return User::where('status', true)
+                            ->where('username', '!=', 'administrator')
+                            ->whereDoesntHave('roles', function ($q) {
+                                $q->whereIn('name', ['administrator']);
+                            })
+                            ->pluck('name', 'id');
+                    })
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->disabledOn('edit')
+                    ->hidden(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
+                    ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
+                    ->rules([
+                        'required',
+                        function () {
+                            return function (string $attribute, $value, \Closure $fail) {
+                                if ($value) {
+                                    $existingPengajuan = PengajuanKartu::where('user_id', $value)
+                                        ->whereIn('status', ['Pending', 'Proses'])
+                                        ->exists();
 
-                                if ($existingPengajuan) {
-                                    $fail('Pengguna ini masih memiliki pengajuan kartu yang sedang diproses.');
+                                    if ($existingPengajuan) {
+                                        $fail('Pengguna ini masih memiliki pengajuan kartu yang sedang diproses.');
+                                    }
                                 }
-                            }
-                        };
-                    }
-                ]),
+                            };
+                        }
+                    ]),
 
-            // TextInput::make('nomorPengajuanKartu')
-            //     ->label('Nomor Pengajuan')
-            //     ->disabled()
-            //     ->dehydrated(false),
+                TextInput::make('biaya')
+                    ->label('Biaya Pembuatan Kartu')
+                    ->prefix('Rp.')
+                    ->integer()
+                    ->default(getenv('BIAYA_KARTU'))
+                    ->maxValue(50000)
+                    ->maxLength(5)
+                    ->minLength(1)
+                    ->required()
+                    ->validationMessages([
+                        'required' => 'Form ini wajib diisi',
+                    ])
+                    ->placeholder('Gratis = 0')
+                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
 
-            DateTimePicker::make('tanggalPengajuanKartu')
-                ->label('Tanggal Pengajuan')
-                ->required()
-                ->displayFormat('l, d F Y H:i')
-                ->native(false)
-                ->default(now())
-                ->maxDate(now()),
-                
-            Select::make('status')
-                ->label('Status')
-                ->options([
-                    'Pending' => 'Pending',
-                    'Proses' => 'Proses',
-                    'Selesai' => 'Selesai',
-                ])
-                ->default('Pending')
-                ->required()
-                ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
-                
-            Textarea::make('alasanPengajuanKartu')
-                ->label('Alasan Pengajuan')
-                ->required()
-                ->columnSpanFull()
-                ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
-                ->rows(3),
-        ])->columns(3);
+                DateTimePicker::make('tanggalPengajuanKartu')
+                    ->label('Tanggal Pengajuan')
+                    ->required()
+                    ->displayFormat('l, d F Y H:i')
+                    ->native(false)
+                    ->default(now())
+                    ->maxDate(now()),
+
+                Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'Pending' => 'Pending',
+                        'Proses' => 'Proses',
+                        'Selesai' => 'Selesai',
+                    ])
+                    ->default('Pending')
+                    ->required()
+                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+
+                Textarea::make('alasanPengajuanKartu')
+                    ->label('Alasan Pengajuan')
+                    ->required()
+                    ->columnSpanFull()
+                    ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
+                    ->rows(3),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
@@ -172,12 +182,27 @@ class PengajuanKartuResource extends Resource
                             ->default(now())
                             ->maxDate(now()),
 
-                        Forms\Components\Textarea::make('alasanPengajuanKartu')
+                        Textarea::make('alasanPengajuanKartu')
                             ->label('Alasan Pengajuan')
                             ->required()
                             ->validationMessages(['required' => 'Form ini wajib diisi.'])
                             ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
                             ->rows(3),
+
+                        TextInput::make('biaya')
+                            ->label('Biaya Pembuatan Kartu')
+                            ->prefix('Rp.')
+                            ->integer()
+                            ->maxValue(50000)
+                            ->maxLength(5)
+                            ->minLength(1)
+                            ->default(getenv('BIAYA_KARTU'))
+                            ->dehydrated()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi',
+                            ])
+                            ->readOnly(!Auth::user()->hasRole('super_admin')),
                     ])
                     ->action(function (array $data) {
                         $userId = Auth::id();
@@ -215,6 +240,7 @@ class PengajuanKartuResource extends Resource
                             'tanggalPengajuanKartu' => Carbon::parse($data['tanggalPengajuanKartu']),
                             'alasanPengajuanKartu' => $data['alasanPengajuanKartu'],
                             'nomorPengajuanKartu' => $nomorPengajuan,
+                            'biaya' => $data['biaya'],
                             'status' => 'Pending',
                         ]);
 
@@ -248,10 +274,10 @@ class PengajuanKartuResource extends Resource
 
                 TextColumn::make('alasanPengajuanKartu')
                     ->label('Alasan Pengajuan')
-                    ->limit(50)
+                    ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= 50) {
+                        if (strlen($state) <= 15) {
                             return null;
                         }
 
@@ -267,6 +293,10 @@ class PengajuanKartuResource extends Resource
                         'success' => 'Selesai',
                     ])
                     ->sortable(),
+                
+                ToggleColumn::make('statusAmbil')
+                    ->label('Penyerahan')
+                    ->disabledClick(fn($record)=>$record->status === 'Selesai' && Auth::user()->hasRole('super_admin'))
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -289,10 +319,14 @@ class PengajuanKartuResource extends Resource
             ])
             ->actions([
                 EditAction::make()
+                ->button()
+                ->outlined()
                     ->visible(fn() => Auth::user()->hasRole('super_admin')),
 
                 Action::make('approve')
                     ->label('Setujui')
+                    ->button()
+                    ->outlined()
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
@@ -308,30 +342,11 @@ class PengajuanKartuResource extends Resource
                             ->body('Pengajuan telah disetujui dan status diubah ke Proses.')
                             ->success()
                             ->send();
-                    }),
-
-                Action::make('complete')
-                    ->label('Selesaikan')
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->visible(
-                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
-                            $record->status === 'Proses'
-                    )
-                    ->action(function (PengajuanKartu $record) {
-                        $record->update(['status' => 'Selesai']);
-
-                        Notification::make()
-                            ->title('Pengajuan Selesai')
-                            ->body('Pengajuan kartu telah diselesaikan.')
-                            ->success()
-                            ->send();
 
                         // Notifikasi ke user
                         Notification::make()
-                            ->title('Kartu Siap Diambil di Ruang PTSP')
-                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' telah selesai diproses. (Biaya pembuatan kartu Rp. 15.000).')
+                            ->title('Pengajuan kartu Anda sedang diproses.')
+                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' sedang diproses.')
                             ->success()
                             ->sendToDatabase($record->user);
 
@@ -352,13 +367,78 @@ class PengajuanKartuResource extends Resource
                             *PTSP MTSN 1 PANDEGLANG*
                             
                             ———————————————————
+                            🎉 *Kartu Presensi Sedang Diproses*
+                            ———————————————————
+                            Halo {$userName},
+                            Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* sedang diproses.
+                            Mohon menunggu kabar selanjutnya.
+                            
+                            Terima kasih! 🙏
+                            ———————————————————
+                            Tautan : https://presensi.mtsn1pandeglang.sch.id/admin/pengajuan-kartu/{$record->id}
+                            ———————————————————
+                            
+                            *© 2022 - 2025 MTs Negeri 1 Pandeglang*
+                            TEXT;
+                            $whatsappService->send($phoneNumber, $message);
+                        }
+                    }),
+
+                Action::make('complete')
+                    ->label('Selesaikan')
+                    ->button()
+                    ->outlined()
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(
+                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+                            $record->status === 'Proses'
+                    )
+                    ->action(function (PengajuanKartu $record) {
+                        $record->update(['status' => 'Selesai']);
+
+                        Notification::make()
+                            ->title('Pengajuan Selesai')
+                            ->body('Pengajuan kartu telah diselesaikan.')
+                            ->success()
+                            ->send();
+
+                        // Notifikasi ke user
+                        Notification::make()
+                            ->title('Kartu Siap Diambil di Ruang PTSP')
+                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' telah selesai diproses. (Biaya pembuatan kartu Rp. ' . number_format($record->biaya, 0, ',','.') . ')')
+                            ->success()
+                            ->sendToDatabase($record->user);
+
+                        // Kirim ke WhatsApp
+                        $phoneNumber = null;
+                        $userName = $record->user->name;
+
+                        // Cek apakah user adalah siswa atau pegawai
+                        if ($record->user->siswa) {
+                            $phoneNumber = $record->user->siswa->telepon;
+                        } elseif ($record->user->pegawai) {
+                            $phoneNumber = $record->user->pegawai->telepon;
+                        }
+
+                        if ($phoneNumber) {
+                            $whatsappService = new WhatsappService;
+                            $biaya = number_format($record->biaya,0,',','.');
+                            $message = <<<TEXT
+                            *PTSP MTSN 1 PANDEGLANG*
+                            
+                            ———————————————————
                             🎉 *Kartu Siap Diambil di Ruang PTSP*
                             ———————————————————
                             Halo {$userName},
                             Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.
                             📍 Silakan ambil di Ruang PTSP
-                            💰 Biaya pembuatan kartu: Rp. 15.000
+                            💰 Biaya pembuatan kartu: Rp. *{$biaya}*,-
+                            
                             Terima kasih! 🙏
+                            ———————————————————
+                            Tautan : https://presensi.mtsn1pandeglang.sch.id/admin/pengajuan-kartu/{$record->id}
                             ———————————————————
                             
                             *© 2022 - 2025 MTs Negeri 1 Pandeglang*
@@ -384,7 +464,7 @@ class PengajuanKartuResource extends Resource
 
     public static function getPages(): array
     {
-        return [
+        return[
             'index' => Pages\ListPengajuanKartus::route('/'),
             'create' => Pages\CreatePengajuanKartu::route('/create'),
             'view' => Pages\ViewPengajuanKartu::route('/{record}'),
