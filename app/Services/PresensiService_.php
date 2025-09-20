@@ -1,9 +1,5 @@
 <?php
 
-// ====================================================
-// 4. UPDATED PRESENSI SERVICE (Use new job)
-// ====================================================
-
 namespace App\Services;
 
 use Carbon\Carbon;
@@ -16,18 +12,10 @@ use App\Models\JadwalPresensi;
 use App\Models\PresensiPegawai;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use App\Services\WhatsappDelayService;
-use App\Jobs\SendWhatsappMessage; // New unified job
+use App\Jobs\SendWhatsappNotification;
 
-class PresensiService
+class PresensiService_
 {
-    protected WhatsappDelayService $delayService;
-
-    public function __construct(WhatsappDelayService $delayService)
-    {
-        $this->delayService = $delayService;
-    }
-    
     public function prosesPresensi(string $rfid, ?string $timestamp = null, bool $isSync = false, ?string $deviceId = null): array
     {
         $now = $timestamp ? Carbon::parse($timestamp) : now();
@@ -154,21 +142,76 @@ class PresensiService
         bool $isSync
     ): void {
         if (!$isSync) {
-            $delay = $this->delayService->calculateRealtimeDelay($status);
+            $now = now();
+            $today = $now->format('Y-m-d');
+            $currentHour = $now->format('H');
+            $currentMinute = $now->format('i');
 
-            // Dispatch unified job
-            SendWhatsappMessage::dispatch(
+            // Cache key per jam untuk reset otomatis setiap jam
+            $hourlyCacheKey = "whatsapp_hourly_{$today}_{$currentHour}";
+
+            // Hitung jumlah notifikasi dalam jam ini
+            $hourlyCount = Cache::get($hourlyCacheKey, 0);
+
+            // Strategi distribusi untuk 1100 siswa
+            // Target: maksimal 30 menit delay, aman dari banned
+
+            // WhatsApp rate limit yang aman: ~40-50 pesan per menit
+            // Untuk 1100 siswa dalam 30 menit = perlu ~37 pesan/menit
+            $messagesPerMinute = 35; // Rate yang aman
+            $maxDelayMinutes = 30;   // Maksimal 30 menit
+
+            // Hitung slot berdasarkan urutan dalam jam ini
+            $minuteSlot = floor($hourlyCount / $messagesPerMinute);
+
+            // Jika sudah melewati 30 menit, reset ke awal dengan jeda kecil
+            if ($minuteSlot >= $maxDelayMinutes) {
+                $minuteSlot = $minuteSlot % $maxDelayMinutes;
+                // Tambah offset kecil untuk menghindari collision
+                $extraOffset = floor($hourlyCount / ($messagesPerMinute * $maxDelayMinutes)) * 60;
+            } else {
+                $extraOffset = 0;
+            }
+
+            // Priority system untuk status tertentu
+            $isPriority = in_array($status, ['Terlambat', 'Pulang Cepat']);
+
+            if ($isPriority) {
+                // Priority: delay minimal (0-2 menit)
+                $baseDelaySeconds = rand(10, 120);
+                $slotDelaySeconds = min($minuteSlot * 30, 300); // Max 5 menit untuk priority
+            } else {
+                // Normal: distribusi merata dalam 30 menit
+                $baseDelaySeconds = rand(15, 45);
+                $slotDelaySeconds = $minuteSlot * 60; // 1 menit per slot
+            }
+
+            // Random spread untuk distribusi natural
+            $randomSpread = rand(0, 30);
+
+            // Total delay dalam detik
+            $totalDelaySeconds = $baseDelaySeconds + $slotDelaySeconds + $randomSpread + $extraOffset;
+
+            // Pastikan tidak melebihi 30 menit (1800 detik)
+            $maxDelaySeconds = $maxDelayMinutes * 60;
+            $totalDelaySeconds = min($totalDelaySeconds, $maxDelaySeconds);
+
+            $delay = $now->addSeconds($totalDelaySeconds);
+
+            // Dispatch notification
+            SendWhatsappNotification::dispatch(
                 $telepon,
-                'presensi', // type
-                [
-                    'jenis' => $jenis,
-                    'status' => $status,
-                    'waktu' => $jam,
-                    'nama' => $nama,
-                    'isSiswa' => $isSiswa,
-                    'instansi' => $instansi,
-                ]
+                $jenis,
+                $status,
+                $jam,
+                $nama,
+                $isSiswa,
+                $instansi
             )->delay($delay);
+
+            // Update counter dengan expire otomatis di akhir jam
+            $newCount = $hourlyCount + 1;
+            Cache::put($hourlyCacheKey, $newCount, now()->endOfHour());
         }
     }
 }

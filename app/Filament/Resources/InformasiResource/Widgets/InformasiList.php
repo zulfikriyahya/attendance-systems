@@ -56,12 +56,13 @@ class InformasiList extends BaseWidget
                         ->label('Detail')
                         ->icon('heroicon-o-eye')
                         ->color('info')
-                        ->modalHeading(fn($record) => 'Detail Informasi')
-                        ->modalDescription(fn($record) => $record->judul)
+                        // ->modalHeading(fn($record) => 'Detail Informasi')
+                        // ->modalDescription(fn($record) => $record->judul)
                         ->form(function ($record) {
                             return [
                                 Section::make('Detail Informasi')
-                                    ->schema([
+                                ->collapsed()
+                                ->schema([
                                         Grid::make(2)
                                             ->schema([
                                                 Placeholder::make('judul')
@@ -98,7 +99,8 @@ class InformasiList extends BaseWidget
                                     ]),
 
                                 Section::make('Konten')
-                                    ->schema([
+                                ->collapsible()
+                                ->schema([
                                         Placeholder::make('isi')
                                             ->label('')
                                             ->content(function ($record) {
@@ -163,7 +165,8 @@ class InformasiList extends BaseWidget
                                     ->collapsed()
                             ];
                         })
-                        ->modalWidth('4xl')
+                        ->modalWidth('2xl')
+                        // ->requiresConfirmation()
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Tutup')
                         ->fillForm(fn($record) => $record->toArray()),
@@ -172,7 +175,7 @@ class InformasiList extends BaseWidget
             ->recordAction('view')
             ->recordUrl(null)
             ->striped()
-            ->paginated([10, 25, 50])
-            ->defaultPaginationPageOption(10);
+            ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5);
     }
 }

@@ -2,15 +2,18 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\User;
 use Filament\Forms\Form;
 use App\Models\Informasi;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\DeleteAction;
@@ -71,6 +74,8 @@ class InformasiResource extends Resource
                     ->required(),
                 FileUpload::make('lampiran')
                     ->label('Lampiran Informasi')
+                    ->directory('lampiranInformasi')
+                    ->visibility('public')
                     ->maxSize(1024 * 5),
                 MarkdownEditor::make('isi')
                     ->label('Uraian Informasi')

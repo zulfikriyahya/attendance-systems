@@ -72,7 +72,6 @@ class DashboardAdmin extends BaseDashboard
             FirstRecordPegawai::class,
             FirstRecordSiswa::class,
             InformasiList::class,
-
         ];
     }
 
@@ -87,10 +86,12 @@ class DashboardAdmin extends BaseDashboard
         if (Auth::user()->hasRole('siswa') || Auth::user()->hasRole('siswa_unggulan') || Auth::user()->hasRole('siswa_reguler')) {
             return [
                 FirstRecordSiswa::class,
+                InformasiList::class,
             ];
         } elseif (Auth::user()->hasRole('guru') || Auth::user()->hasRole('staf') || Auth::user()->hasRole('manajemen') || Auth::user()->hasRole('wali_kelas')) {
             return [
                 FirstRecordPegawai::class,
+                InformasiList::class,
             ];
         }
         return [

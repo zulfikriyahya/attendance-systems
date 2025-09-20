@@ -12,21 +12,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class SendWhatsappNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     public string $nomor;
-
     public string $jenis;
-
     public string $status;
-
     public string $waktu;
-
     public string $nama;
-
     public bool $isSiswa;
-
     public string $instansi;
-
     public function __construct($nomor, $jenis, $status, $waktu, $nama, $isSiswa, $instansi)
     {
         $this->nomor = $nomor;
