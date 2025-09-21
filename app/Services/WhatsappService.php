@@ -137,7 +137,7 @@ class WhatsappService
         $ikon = $jenis === 'Presensi Masuk' ? 'Masuk' : 'Pulang';
         $tanggal = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-        $urlPresensi = config('app.url');
+        $urlPresensi = config('app.url') . '/admin';
 
         // Get template messages
         $messageType = $jenis === 'Presensi Masuk' ? 'masuk' : 'pulang';
@@ -159,8 +159,8 @@ class WhatsappService
                         : 'Terima kasih atas dedikasi dan kinerja Anda hari ini.'));
         }
 
-        $header = str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}');
-        $footer = str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}');
+        $header = strtoupper(str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}'));
+        $footer = strtoupper(str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}'));
 
         $pesan = <<<TEXT
         *{$header}*
@@ -204,7 +204,7 @@ class WhatsappService
         $templates = $this->config['templates']['informasi'] ?? [];
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-
+        $urlPresensi = config('app.url') . '/admin';
         // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 200;
         $isiSingkat = strlen($isi) > $maxLength
@@ -219,8 +219,8 @@ class WhatsappService
         $closing = $templates['closing'][$userType]
             ?? ($isSiswa ? "Terima kasih atas perhatiannya. Tetap semangat belajar!" : "Terima kasih atas perhatian dan kerjasamanya.");
 
-        $header = str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}');
-        $footer = str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}');
+        $header = strtoupper(str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}'));
+        $footer = strtoupper(str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}'));
 
         $pesan = <<<TEXT
         *{$header}*
@@ -234,10 +234,13 @@ class WhatsappService
 
         {$isiSingkat}
 
-        🗓️ Tanggal: {$tanggalFormatted}
-        👤 Penerima: {$nama}
+        Tanggal: {$tanggalFormatted}
+        Penerima: {$nama}
 
         ———————————————————
+        Tautan: {$urlPresensi}
+        ———————————————————
+
         {$closing}
 
         *{$footer}*
@@ -263,7 +266,11 @@ class WhatsappService
     protected function sendAttachment(string $nomor, string $lampiran, array $mainResult): array
     {
         $filePath = storage_path('app/public/' . $lampiran);
-
+        Log::info('Sending attachment', [
+            'file_path' => $filePath,
+            'file_exists' => file_exists($filePath),
+            'nomor' => $nomor
+        ]);
         if (!file_exists($filePath)) {
             $this->logError('Attachment Not Found', $nomor, "File not found: {$lampiran}");
             return array_merge($mainResult, ['attachment_error' => 'File not found']);
