@@ -2,18 +2,19 @@
 
 namespace App\Filament\Resources\PresensiSiswaResource\Widgets;
 
+use App\Models\PresensiSiswa;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Models\PresensiSiswa;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class FirstRecordSiswa extends BaseWidget
 {
     protected static ?string $heading = '5 Presensi Siswa Pertama';
+
     // protected int | string | array $columnSpan = 'full';
     public function table(Table $table): Table
     {
-        
+
         return $table
             ->query(
                 PresensiSiswa::query()

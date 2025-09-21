@@ -26,7 +26,7 @@ return [
     'whatsapp' => [
         'endpoint' => env('WHATSAPP_ENDPOINT'),
     ],
-    
+
     'api' => [
         'secret' => env('API_SECRET'),
     ],

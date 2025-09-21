@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use App\Enums\StatusPulang;
 use App\Enums\StatusPresensi;
-use App\Models\PresensiSiswa;
-use Illuminate\Bus\Queueable;
+use App\Enums\StatusPulang;
 use App\Models\JadwalPresensi;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\PresensiSiswa;
+use App\Models\Siswa;
 use App\Services\WhatsappDelayService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class ProcessKetidakhadiran implements ShouldQueue
 {
@@ -51,6 +51,7 @@ class ProcessKetidakhadiran implements ShouldQueue
 
         if (! $jadwal) {
             info('❌ Tidak ada jadwal presensi aktif hari ini.');
+
             return;
         }
 
@@ -75,7 +76,7 @@ class ProcessKetidakhadiran implements ShouldQueue
         Pegawai::with('jabatan.instansi', 'user')
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
-            ->whereDoesntHave('presensiPegawai', fn($q) => $q->whereDate('tanggal', $tanggal))
+            ->whereDoesntHave('presensiPegawai', fn ($q) => $q->whereDate('tanggal', $tanggal))
             ->where(function ($q) {
                 $q->whereHas('user.pengajuanKartu', function ($subQ) {
                     $subQ->where('statusAmbil', true);
@@ -119,7 +120,7 @@ class ProcessKetidakhadiran implements ShouldQueue
         Siswa::with('jabatan.instansi', 'user')
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
-            ->whereDoesntHave('presensiSiswa', fn($q) => $q->whereDate('tanggal', $tanggal))
+            ->whereDoesntHave('presensiSiswa', fn ($q) => $q->whereDate('tanggal', $tanggal))
             ->where(function ($q) {
                 $q->whereHas('user.pengajuanKartu', function ($subQ) {
                     $subQ->where('statusAmbil', true);
@@ -186,7 +187,7 @@ class ProcessKetidakhadiran implements ShouldQueue
             ->whereDate('tanggal', $tanggal)
             ->whereNull('jamPulang')
             ->whereNull('statusPulang')
-            ->whereHas('pegawai', fn($q) => $q->whereIn('jabatan_id', $jabatanIds))
+            ->whereHas('pegawai', fn ($q) => $q->whereIn('jabatan_id', $jabatanIds))
             ->where(function ($q) {
                 $q->whereHas('pegawai.user.pengajuanKartu', function ($subQ) {
                     $subQ->where('statusAmbil', true);
@@ -230,7 +231,7 @@ class ProcessKetidakhadiran implements ShouldQueue
             ->whereDate('tanggal', $tanggal)
             ->whereNull('jamPulang')
             ->whereNull('statusPulang')
-            ->whereHas('siswa', fn($q) => $q->whereIn('jabatan_id', $jabatanIds))
+            ->whereHas('siswa', fn ($q) => $q->whereIn('jabatan_id', $jabatanIds))
             ->where(function ($q) {
                 $q->whereHas('siswa.user.pengajuanKartu', function ($subQ) {
                     $subQ->where('statusAmbil', true);

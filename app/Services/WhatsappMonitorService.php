@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 class WhatsappMonitorService
@@ -193,6 +192,7 @@ class WhatsappMonitorService
                 ->map(function ($job) {
                     $payload = json_decode($job->payload, true);
                     $className = $payload['displayName'] ?? 'Unknown';
+
                     return basename(str_replace('\\', '/', $className));
                 })
                 ->countBy()
@@ -276,7 +276,7 @@ class WhatsappMonitorService
             'status' => $status,
             'message' => $message,
             'pending_jobs' => $pendingJobs,
-            'failed_jobs' => $failedJobs
+            'failed_jobs' => $failedJobs,
         ];
     }
 
@@ -298,7 +298,7 @@ class WhatsappMonitorService
             'status' => $status,
             'message' => $message,
             'current_hour_total' => $total,
-            'details' => $currentHourStats
+            'details' => $currentHourStats,
         ];
     }
 
@@ -344,8 +344,10 @@ class WhatsappMonitorService
         // Generate possible cache keys based on pattern
         if (str_contains($pattern, 'whatsapp_hourly_')) {
             for ($hour = 0; $hour < 24; $hour++) {
-                $key = "whatsapp_hourly_{$today}_" . str_pad($hour, 2, '0', STR_PAD_LEFT);
-                if (Cache::forget($key)) $cleared++;
+                $key = "whatsapp_hourly_{$today}_".str_pad($hour, 2, '0', STR_PAD_LEFT);
+                if (Cache::forget($key)) {
+                    $cleared++;
+                }
             }
         }
 
@@ -354,8 +356,10 @@ class WhatsappMonitorService
         foreach ($bulkTypes as $type) {
             if (str_contains($pattern, "whatsapp_bulk_{$type}_") || str_contains($pattern, 'whatsapp_bulk_*_')) {
                 for ($hour = 0; $hour < 24; $hour++) {
-                    $key = "whatsapp_bulk_{$type}_{$today}_" . str_pad($hour, 2, '0', STR_PAD_LEFT);
-                    if (Cache::forget($key)) $cleared++;
+                    $key = "whatsapp_bulk_{$type}_{$today}_".str_pad($hour, 2, '0', STR_PAD_LEFT);
+                    if (Cache::forget($key)) {
+                        $cleared++;
+                    }
                 }
             }
         }
@@ -406,13 +410,14 @@ class WhatsappMonitorService
         return [
             'morning' => ['07', '08', '09'],
             'afternoon' => ['13', '14', '15'],
-            'evening' => ['16', '17', '18']
+            'evening' => ['16', '17', '18'],
         ];
     }
 
     protected function getThroughputStats(): array
     {
         $recentActivity = $this->getRecentActivity(3);
+
         return [
             'last_3_hours_total' => $recentActivity['total_messages'],
             'average_per_hour' => $recentActivity['average_per_hour'],

@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\JurusanResource\Pages;
 
-use Filament\Actions;
+use App\Filament\Resources\JurusanResource;
 use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\JurusanResource;
 
 class ListJurusans extends ListRecords
 {
@@ -24,6 +23,7 @@ class ListJurusans extends ListRecords
                     ->color(Color::Emerald),
             ];
         }
+
         return [];
     }
 }

@@ -2,36 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use Closure;
-use Carbon\Carbon;
-use App\Models\User;
+use App\Filament\Resources\PengajuanKartuResource\Pages;
 use App\Models\Instansi;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use App\Models\PengajuanKartu;
-use Filament\Resources\Resource;
+use App\Models\User;
 use App\Services\WhatsappService;
-use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PengajuanKartuResource\Pages;
+use Illuminate\Support\Facades\Auth;
 
 class PengajuanKartuResource extends Resource
 {
@@ -58,6 +56,7 @@ class PengajuanKartuResource extends Resource
         if (! $user || ! $user->hasRole('super_admin')) {
             return 'Fitur Baru';
         }
+
         return static::getModel()::where('status', 'Pending')->count();
     }
 
@@ -68,6 +67,7 @@ class PengajuanKartuResource extends Resource
         if (! $user || ! $user->hasRole('super_admin')) {
             return 'success';
         }
+
         return 'primary';
     }
 
@@ -91,8 +91,8 @@ class PengajuanKartuResource extends Resource
                     ->searchable()
                     ->preload()
                     ->disabledOn('edit')
-                    ->hidden(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
-                    ->default(fn() => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
+                    ->hidden(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
+                    ->default(fn () => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
                     ->rules([
                         'required',
                         function () {
@@ -107,7 +107,7 @@ class PengajuanKartuResource extends Resource
                                     }
                                 }
                             };
-                        }
+                        },
                     ]),
 
                 TextInput::make('biaya')
@@ -123,7 +123,7 @@ class PengajuanKartuResource extends Resource
                         'required' => 'Form ini wajib diisi',
                     ])
                     ->placeholder('Gratis = 0')
-                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
 
                 DateTimePicker::make('tanggalPengajuanKartu')
                     ->label('Tanggal Pengajuan')
@@ -142,7 +142,7 @@ class PengajuanKartuResource extends Resource
                     ])
                     ->default('Pending')
                     ->required()
-                    ->disabled(fn() => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
 
                 Textarea::make('alasanPengajuanKartu')
                     ->label('Alasan Pengajuan')
@@ -203,7 +203,7 @@ class PengajuanKartuResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi',
                             ])
-                            ->readOnly(!Auth::user()->hasRole('super_admin')),
+                            ->readOnly(! Auth::user()->hasRole('super_admin')),
                     ])
                     ->action(function (array $data) {
                         $userId = Auth::id();
@@ -247,7 +247,7 @@ class PengajuanKartuResource extends Resource
 
                         Notification::make()
                             ->title('Pengajuan Berhasil')
-                            ->body('Pengajuan kartu baru Anda telah berhasil disubmit dengan nomor: ' . $pengajuanKartu->nomorPengajuanKartu)
+                            ->body('Pengajuan kartu baru Anda telah berhasil disubmit dengan nomor: '.$pengajuanKartu->nomorPengajuanKartu)
                             ->success()
                             ->duration(5000)
                             ->send();
@@ -294,10 +294,10 @@ class PengajuanKartuResource extends Resource
                         'success' => 'Selesai',
                     ])
                     ->sortable(),
-                
+
                 ToggleColumn::make('statusAmbil')
                     ->label('Penyerahan')
-                    ->disabledClick(fn($record)=>$record->status === 'Selesai' && Auth::user()->hasRole('super_admin'))
+                    ->disabledClick(fn ($record) => $record->status === 'Selesai' && Auth::user()->hasRole('super_admin')),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -307,22 +307,22 @@ class PengajuanKartuResource extends Resource
                         'Selesai' => 'Selesai',
                     ])
                     ->multiple()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
 
                 SelectFilter::make('user')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
 
                 TrashedFilter::make()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
+                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
             ])
             ->actions([
                 EditAction::make()
-                ->button()
-                ->outlined()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
+                    ->button()
+                    ->outlined()
+                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
 
                 Action::make('approve')
                     ->label('Setujui')
@@ -332,7 +332,7 @@ class PengajuanKartuResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(
-                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
                             $record->status === 'Pending'
                     )
                     ->action(function (PengajuanKartu $record) {
@@ -347,7 +347,7 @@ class PengajuanKartuResource extends Resource
                         // Notifikasi ke user
                         Notification::make()
                             ->title('Pengajuan kartu Anda sedang diproses.')
-                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' sedang diproses.')
+                            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' sedang diproses.')
                             ->success()
                             ->sendToDatabase($record->user);
 
@@ -397,7 +397,7 @@ class PengajuanKartuResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(
-                        fn(PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
                             $record->status === 'Proses'
                     )
                     ->action(function (PengajuanKartu $record) {
@@ -412,7 +412,7 @@ class PengajuanKartuResource extends Resource
                         // Notifikasi ke user
                         Notification::make()
                             ->title('Kartu Siap Diambil di Ruang PTSP')
-                            ->body('Pengajuan kartu Anda dengan nomor ' . $record->nomorPengajuanKartu . ' telah selesai diproses. (Biaya pembuatan kartu Rp. ' . number_format($record->biaya, 0, ',','.') . ')')
+                            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' telah selesai diproses. (Biaya pembuatan kartu Rp. '.number_format($record->biaya, 0, ',', '.').')')
                             ->success()
                             ->sendToDatabase($record->user);
 
@@ -429,7 +429,7 @@ class PengajuanKartuResource extends Resource
 
                         if ($phoneNumber) {
                             $whatsappService = new WhatsappService;
-                            $biaya = number_format($record->biaya,0,',','.');
+                            $biaya = number_format($record->biaya, 0, ',', '.');
                             $tahunIni = date('Y');
                             $namaInstansi = Instansi::all()->first()->nama;
                             $instansi = strtoupper($namaInstansi);
@@ -459,13 +459,13 @@ class PengajuanKartuResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
 
                     ForceDeleteBulkAction::make()
-                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
 
                     RestoreBulkAction::make()
-                        ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -473,7 +473,7 @@ class PengajuanKartuResource extends Resource
 
     public static function getPages(): array
     {
-        return[
+        return [
             'index' => Pages\ListPengajuanKartus::route('/'),
             'create' => Pages\CreatePengajuanKartu::route('/create'),
             'view' => Pages\ViewPengajuanKartu::route('/{record}'),
@@ -528,7 +528,7 @@ class PengajuanKartuResource extends Resource
         foreach ($adminUsers as $admin) {
             Notification::make()
                 ->title('Pengajuan Kartu Baru')
-                ->body('User ' . Auth::user()->name . ' mengajukan kartu baru dengan alasan: ' . $alasan)
+                ->body('User '.Auth::user()->name.' mengajukan kartu baru dengan alasan: '.$alasan)
                 ->info()
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('lihat')

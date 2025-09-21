@@ -2,13 +2,13 @@
 
 namespace App\Filament\Widgets;
 
-use Flowframe\Trend\Trend;
 use App\Enums\StatusPulang;
-use Illuminate\Support\Carbon;
-use Flowframe\Trend\TrendValue;
-use Filament\Widgets\ChartWidget;
 use App\Models\PresensiSiswa as PresensiSiswaModel;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
+use Filament\Widgets\ChartWidget;
+use Flowframe\Trend\Trend;
+use Flowframe\Trend\TrendValue;
+use Illuminate\Support\Carbon;
 
 class PresensiPulangSiswaChart extends ChartWidget
 {
@@ -43,13 +43,13 @@ class PresensiPulangSiswaChart extends ChartWidget
             // Ambil label sekali saja
             if (empty($labels)) {
                 $labels = $data->map(
-                    fn(TrendValue $value) => Carbon::parse($value->date)->translatedFormat('F Y')
+                    fn (TrendValue $value) => Carbon::parse($value->date)->translatedFormat('F Y')
                 )->toArray();
             }
 
             $datasets[] = [
                 'label' => $status->name,
-                'data' => $data->map(fn(TrendValue $value) => $value->aggregate)->toArray(),
+                'data' => $data->map(fn (TrendValue $value) => $value->aggregate)->toArray(),
                 'borderColor' => $colorMap[$status->name] ?? '#9ca3af',
                 'fill' => false, // tidak diisi warna
                 'tension' => 0.3, // bikin garis agak melengkung (opsional)

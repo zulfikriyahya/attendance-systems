@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\PengajuanKartuResource\Pages;
 
-use App\Models\User;
+use App\Filament\Resources\PengajuanKartuResource;
 use App\Models\PengajuanKartu;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\PengajuanKartuResource;
+use Illuminate\Support\Facades\Auth;
 
 class CreatePengajuanKartu extends CreateRecord
 {
@@ -23,7 +23,7 @@ class CreatePengajuanKartu extends CreateRecord
         // Generate nomor pengajuan yang unik sebelum create
         $userId = $data['user_id'] ?? Auth::id();
         $data['nomorPengajuanKartu'] = $this->generateNomorPengajuan($userId);
-        
+
         return $data;
     }
 
@@ -32,11 +32,11 @@ class CreatePengajuanKartu extends CreateRecord
         // Kirim notifikasi sukses
         Notification::make()
             ->title('Pengajuan Berhasil')
-            ->body('Pengajuan kartu baru telah berhasil disubmit dengan nomor: ' . $this->record->nomorPengajuanKartu)
+            ->body('Pengajuan kartu baru telah berhasil disubmit dengan nomor: '.$this->record->nomorPengajuanKartu)
             ->success()
             ->duration(5000)
             ->send();
-        
+
         // Kirim notifikasi ke admin
         $this->sendNotificationToAdmins($this->record, $this->record->alasanPengajuanKartu);
     }
@@ -73,7 +73,7 @@ class CreatePengajuanKartu extends CreateRecord
         foreach ($adminUsers as $admin) {
             Notification::make()
                 ->title('Pengajuan Kartu Baru')
-                ->body('User ' . Auth::user()->name . ' mengajukan kartu baru dengan alasan: ' . $alasan)
+                ->body('User '.Auth::user()->name.' mengajukan kartu baru dengan alasan: '.$alasan)
                 ->info()
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('lihat')

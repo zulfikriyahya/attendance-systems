@@ -2,19 +2,19 @@
 
 namespace App\Filament\Pages\Auth;
 
+use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
+use Filament\Forms\Components\Component;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Pages\Auth\EditProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Intervention\Image\ImageManager;
-use Filament\Forms\Components\Textarea;
 use Illuminate\Support\Facades\Storage;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\FileUpload;
 use Illuminate\Validation\Rules\Password;
 use Intervention\Image\Drivers\Gd\Driver;
-use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
+use Intervention\Image\ImageManager;
 
 class EditProfileCustom extends EditProfile
 {
@@ -54,6 +54,7 @@ class EditProfileCustom extends EditProfile
             $data['telepon'] = $user->siswa->telepon ?? '';
             $data['alamat'] = $user->siswa->alamat ?? '';
         }
+
         return $data;
     }
 

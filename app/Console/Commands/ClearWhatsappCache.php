@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 class ClearWhatsappCache extends Command
 {
     protected $signature = 'whatsapp:clear-cache';
+
     protected $description = 'Clear WhatsApp rate limiting cache';
 
     public function handle()
@@ -20,9 +21,10 @@ class ClearWhatsappCache extends Command
             Cache::forget("whatsapp_informasi_hourly_{$today}_{$hourStr}");
         }
 
-        Cache::forget("jadwal_presensi:" . now()->isoFormat('dddd'));
+        Cache::forget('jadwal_presensi:'.now()->isoFormat('dddd'));
 
         $this->info('WhatsApp cache cleared successfully');
+
         return 0;
     }
 }

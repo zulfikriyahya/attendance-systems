@@ -2,12 +2,12 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Login;
+use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
+use Filament\Pages\Auth\Login;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Validation\ValidationException;
-use DiogoGPinto\AuthUIEnhancer\Pages\Auth\Concerns\HasCustomLayout;
 
 class LoginCustom extends Login
 {

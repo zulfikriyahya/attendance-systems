@@ -2,19 +2,19 @@
 
 namespace App\Filament\Pages;
 
-use Carbon\Carbon;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Auth;
-use Filament\Pages\Dashboard as BaseDashboard;
-use App\Filament\Widgets\PresensiMasukSiswaChart;
-use App\Filament\Widgets\PresensiPulangSiswaChart;
-use App\Filament\Widgets\PresensiMasukPegawaiChart;
-use App\Filament\Widgets\PresensiPulangPegawaiChart;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use App\Filament\Resources\InformasiResource\Widgets\InformasiList;
-use App\Filament\Resources\PresensiSiswaResource\Widgets\FirstRecordSiswa;
-use App\Filament\Resources\PresensiPegawaiResource\Widgets\FirstRecordPegawai;
 use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview as KartuStats;
+use App\Filament\Resources\PresensiPegawaiResource\Widgets\FirstRecordPegawai;
+use App\Filament\Resources\PresensiSiswaResource\Widgets\FirstRecordSiswa;
+use App\Filament\Widgets\PresensiMasukPegawaiChart;
+use App\Filament\Widgets\PresensiMasukSiswaChart;
+use App\Filament\Widgets\PresensiPulangPegawaiChart;
+use App\Filament\Widgets\PresensiPulangSiswaChart;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Carbon\Carbon;
+use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 class DashboardAdmin extends BaseDashboard
 {
@@ -27,7 +27,7 @@ class DashboardAdmin extends BaseDashboard
 
     protected static ?string $navigationIcon = 'heroicon-o-signal';
 
-    protected function formatDisplayName(string|null $name): string
+    protected function formatDisplayName(?string $name): string
     {
         if (! $name) {
             return '';
@@ -58,7 +58,7 @@ class DashboardAdmin extends BaseDashboard
 
         $displayName = $this->formatDisplayName(Auth::user()?->name ?? '');
 
-        return new HtmlString($greeting . ', ' . e($displayName).'!');
+        return new HtmlString($greeting.', '.e($displayName).'!');
     }
 
     public function widgets(): array
@@ -81,6 +81,7 @@ class DashboardAdmin extends BaseDashboard
             KartuStats::class,
         ];
     }
+
     public function getFooterWidgets(): array
     {
         if (Auth::user()->hasRole('siswa') || Auth::user()->hasRole('siswa_unggulan') || Auth::user()->hasRole('siswa_reguler')) {
@@ -94,6 +95,7 @@ class DashboardAdmin extends BaseDashboard
                 InformasiList::class,
             ];
         }
+
         return [
             FirstRecordPegawai::class,
             FirstRecordSiswa::class,

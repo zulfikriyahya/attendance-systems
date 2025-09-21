@@ -2,19 +2,21 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Services\WhatsappService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendWhatsappMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $nomor;
+
     public string $type; // 'presensi', 'presensi_bulk', 'informasi'
+
     public array $data;
 
     public function __construct(string $nomor, string $type, array $data)
@@ -71,7 +73,7 @@ class SendWhatsappMessage implements ShouldQueue
             }
 
             // Log jika gagal
-            if (!$result['status']) {
+            if (! $result['status']) {
                 $this->logError($result['error'] ?? 'Unknown error');
             }
         } catch (\Exception $e) {
@@ -86,7 +88,7 @@ class SendWhatsappMessage implements ShouldQueue
             'nomor' => $this->nomor,
             'type' => $this->type,
             'data' => $this->data,
-            'error' => $error
+            'error' => $error,
         ]);
     }
 }

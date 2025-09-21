@@ -2,37 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
-use Filament\Forms\Form;
+use App\Filament\Resources\InformasiResource\Pages;
 use App\Models\Informasi;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Log;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
-use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Actions\DeleteAction;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use App\Filament\Resources\InformasiResource\Pages;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InformasiResource extends Resource
@@ -83,7 +79,7 @@ class InformasiResource extends Resource
                     ->directory('lampiranInformasi')
                     ->visibility('public')
                     ->maxSize(2048),
-            MarkdownEditor::make('isi')
+                MarkdownEditor::make('isi')
                     ->label('Uraian Informasi')
                     ->required()
                     ->columnSpanFull()
@@ -112,8 +108,8 @@ class InformasiResource extends Resource
 
                         return $state;
                     })
-                ->weight(FontWeight::Medium),
-            TextColumn::make('isi')
+                    ->weight(FontWeight::Medium),
+                TextColumn::make('isi')
                     ->label('Uraian')
                     ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -125,9 +121,8 @@ class InformasiResource extends Resource
                         return $state;
                     }),
                 TextColumn::make('tanggal')
-                ->dateTime('l, d F Y'),
-                BadgeColumn::make('status')
-                ,
+                    ->dateTime('l, d F Y'),
+                BadgeColumn::make('status'),
                 ImageColumn::make('lampiran'),
             ])
             ->filters([
@@ -174,7 +169,6 @@ class InformasiResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ])
-            ->orderBy('tanggal', 'desc')
-            ;
+            ->orderBy('tanggal', 'desc');
     }
 }

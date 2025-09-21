@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\PresensiPegawaiResource\Widgets;
 
-use Carbon\Carbon;
 use App\Models\PresensiPegawai;
+use Carbon\Carbon;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Auth;
 
 class BulanStatsOverview extends BaseWidget
 {
@@ -16,21 +16,24 @@ class BulanStatsOverview extends BaseWidget
     protected function getHeading(): ?string
     {
         $bulan = now()->format('F Y');
-        return 'Statistik Presensi Bulan ' . $bulan;
+
+        return 'Statistik Presensi Bulan '.$bulan;
     }
+
     protected function getStats(): array
     {
 
         $pegawaiId = Auth::user()?->pegawai?->id;
+
         return [
             Stat::make(
                 'Status Hadir',
                 PresensiPegawai::query()
                     ->where('statusPresensi', 'Hadir')
-                    ->when($pegawaiId, fn($query) => $query->where('pegawai_id', $pegawaiId))
+                    ->when($pegawaiId, fn ($query) => $query->where('pegawai_id', $pegawaiId))
                     ->whereMonth('tanggal', Carbon::now()->month)
                     ->whereYear('tanggal', Carbon::now()->year)
-                    ->count() . ' Hari'
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Green)
                 ->chart([7, 2, 10, 3, 15, 4, 10])
@@ -43,10 +46,10 @@ class BulanStatsOverview extends BaseWidget
                 'Status Terlambat',
                 PresensiPegawai::query()
                     ->where('statusPresensi', 'Terlambat')
-                    ->when($pegawaiId, fn($query) => $query->where('pegawai_id', $pegawaiId))
+                    ->when($pegawaiId, fn ($query) => $query->where('pegawai_id', $pegawaiId))
                     ->whereMonth('tanggal', Carbon::now()->month)
                     ->whereYear('tanggal', Carbon::now()->year)
-                    ->count() . ' Hari'
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Amber)
                 ->chart([10, 2, 10, 3, 15, 4, 17])
@@ -59,10 +62,10 @@ class BulanStatsOverview extends BaseWidget
                 'Status Sakit, Izin, Dispensasi',
                 PresensiPegawai::query()
                     ->whereIn('statusPresensi', ['Sakit', 'Izin', 'Dispen'])
-                    ->when($pegawaiId, fn($query) => $query->where('pegawai_id', $pegawaiId))
+                    ->when($pegawaiId, fn ($query) => $query->where('pegawai_id', $pegawaiId))
                     ->whereMonth('tanggal', Carbon::now()->month)
                     ->whereYear('tanggal', Carbon::now()->year)
-                    ->count() . ' Hari'
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Fuchsia)
                 ->chart([10, 2, 10, 3, 15, 4, 17])
@@ -75,10 +78,10 @@ class BulanStatsOverview extends BaseWidget
                 'Status Alfa',
                 PresensiPegawai::query()
                     ->where('statusPresensi', 'Alfa')
-                    ->when($pegawaiId, fn($query) => $query->where('pegawai_id', $pegawaiId))
+                    ->when($pegawaiId, fn ($query) => $query->where('pegawai_id', $pegawaiId))
                     ->whereMonth('tanggal', Carbon::now()->month)
                     ->whereYear('tanggal', Carbon::now()->year)
-                    ->count() . ' Hari'
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Red)
                 ->chart([7, 2, 10, 3, 15, 4, 10])

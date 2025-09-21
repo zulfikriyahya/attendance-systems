@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\StatusPulang;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PresensiPegawai extends Model
 {

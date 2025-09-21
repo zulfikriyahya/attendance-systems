@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\UserResource\Widgets;
 
 use App\Models\User;
-use Blueprint\Models\Model;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends BaseWidget
 {

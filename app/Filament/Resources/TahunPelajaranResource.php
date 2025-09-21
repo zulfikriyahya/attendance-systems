@@ -2,37 +2,37 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
 use App\Models\TahunPelajaran;
-use Filament\Resources\Resource;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Actions\DeleteAction;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
-use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
 
 class TahunPelajaranResource extends Resource
 {
@@ -43,7 +43,7 @@ class TahunPelajaranResource extends Resource
     protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Tahun Pelajaran';
-    
+
     protected static ?string $recordTitleAttribute = 'nama';
 
     protected static ?int $navigationSort = 3;
@@ -116,12 +116,12 @@ class TahunPelajaranResource extends Resource
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('instansi.nama')
                     ->label('Nama Instansi')
-                    ->searchable(TahunPelajaran::all()->count()>10),
+                    ->searchable(TahunPelajaran::all()->count() > 10),
                 TextColumn::make('nama')
                     ->label('Tahun Pelajaran')
                     ->badge()
                     ->searchable(TahunPelajaran::all()->count() > 10),
-            TextColumn::make('mulai')
+                TextColumn::make('mulai')
                     ->label('Tanggal Mulai')
                     ->date('d F Y')
                     ->sortable(),

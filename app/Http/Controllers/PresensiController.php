@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use Illuminate\Http\Request;
-use App\Models\PresensiSiswa;
 use App\Models\JadwalPresensi;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\PresensiSiswa;
+use App\Models\Siswa;
 use App\Services\PresensiService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

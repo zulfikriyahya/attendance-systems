@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
+use App\Services\WhatsappMonitorService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
-use App\Services\WhatsappMonitorService;
 
 class WhatsappMaintenance extends Command
 {
@@ -47,11 +45,13 @@ class WhatsappMaintenance extends Command
 
         if ($count === 0) {
             $this->info('No failed jobs to clear.');
+
             return 0;
         }
 
-        if (!$this->option('force') && !$this->confirm("Clear {$count} failed jobs?")) {
+        if (! $this->option('force') && ! $this->confirm("Clear {$count} failed jobs?")) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
@@ -67,13 +67,15 @@ class WhatsappMaintenance extends Command
 
         if ($failedJobs->isEmpty()) {
             $this->info('No failed jobs to retry.');
+
             return 0;
         }
 
         $count = $failedJobs->count();
 
-        if (!$this->option('force') && !$this->confirm("Retry {$count} failed jobs?")) {
+        if (! $this->option('force') && ! $this->confirm("Retry {$count} failed jobs?")) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
@@ -113,8 +115,9 @@ class WhatsappMaintenance extends Command
     {
         $pattern = $this->ask('Enter cache pattern (leave empty for all WhatsApp caches)', '');
 
-        if (!$this->option('force') && !$this->confirm('Clear cache counters?')) {
+        if (! $this->option('force') && ! $this->confirm('Clear cache counters?')) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
@@ -143,7 +146,7 @@ class WhatsappMaintenance extends Command
             default => '❓'
         };
 
-        $this->line("Overall Status: {$statusIcon} " . ucfirst($health['overall_status']));
+        $this->line("Overall Status: {$statusIcon} ".ucfirst($health['overall_status']));
         $this->newLine();
 
         // Queue Health
@@ -152,7 +155,7 @@ class WhatsappMaintenance extends Command
         $this->line("Failed Jobs: {$stats['failed_jobs']}");
         $this->line("Processing Jobs: {$stats['processing_jobs']}");
 
-        if (!empty($stats['job_distribution'])) {
+        if (! empty($stats['job_distribution'])) {
             $this->line('Job Distribution:');
             foreach ($stats['job_distribution'] as $type => $count) {
                 $this->line("  - {$type}: {$count}");
@@ -183,7 +186,7 @@ class WhatsappMaintenance extends Command
         }
 
         // Active Alerts
-        if (!empty($health['alerts'])) {
+        if (! empty($health['alerts'])) {
             $this->info('🚨 Active Alerts');
             foreach ($health['alerts'] as $alert) {
                 $icon = $alert['type'] === 'critical' ? '❌' : '⚠️';
@@ -194,7 +197,7 @@ class WhatsappMaintenance extends Command
 
         // Recommendations
         $recommendations = $this->monitorService->getRecommendations();
-        if (!empty($recommendations)) {
+        if (! empty($recommendations)) {
             $this->info('💡 Recommendations');
             foreach ($recommendations as $rec) {
                 $icon = match ($rec['type']) {
@@ -249,15 +252,15 @@ class WhatsappMaintenance extends Command
             $this->line("Success Rate: {$performance['success_rate']}%");
         }
 
-        if (!empty($performance['throughput'])) {
+        if (! empty($performance['throughput'])) {
             $this->line("Throughput (last 3h): {$performance['throughput']['last_3_hours_total']} messages");
             $this->line("Average per hour: {$performance['throughput']['average_per_hour']}");
         }
 
-        if (!empty($performance['peak_hours'])) {
-            $this->line("Peak Hours:");
+        if (! empty($performance['peak_hours'])) {
+            $this->line('Peak Hours:');
             foreach ($performance['peak_hours'] as $period => $hours) {
-                $this->line("  - {$period}: " . implode(', ', $hours));
+                $this->line("  - {$period}: ".implode(', ', $hours));
             }
         }
 
@@ -322,20 +325,21 @@ class WhatsappWorkerManager extends Command
         }
 
         $this->info("✅ Successfully started {$workers} workers");
+
         return 0;
     }
 
     protected function stopWorkers(): int
     {
-        $this->info("Stopping WhatsApp queue workers...");
+        $this->info('Stopping WhatsApp queue workers...');
 
         // Send SIGTERM to all queue:work processes
         exec("pkill -f 'queue:work'", $output, $returnCode);
 
         if ($returnCode === 0) {
-            $this->info("✅ Workers stop signal sent");
+            $this->info('✅ Workers stop signal sent');
         } else {
-            $this->warn("⚠️  No running workers found or failed to stop");
+            $this->warn('⚠️  No running workers found or failed to stop');
         }
 
         return 0;
@@ -343,7 +347,7 @@ class WhatsappWorkerManager extends Command
 
     protected function restartWorkers(): int
     {
-        $this->info("Restarting WhatsApp queue workers...");
+        $this->info('Restarting WhatsApp queue workers...');
 
         // Stop existing workers
         $this->call('queue:restart');
@@ -364,7 +368,7 @@ class WhatsappWorkerManager extends Command
         if (empty($processes)) {
             $this->warn('⚠️  No queue workers are currently running');
         } else {
-            $this->info("✅ Found " . count($processes) . " running workers:");
+            $this->info('✅ Found '.count($processes).' running workers:');
             foreach ($processes as $process) {
                 // Extract relevant info from process list
                 $parts = preg_split('/\s+/', $process);

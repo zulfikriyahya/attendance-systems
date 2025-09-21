@@ -2,24 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Facades\Filament;
-use Filament\Resources\Resource;
-use Illuminate\Support\HtmlString;
-use Illuminate\Validation\Rules\Unique;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Tables\Enums\ActionsPosition;
-use Illuminate\Contracts\Support\Arrayable;
 use App\Filament\Resources\RoleResource\Pages;
-use BezhanSalleh\FilamentShield\Support\Utils;
-use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
+use BezhanSalleh\FilamentShield\Support\Utils;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Pages\SubNavigationPosition;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class RoleResource extends Resource implements HasShieldPermissions
 {
@@ -128,7 +128,7 @@ class RoleResource extends Resource implements HasShieldPermissions
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
-                    ]),
+                ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

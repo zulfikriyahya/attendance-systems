@@ -4,8 +4,8 @@ namespace App\Filament\Resources\InformasiResource\Widgets;
 
 use App\Models\Informasi;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends BaseWidget
 {

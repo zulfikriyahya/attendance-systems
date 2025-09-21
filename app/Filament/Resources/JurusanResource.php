@@ -2,33 +2,33 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\JurusanResource\Pages\CreateJurusan;
+use App\Filament\Resources\JurusanResource\Pages\EditJurusan;
+use App\Filament\Resources\JurusanResource\Pages\ListJurusans;
+use App\Filament\Resources\JurusanResource\Pages\ViewJurusan;
 use App\Models\Jurusan;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\JurusanResource\Pages\EditJurusan;
-use App\Filament\Resources\JurusanResource\Pages\ViewJurusan;
-use App\Filament\Resources\JurusanResource\Pages\ListJurusans;
-use App\Filament\Resources\JurusanResource\Pages\CreateJurusan;
 
 class JurusanResource extends Resource
 {
@@ -75,7 +75,7 @@ class JurusanResource extends Resource
                 TextColumn::make('nama')
                     ->badge()
                     ->searchable(Jurusan::all()->count() > 10),
-        ])
+            ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([
                 TrashedFilter::make(),

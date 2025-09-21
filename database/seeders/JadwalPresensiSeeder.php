@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Instansi;
-use Illuminate\Support\Str;
 use App\Models\JadwalPresensi;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JadwalPresensiSeeder extends Seeder
 {

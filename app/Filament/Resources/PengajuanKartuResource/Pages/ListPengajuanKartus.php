@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\PengajuanKartuResource\Pages;
 
-use Filament\Actions;
-use Filament\Actions\CreateAction;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\PengajuanKartuResource;
 use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 
 class ListPengajuanKartus extends ListRecords
 {
     protected static string $resource = PengajuanKartuResource::class;
+
     protected function getHeaderWidgets(): array
     {
         if (Auth::user()->hasRole('super_admin')) {
@@ -20,8 +20,10 @@ class ListPengajuanKartus extends ListRecords
                 StatsOverview::class,
             ];
         }
+
         return [];
     }
+
     protected function getHeaderActions(): array
     {
         if (Auth::user()->hasRole('super_admin')) {
@@ -33,6 +35,7 @@ class ListPengajuanKartus extends ListRecords
                     ->color(Color::Emerald),
             ];
         }
+
         return [];
     }
 }

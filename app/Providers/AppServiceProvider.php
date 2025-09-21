@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use App\Services\WhatsappDelayService;
 use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
-use App\Services\WhatsappDelayService;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Cache\RateLimiting\Limit;
 use Filament\Support\Facades\FilamentColor;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,9 +19,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(WhatsappDelayService::class);
         $this->app->singleton(WhatsappService::class, function ($app) {
-            return new WhatsappService();
+            return new WhatsappService;
         });
     }
+
     public function boot(): void
     {
         Model::unguard();

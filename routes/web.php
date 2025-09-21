@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LaporanAllSiswaController;
 use App\Http\Controllers\LaporanAllPegawaiController;
-use App\Http\Controllers\LaporanSingleSiswaController;
+use App\Http\Controllers\LaporanAllSiswaController;
 use App\Http\Controllers\LaporanSinglePegawaiController;
-use App\Http\Controllers\VerifikasiLaporanSiswaController;
+use App\Http\Controllers\LaporanSingleSiswaController;
 use App\Http\Controllers\VerifikasiLaporanPegawaiController;
+use App\Http\Controllers\VerifikasiLaporanSiswaController;
+use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('index');

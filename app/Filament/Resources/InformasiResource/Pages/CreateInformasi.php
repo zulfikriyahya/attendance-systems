@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
-use App\Models\User;
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use App\Models\Informasi;
+use App\Filament\Resources\InformasiResource;
 use App\Jobs\SendWhatsappMessage;
+use App\Models\Informasi;
+use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Models\User;
 use App\Services\WhatsappDelayService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\InformasiResource;
 
 class CreateInformasi extends CreateRecord
 {
@@ -28,14 +28,14 @@ class CreateInformasi extends CreateRecord
         if ($record->status === 'Publish') {
             // 🔔 Notifikasi Filament ke user login
             Notification::make()
-                ->title('Informasi Baru: ' . $record->judul)
+                ->title('Informasi Baru: '.$record->judul)
                 ->body('Ada informasi baru yang telah dipublikasikan.')
                 ->success()
                 ->send();
 
             // 🔔 Notifikasi DB ke semua user aktif
             Notification::make()
-                ->title('Informasi Baru: ' . $record->judul)
+                ->title('Informasi Baru: '.$record->judul)
                 ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
                 ->success()
                 ->sendToDatabase(User::query()->where('status', true)->get());
@@ -62,7 +62,7 @@ class CreateInformasi extends CreateRecord
             ->where('status', true)
             ->get();
 
-        // Ambil semua pegawai dengan nomor telepon  
+        // Ambil semua pegawai dengan nomor telepon
         $pegawai = Pegawai::with('jabatan.instansi', 'user')
             ->whereNotNull('telepon')
             ->where('telepon', '!=', '')
@@ -75,8 +75,9 @@ class CreateInformasi extends CreateRecord
         if ($totalRecipients === 0) {
             logger()->warning('No recipients found for informasi broadcast', [
                 'informasi_id' => $informasi->id,
-                'judul' => $informasi->judul
+                'judul' => $informasi->judul,
             ]);
+
             return;
         }
 
@@ -96,7 +97,7 @@ class CreateInformasi extends CreateRecord
                     'nama' => $nama,
                     'instansi' => $instansi,
                     'lampiran' => $informasi->lampiran,
-                    'isSiswa' => true
+                    'isSiswa' => true,
                 ]
             )->delay($delay);
 
@@ -119,7 +120,7 @@ class CreateInformasi extends CreateRecord
                     'nama' => $nama,
                     'instansi' => $instansi,
                     'lampiran' => $informasi->lampiran,
-                    'isSiswa' => false
+                    'isSiswa' => false,
                 ]
             )->delay($delay);
 
@@ -133,7 +134,7 @@ class CreateInformasi extends CreateRecord
             'total_recipients' => $totalRecipients,
             'siswa' => $siswa->count(),
             'pegawai' => $pegawai->count(),
-            'max_delay_minutes' => $delayService->calculateBulkDelay($notifCounter - 1, 'informasi')->diffInMinutes(now())
+            'max_delay_minutes' => $delayService->calculateBulkDelay($notifCounter - 1, 'informasi')->diffInMinutes(now()),
         ]);
     }
 }

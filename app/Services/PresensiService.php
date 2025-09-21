@@ -2,18 +2,17 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use App\Enums\StatusPulang;
 use App\Enums\StatusPresensi;
-use App\Models\PresensiSiswa;
-use App\Models\JadwalPresensi;
-use App\Models\PresensiPegawai;
+use App\Enums\StatusPulang;
 use App\Jobs\SendWhatsappMessage;
-use Illuminate\Support\Facades\DB;
+use App\Models\JadwalPresensi;
+use App\Models\Pegawai;
+use App\Models\PresensiPegawai;
+use App\Models\PresensiSiswa;
+use App\Models\Siswa;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
-use App\Services\WhatsappDelayService;
+use Illuminate\Support\Facades\DB;
 
 class PresensiService
 {
@@ -23,7 +22,7 @@ class PresensiService
     {
         $this->delayService = $delayService;
     }
-    
+
     public function prosesPresensi(string $rfid, ?string $timestamp = null, bool $isSync = false, ?string $deviceId = null): array
     {
         $now = $timestamp ? Carbon::parse($timestamp) : now();
@@ -149,7 +148,7 @@ class PresensiService
         string $instansi,
         bool $isSync
     ): void {
-        if (!$isSync) {
+        if (! $isSync) {
             $delay = $this->delayService->calculateRealtimeDelay($status);
 
             // Dispatch unified job

@@ -2,49 +2,49 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
-use App\Models\Siswa;
+use App\Filament\Imports\PegawaiImporter;
+use App\Filament\Resources\PegawaiResource\Pages\CetakKartuPegawai;
+use App\Filament\Resources\PegawaiResource\Pages\CreatePegawai;
+use App\Filament\Resources\PegawaiResource\Pages\EditPegawai;
+use App\Filament\Resources\PegawaiResource\Pages\ListPegawais;
+use App\Filament\Resources\PegawaiResource\Pages\ViewPegawai;
 use App\Models\Jabatan;
 use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Models\User;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Support\Facades\Storage;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ImageColumn;
-use App\Filament\Imports\PegawaiImporter;
-use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\ImportAction;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PegawaiResource\Pages\EditPegawai;
-use App\Filament\Resources\PegawaiResource\Pages\ViewPegawai;
-use App\Filament\Resources\PegawaiResource\Pages\ListPegawais;
-use App\Filament\Resources\PegawaiResource\Pages\CreatePegawai;
-use App\Filament\Resources\PegawaiResource\Pages\CetakKartuPegawai;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PegawaiResource extends Resource
 {
@@ -57,7 +57,7 @@ class PegawaiResource extends Resource
     protected static ?string $navigationLabel = 'Pegawai';
 
     protected static ?string $recordTitleAttribute = 'user_name';
-    
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'pegawai';
@@ -87,7 +87,7 @@ class PegawaiResource extends Resource
                             })
                             ->pluck('name', 'id');
                     })
-                    ->when(User::count() > 10, fn($field) => $field->searchable())
+                    ->when(User::count() > 10, fn ($field) => $field->searchable())
                     ->preload()
                     ->disabledOn('edit')
                     ->required()
@@ -145,7 +145,7 @@ class PegawaiResource extends Resource
                 Select::make('jabatan_id')
                     ->label('Jabatan')
                     ->relationship('jabatan', 'nama')
-                    ->when(Jabatan::count() > 10, fn($field) => $field->searchable())
+                    ->when(Jabatan::count() > 10, fn ($field) => $field->searchable())
                     ->required()
                     ->preload()
                     ->validationMessages([
@@ -166,44 +166,44 @@ class PegawaiResource extends Resource
         return $table
             ->headerActions([
                 ActionGroup::make([
-                ImportAction::make('import')
-                    ->label('Impor Data')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-identification')
-                    ->importer(PegawaiImporter::class)
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
-                Action::make('import-kartu')
-                    ->label('Impor Kartu')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-photo')
-                    ->requiresConfirmation()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin'))
-                    ->form([
-                        FileUpload::make('zip_file')
-                            ->label('File ZIP Kartu Pegawai')
-                            ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
-                            ->required()
-                            ->helperText('Upload file ZIP yang berisi kartu pegawai')
-                            ->maxSize(1024000),
+                    ImportAction::make('import')
+                        ->label('Impor Data')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-identification')
+                        ->importer(PegawaiImporter::class)
+                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    Action::make('import-kartu')
+                        ->label('Impor Kartu')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-photo')
+                        ->requiresConfirmation()
+                        ->visible(fn () => Auth::user()->hasRole('super_admin'))
+                        ->form([
+                            FileUpload::make('zip_file')
+                                ->label('File ZIP Kartu Pegawai')
+                                ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
+                                ->required()
+                                ->helperText('Upload file ZIP yang berisi kartu pegawai')
+                                ->maxSize(1024000),
 
-                        Checkbox::make('overwrite_existing')
-                            ->label('Timpa file yang sudah ada')
-                            ->default(true),
+                            Checkbox::make('overwrite_existing')
+                                ->label('Timpa file yang sudah ada')
+                                ->default(true),
 
-                        Checkbox::make('preserve_structure')
-                            ->label('Pertahankan struktur folder dalam ZIP')
-                            ->default(true)
-                            ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
-                    ])
-                    ->action(function (array $data) {
-                        self::extractZipToStorage($data);
-                    }),
-                            ])
-                ->hiddenLabel()
-                ->icon('heroicon-o-rectangle-group')
-                ->color(Color::Emerald)
+                            Checkbox::make('preserve_structure')
+                                ->label('Pertahankan struktur folder dalam ZIP')
+                                ->default(true)
+                                ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
+                        ])
+                        ->action(function (array $data) {
+                            self::extractZipToStorage($data);
+                        }),
+                ])
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-rectangle-group')
+                    ->color(Color::Emerald),
                 // ->button()
                 // ->outlined()
             ])
@@ -225,11 +225,11 @@ class PegawaiResource extends Resource
                 TextColumn::make('jenisKelamin')
                     ->label('Jenis Kelamin')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Pria' => 'success',
                         'Wanita' => 'danger',
                     })
-                    ->icon(fn(string $state): string => match ($state) {
+                    ->icon(fn (string $state): string => match ($state) {
                         'Pria' => 'heroicon-o-user',
                         'Wanita' => 'heroicon-o-user',
                     }),
@@ -273,7 +273,7 @@ class PegawaiResource extends Resource
 
                         return null;
                     })
-                    ->hidden(fn($record) => ! Storage::disk('public')->exists('kartu/' . basename($record->user->avatar)))
+                    ->hidden(fn ($record) => ! Storage::disk('public')->exists('kartu/'.basename($record->user->avatar)))
                     ->openUrlInNewTab(true),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -380,7 +380,7 @@ class PegawaiResource extends Resource
                 try {
                     // Determine final filename
                     $finalFilename = $preserveStructure ? $filename : basename($filename);
-                    $finalPath = $destinationPath . '/' . $finalFilename;
+                    $finalPath = $destinationPath.'/'.$finalFilename;
 
                     // Create subdirectory if needed
                     if ($preserveStructure && strpos($finalFilename, '/') !== false) {
@@ -403,15 +403,15 @@ class PegawaiResource extends Resource
                         if (file_put_contents($finalPath, $fileContent) !== false) {
                             $extractedCount++;
                         } else {
-                            $errors[] = 'Gagal menyimpan: ' . $filename;
+                            $errors[] = 'Gagal menyimpan: '.$filename;
                             $errorCount++;
                         }
                     } else {
-                        $errors[] = 'Gagal membaca dari ZIP: ' . $filename;
+                        $errors[] = 'Gagal membaca dari ZIP: '.$filename;
                         $errorCount++;
                     }
                 } catch (\Exception $e) {
-                    $errors[] = "Error pada {$filename}: " . $e->getMessage();
+                    $errors[] = "Error pada {$filename}: ".$e->getMessage();
                     $errorCount++;
                 }
             }
@@ -426,7 +426,7 @@ class PegawaiResource extends Resource
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Error')
-                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                ->body('Terjadi kesalahan: '.$e->getMessage())
                 ->danger()
                 ->send();
         }
@@ -450,9 +450,9 @@ class PegawaiResource extends Resource
         if ($errors > 0) {
             $message .= "❌ File error: {$errors}\n";
             if (! empty($errorMessages)) {
-                $message .= "\nDetail error:\n" . implode("\n", array_slice($errorMessages, 0, 5));
+                $message .= "\nDetail error:\n".implode("\n", array_slice($errorMessages, 0, 5));
                 if (count($errorMessages) > 5) {
-                    $message .= "\n... dan " . (count($errorMessages) - 5) . ' error lainnya';
+                    $message .= "\n... dan ".(count($errorMessages) - 5).' error lainnya';
                 }
             }
         }

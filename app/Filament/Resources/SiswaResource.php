@@ -2,55 +2,54 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
-use App\Models\Kelas;
-use App\Models\Siswa;
+use App\Filament\Imports\SiswaImporter;
+use App\Filament\Resources\SiswaResource\Pages\CetakKartuSiswa;
+use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
+use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
+use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
+use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
 use App\Models\Jabatan;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Models\Kelas;
+use App\Models\KelasSiswaTahunPelajaran;
+use App\Models\Siswa;
 use App\Models\TahunPelajaran;
+use App\Models\User;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\Collection;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use App\Filament\Imports\SiswaImporter;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use App\Models\KelasSiswaTahunPelajaran;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\ImportAction;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
-use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
-use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
-use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
-use App\Filament\Resources\SiswaResource\Pages\CetakKartuSiswa;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SiswaResource extends Resource
 {
@@ -172,44 +171,44 @@ class SiswaResource extends Resource
         return $table
             ->headerActions([
                 ActionGroup::make([
-                ImportAction::make('import')
-                    ->label('Impor Data')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-identification')
-                    ->importer(SiswaImporter::class)
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
-                Action::make('import-kartu')
-                    ->label('Impor Kartu')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-photo')
-                    ->requiresConfirmation()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin'))
-                    ->form([
-                        FileUpload::make('zip_file')
-                            ->label('File ZIP Kartu Siswa')
-                            ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
-                            ->required()
-                            ->helperText('Upload file ZIP yang berisi kartu siswa')
-                            ->maxSize(1024000),
+                    ImportAction::make('import')
+                        ->label('Impor Data')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-identification')
+                        ->importer(SiswaImporter::class)
+                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    Action::make('import-kartu')
+                        ->label('Impor Kartu')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-photo')
+                        ->requiresConfirmation()
+                        ->visible(fn () => Auth::user()->hasRole('super_admin'))
+                        ->form([
+                            FileUpload::make('zip_file')
+                                ->label('File ZIP Kartu Siswa')
+                                ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
+                                ->required()
+                                ->helperText('Upload file ZIP yang berisi kartu siswa')
+                                ->maxSize(1024000),
 
-                        Checkbox::make('overwrite_existing')
-                            ->label('Timpa file yang sudah ada')
-                            ->default(true),
+                            Checkbox::make('overwrite_existing')
+                                ->label('Timpa file yang sudah ada')
+                                ->default(true),
 
-                        Checkbox::make('preserve_structure')
-                            ->label('Pertahankan struktur folder dalam ZIP')
-                            ->default(true)
-                            ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
-                    ])
-                    ->action(function (array $data) {
-                        self::extractZipToStorage($data);
-                    }),
-                            ])
-                ->hiddenLabel()
-                ->icon('heroicon-o-rectangle-group')
-                ->color(Color::Emerald)
+                            Checkbox::make('preserve_structure')
+                                ->label('Pertahankan struktur folder dalam ZIP')
+                                ->default(true)
+                                ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
+                        ])
+                        ->action(function (array $data) {
+                            self::extractZipToStorage($data);
+                        }),
+                ])
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-rectangle-group')
+                    ->color(Color::Emerald),
                 // ->button()
                 // ->outlined()
             ])

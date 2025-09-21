@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
+use App\Filament\Resources\InformasiResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\InformasiResource;
 
 class EditInformasi extends EditRecord
 {

@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\PresensiController;
 use App\Services\WhatsappService;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PresensiController;
 
 Route::middleware(['api.secret'])->prefix('presensi')->name('presensi.')->group(function () {
 

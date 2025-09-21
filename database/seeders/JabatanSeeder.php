@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Jabatan;
 use App\Models\Instansi;
-use Illuminate\Support\Str;
+use App\Models\Jabatan;
 use App\Models\JadwalPresensi;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JabatanSeeder extends Seeder
 {

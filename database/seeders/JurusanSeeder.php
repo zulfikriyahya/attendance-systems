@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Jurusan;
 use App\Models\Instansi;
-use Illuminate\Support\Str;
+use App\Models\Jurusan;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JurusanSeeder extends Seeder
 {

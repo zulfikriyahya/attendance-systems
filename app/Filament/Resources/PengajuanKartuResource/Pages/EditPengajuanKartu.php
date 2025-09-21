@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\PengajuanKartuResource\Pages;
 
+use App\Filament\Resources\PengajuanKartuResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\PengajuanKartuResource;
 
 class EditPengajuanKartu extends EditRecord
 {
@@ -14,7 +14,7 @@ class EditPengajuanKartu extends EditRecord
     {
         return static::getResource()::getUrl('index');
     }
-    
+
     protected function getHeaderActions(): array
     {
         return [

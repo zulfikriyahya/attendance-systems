@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources\PresensiSiswaResource\Widgets;
 
-use Carbon\Carbon;
 use App\Models\PresensiSiswa;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Auth;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Auth;
 
 class AllStatsOverview extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected function getHeading(): ?string
     {
         return 'Statistik Presensi Siswa';
     }
+
     protected function getStats(): array
     {
         $siswaId = Auth::user()?->siswa?->id;
@@ -26,8 +26,8 @@ class AllStatsOverview extends BaseWidget
                 'Status Hadir',
                 PresensiSiswa::query()
                     ->where('statusPresensi', 'Hadir')
-                    ->when($siswaId, fn($query) => $query->where('siswa_id', $siswaId))
-                    ->count() . ' Hari'
+                    ->when($siswaId, fn ($query) => $query->where('siswa_id', $siswaId))
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Green)
                 ->chart([7, 2, 10, 3, 15, 4, 10])
@@ -40,8 +40,8 @@ class AllStatsOverview extends BaseWidget
                 'Status Terlambat',
                 PresensiSiswa::query()
                     ->where('statusPresensi', 'Terlambat')
-                    ->when($siswaId, fn($query) => $query->where('siswa_id', $siswaId))
-                    ->count() . ' Hari'
+                    ->when($siswaId, fn ($query) => $query->where('siswa_id', $siswaId))
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Amber)
                 ->chart([10, 2, 10, 3, 15, 4, 17])
@@ -54,8 +54,8 @@ class AllStatsOverview extends BaseWidget
                 'Status Sakit, Izin, Dispensasi',
                 PresensiSiswa::query()
                     ->whereIn('statusPresensi', ['Sakit', 'Izin', 'Dispen'])
-                    ->when($siswaId, fn($query) => $query->where('siswa_id', $siswaId))
-                    ->count() . ' Hari'
+                    ->when($siswaId, fn ($query) => $query->where('siswa_id', $siswaId))
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Fuchsia)
                 ->chart([10, 2, 10, 3, 15, 4, 17])
@@ -68,8 +68,8 @@ class AllStatsOverview extends BaseWidget
                 'Status Alfa',
                 PresensiSiswa::query()
                     ->where('statusPresensi', 'Alfa')
-                    ->when($siswaId, fn($query) => $query->where('siswa_id', $siswaId))
-                    ->count() . ' Hari'
+                    ->when($siswaId, fn ($query) => $query->where('siswa_id', $siswaId))
+                    ->count().' Hari'
             )
                 ->chartColor(Color::Red)
                 ->chart([7, 2, 10, 3, 15, 4, 10])

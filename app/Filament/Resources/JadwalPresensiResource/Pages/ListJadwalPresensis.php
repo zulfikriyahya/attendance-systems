@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\JadwalPresensiResource\Pages;
 
-use Filament\Actions;
+use App\Filament\Resources\JadwalPresensiResource;
 use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\JadwalPresensiResource;
 
 class ListJadwalPresensis extends ListRecords
 {
@@ -24,6 +23,7 @@ class ListJadwalPresensis extends ListRecords
                     ->color(Color::Emerald),
             ];
         }
+
         return [];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\InstansiResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\InstansiResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateInstansi extends CreateRecord
 {

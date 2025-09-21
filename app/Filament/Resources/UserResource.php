@@ -2,49 +2,48 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\UserImporter;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\Pages\ViewUser;
 use App\Models\User;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Intervention\Image\ImageManager;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use App\Filament\Imports\UserImporter;
-use Filament\Forms\Components\Checkbox;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Geometry\Circle;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\ImportAction;
-use Illuminate\Database\Eloquent\Builder;
-use Intervention\Image\Drivers\Gd\Driver;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages\ViewUser;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class UserResource extends Resource
 {
@@ -55,7 +54,7 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Pengguna';
-    
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 1;
@@ -71,6 +70,7 @@ class UserResource extends Resource
         if (! $user || ! $user->hasRole('super_admin')) {
             return null; // hanya admin yang bisa lihat badge
         }
+
         return static::getModel()::where('status', true)->count();
     }
 
@@ -91,7 +91,7 @@ class UserResource extends Resource
                     ]),
                 TextInput::make('username')
                     ->required()
-                    ->rule(fn($record) => $record === null ? 'unique:users,username' : 'unique:users,username,' . $record->id)
+                    ->rule(fn ($record) => $record === null ? 'unique:users,username' : 'unique:users,username,'.$record->id)
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->validationMessages([
@@ -101,7 +101,7 @@ class UserResource extends Resource
                 TextInput::make('email')
                     ->email()
                     ->required()
-                    ->rule(fn($record) => $record === null ? 'unique:users,email' : 'unique:users,email,' . $record->id)
+                    ->rule(fn ($record) => $record === null ? 'unique:users,email' : 'unique:users,email,'.$record->id)
                     ->unique(ignoreRecord: true)
                     ->validationMessages([
                         'required' => 'Form ini wajib diisi.',
@@ -112,8 +112,8 @@ class UserResource extends Resource
                     ->default(now()),
                 TextInput::make('password')
                     ->password()
-                    ->required(fn($record) => $record === null)
-                    ->dehydrateStateUsing(fn($state, $record) => $state ? bcrypt($state) : $record->password)
+                    ->required(fn ($record) => $record === null)
+                    ->dehydrateStateUsing(fn ($state, $record) => $state ? bcrypt($state) : $record->password)
                     ->validationMessages([
                         'required' => 'Form ini wajib diisi.',
                     ]),
@@ -132,13 +132,14 @@ class UserResource extends Resource
                     ->directory('avatar')
                     ->visibility('public')
                     ->getUploadedFileNameForStorageUsing(function ($file, $record) {
-                        $username = $record?->username ?? 'user_' . time();
-                        $fileName = strtolower($username) . '.png';
+                        $username = $record?->username ?? 'user_'.time();
+                        $fileName = strtolower($username).'.png';
                         $manager = new ImageManager(new Driver);
                         $image = $manager->read($file->getRealPath());
                         // Resize maksimal (jaga performa)
                         // $image = $image->scaleDown(1024, 1024);
-                        Storage::disk('public')->put('avatar/' . $fileName, (string) $image->toPng());
+                        Storage::disk('public')->put('avatar/'.$fileName, (string) $image->toPng());
+
                         return $fileName;
                     }),
                 Select::make('roles')
@@ -162,47 +163,48 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         $searchable = User::count() > 10;
+
         return $table
             ->headerActions([
                 ActionGroup::make([
-                ImportAction::make('import')
-                    ->label('Impor Data')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-identification')
-                    ->importer(UserImporter::class)
-                    ->visible(fn() => Auth::user()->hasRole('super_admin')),
-                Action::make('import-avatar')
-                    ->label('Impor Avatar')
-                    ->outlined()
-                    ->color('primary')
-                    ->icon('heroicon-o-photo')
-                    ->requiresConfirmation()
-                    ->visible(fn() => Auth::user()->hasRole('super_admin'))
-                    ->form([
-                        FileUpload::make('zip_file')
-                            ->label('File ZIP Avatar')
-                            ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
-                            ->required()
-                            ->helperText('Upload file ZIP yang berisi avatar')
-                            ->maxSize(1024000),
+                    ImportAction::make('import')
+                        ->label('Impor Data')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-identification')
+                        ->importer(UserImporter::class)
+                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    Action::make('import-avatar')
+                        ->label('Impor Avatar')
+                        ->outlined()
+                        ->color('primary')
+                        ->icon('heroicon-o-photo')
+                        ->requiresConfirmation()
+                        ->visible(fn () => Auth::user()->hasRole('super_admin'))
+                        ->form([
+                            FileUpload::make('zip_file')
+                                ->label('File ZIP Avatar')
+                                ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
+                                ->required()
+                                ->helperText('Upload file ZIP yang berisi avatar')
+                                ->maxSize(1024000),
 
-                        Checkbox::make('overwrite_existing')
-                            ->label('Timpa file yang sudah ada')
-                            ->default(true),
+                            Checkbox::make('overwrite_existing')
+                                ->label('Timpa file yang sudah ada')
+                                ->default(true),
 
-                        Checkbox::make('preserve_structure')
-                            ->label('Pertahankan struktur folder dalam ZIP')
-                            ->default(true)
-                            ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
-                    ])
-                    ->action(function (array $data) {
-                        self::extractZipToStorage($data);
-                    }),
-                            ])
-                ->hiddenLabel()
-                ->icon('heroicon-o-rectangle-group')
-                ->color(Color::Emerald)
+                            Checkbox::make('preserve_structure')
+                                ->label('Pertahankan struktur folder dalam ZIP')
+                                ->default(true)
+                                ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
+                        ])
+                        ->action(function (array $data) {
+                            self::extractZipToStorage($data);
+                        }),
+                ])
+                    ->hiddenLabel()
+                    ->icon('heroicon-o-rectangle-group')
+                    ->color(Color::Emerald),
                 // ->button()
                 // ->outlined()
             ])
@@ -227,9 +229,9 @@ class UserResource extends Resource
                 BadgeColumn::make('roles.name')
                     ->label('Peran')
                     ->formatStateUsing(
-                        fn($state, $record) => $record->roles
+                        fn ($state, $record) => $record->roles
                             ->pluck('name')
-                            ->map(fn($name) => Str::title(str_replace('_', ' ', $name)))
+                            ->map(fn ($name) => Str::title(str_replace('_', ' ', $name)))
                             ->join(', ')
                     )
                     ->searchable($searchable),
@@ -246,14 +248,14 @@ class UserResource extends Resource
                     EditAction::make(),
                     DeleteAction::make()
                         ->visible(
-                            fn($record) => ! $record->roles->contains('name', 'super_admin')
+                            fn ($record) => ! $record->roles->contains('name', 'super_admin')
                         ),
                     RestoreAction::make(),
                     ForceDeleteAction::make(),
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->checkIfRecordIsSelectableUsing(
-                fn($record) => ! $record->roles?->contains('name', 'super_admin')
+                fn ($record) => ! $record->roles?->contains('name', 'super_admin')
             )
             ->bulkActions([
                 BulkActionGroup::make([
@@ -339,7 +341,7 @@ class UserResource extends Resource
                 try {
                     // Determine final filename
                     $finalFilename = $preserveStructure ? $filename : basename($filename);
-                    $finalPath = $destinationPath . '/' . $finalFilename;
+                    $finalPath = $destinationPath.'/'.$finalFilename;
 
                     // Create subdirectory if needed
                     if ($preserveStructure && strpos($finalFilename, '/') !== false) {
@@ -362,15 +364,15 @@ class UserResource extends Resource
                         if (file_put_contents($finalPath, $fileContent) !== false) {
                             $extractedCount++;
                         } else {
-                            $errors[] = 'Gagal menyimpan: ' . $filename;
+                            $errors[] = 'Gagal menyimpan: '.$filename;
                             $errorCount++;
                         }
                     } else {
-                        $errors[] = 'Gagal membaca dari ZIP: ' . $filename;
+                        $errors[] = 'Gagal membaca dari ZIP: '.$filename;
                         $errorCount++;
                     }
                 } catch (\Exception $e) {
-                    $errors[] = "Error pada {$filename}: " . $e->getMessage();
+                    $errors[] = "Error pada {$filename}: ".$e->getMessage();
                     $errorCount++;
                 }
             }
@@ -385,7 +387,7 @@ class UserResource extends Resource
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Error')
-                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                ->body('Terjadi kesalahan: '.$e->getMessage())
                 ->danger()
                 ->send();
         }
@@ -409,9 +411,9 @@ class UserResource extends Resource
         if ($errors > 0) {
             $message .= "❌ File error: {$errors}\n";
             if (! empty($errorMessages)) {
-                $message .= "\nDetail error:\n" . implode("\n", array_slice($errorMessages, 0, 5));
+                $message .= "\nDetail error:\n".implode("\n", array_slice($errorMessages, 0, 5));
                 if (count($errorMessages) > 5) {
-                    $message .= "\n... dan " . (count($errorMessages) - 5) . ' error lainnya';
+                    $message .= "\n... dan ".(count($errorMessages) - 5).' error lainnya';
                 }
             }
         }

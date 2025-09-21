@@ -3,15 +3,19 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class WhatsappService
 {
     protected string $endpoint;
+
     protected int $timeout;
+
     protected bool $loggingEnabled;
+
     protected bool $testingMode;
+
     protected array $config;
 
     public function __construct()
@@ -32,7 +36,7 @@ class WhatsappService
         $nomor = $this->normalizeNumber($nomor);
 
         // Validation
-        if (!$this->isValidNumber($nomor)) {
+        if (! $this->isValidNumber($nomor)) {
             return $this->buildErrorResponse('Invalid phone number format', $nomor);
         }
 
@@ -89,11 +93,13 @@ class WhatsappService
 
             if ($error) {
                 $this->logError('CURL Error', $nomor, $error, ['duration_ms' => $duration]);
+
                 return $this->buildErrorResponse($error, $nomor);
             }
 
             if ($httpCode >= 400) {
                 $this->logError('HTTP Error', $nomor, "HTTP {$httpCode}", ['duration_ms' => $duration, 'response' => $response]);
+
                 return $this->buildErrorResponse("HTTP {$httpCode}", $nomor);
             }
 
@@ -101,6 +107,7 @@ class WhatsappService
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->logError('JSON Decode Error', $nomor, json_last_error_msg(), ['duration_ms' => $duration, 'raw_response' => $response]);
+
                 return $this->buildErrorResponse('Invalid JSON response', $nomor);
             }
 
@@ -137,7 +144,7 @@ class WhatsappService
         $ikon = $jenis === 'Presensi Masuk' ? 'Masuk' : 'Pulang';
         $tanggal = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-        $urlPresensi = config('app.url') . '/admin';
+        $urlPresensi = config('app.url').'/admin';
 
         // Get template messages
         $messageType = $jenis === 'Presensi Masuk' ? 'masuk' : 'pulang';
@@ -204,21 +211,21 @@ class WhatsappService
         $templates = $this->config['templates']['informasi'] ?? [];
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-        $urlPresensi = config('app.url') . '/admin';
+        $urlPresensi = config('app.url').'/admin';
         // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 200;
         $isiSingkat = strlen($isi) > $maxLength
-            ? substr($isi, 0, $maxLength) . '...'
+            ? substr($isi, 0, $maxLength).'...'
             : $isi;
 
         // Get template greetings and closings
         $userType = $isSiswa ? 'siswa' : 'pegawai';
         $title = strtoupper($judul);
         $greeting = $templates['greetings'][$userType]
-            ?? ($isSiswa ? "Halo, {$nama}!" : "Kepada Bapak/Ibu yang terhormat,");
+            ?? ($isSiswa ? "Halo, {$nama}!" : 'Kepada Bapak/Ibu yang terhormat,');
 
         $closing = $templates['closing'][$userType]
-            ?? ($isSiswa ? "Terima kasih atas perhatiannya. Tetap semangat belajar!" : "Terima kasih atas perhatian dan kerjasamanya.");
+            ?? ($isSiswa ? 'Terima kasih atas perhatiannya. Tetap semangat belajar!' : 'Terima kasih atas perhatian dan kerjasamanya.');
 
         $header = strtoupper(str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}'));
         $footer = strtoupper(str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}'));
@@ -264,14 +271,15 @@ class WhatsappService
      */
     protected function sendAttachment(string $nomor, string $lampiran, array $mainResult): array
     {
-        $filePath = storage_path('app/public/' . $lampiran);
+        $filePath = storage_path('app/public/'.$lampiran);
         Log::info('Sending attachment', [
             'file_path' => $filePath,
             'file_exists' => file_exists($filePath),
-            'nomor' => $nomor
+            'nomor' => $nomor,
         ]);
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             $this->logError('Attachment Not Found', $nomor, "File not found: {$lampiran}");
+
             return array_merge($mainResult, ['attachment_error' => 'File not found']);
         }
 
@@ -279,8 +287,9 @@ class WhatsappService
         $extension = strtolower(pathinfo($lampiran, PATHINFO_EXTENSION));
         $allowedTypes = $this->config['attachments']['allowed_types'] ?? ['jpg', 'jpeg', 'png', 'pdf'];
 
-        if (!in_array($extension, $allowedTypes)) {
+        if (! in_array($extension, $allowedTypes)) {
             $this->logError('Invalid File Type', $nomor, "File type not allowed: {$extension}");
+
             return array_merge($mainResult, ['attachment_error' => 'File type not allowed']);
         }
 
@@ -298,11 +307,12 @@ class WhatsappService
      */
     protected function isValidNumber(string $nomor): bool
     {
-        if (!$this->config['phone']['validation']['enabled'] ?? true) {
+        if (! $this->config['phone']['validation']['enabled'] ?? true) {
             return true;
         }
 
         $pattern = $this->config['phone']['validation']['pattern'] ?? '/^08[0-9]{8,12}$/';
+
         return preg_match($pattern, $nomor) === 1;
     }
 
@@ -316,10 +326,10 @@ class WhatsappService
         $prefix = $this->config['phone']['normalization']['prefix'] ?? '08';
 
         if (str_starts_with($nomor, $countryCode)) {
-            return $prefix . substr($nomor, strlen($countryCode));
+            return $prefix.substr($nomor, strlen($countryCode));
         }
         if (str_starts_with($nomor, '8')) {
-            return $prefix . substr($nomor, 1);
+            return $prefix.substr($nomor, 1);
         }
         if (str_starts_with($nomor, $prefix)) {
             return $nomor;
@@ -347,7 +357,7 @@ class WhatsappService
                 $invalid[] = [
                     'original' => $original,
                     'normalized' => $normalized_number,
-                    'reason' => 'Invalid format'
+                    'reason' => 'Invalid format',
                 ];
             }
         }
@@ -360,8 +370,8 @@ class WhatsappService
                 'total' => count($nomors),
                 'valid_count' => count($valid),
                 'invalid_count' => count($invalid),
-                'success_rate' => count($nomors) > 0 ? round((count($valid) / count($nomors)) * 100, 2) : 0
-            ]
+                'success_rate' => count($nomors) > 0 ? round((count($valid) / count($nomors)) * 100, 2) : 0,
+            ],
         ];
     }
 
@@ -370,7 +380,7 @@ class WhatsappService
      */
     protected function isRateLimited(): bool
     {
-        $key = 'whatsapp_rate_limit_' . date('Y-m-d-H');
+        $key = 'whatsapp_rate_limit_'.date('Y-m-d-H');
         $limit = $this->config['rate_limits']['presensi']['messages_per_minute'] ?? 35;
         $current = Cache::get($key, 0);
 
@@ -388,7 +398,7 @@ class WhatsappService
             'status' => true,
             'message' => 'Mock message sent successfully',
             'mock' => true,
-            'recipient' => $nomor
+            'recipient' => $nomor,
         ];
     }
 
@@ -402,7 +412,7 @@ class WhatsappService
             'error' => $error,
             'recipient' => $nomor,
             'timestamp' => now()->toISOString(),
-            'context' => $context
+            'context' => $context,
         ];
     }
 
@@ -411,18 +421,22 @@ class WhatsappService
      */
     protected function logSuccess(string $nomor, float $duration, array $response): void
     {
-        if (!$this->loggingEnabled) return;
+        if (! $this->loggingEnabled) {
+            return;
+        }
 
         Log::channel($this->config['logging']['channels']['success'] ?? 'single')->info('WhatsApp message sent successfully', [
             'recipient' => $nomor,
             'duration_ms' => $duration,
-            'response' => $this->config['logging']['context']['include_response'] ? $response : 'hidden'
+            'response' => $this->config['logging']['context']['include_response'] ? $response : 'hidden',
         ]);
     }
 
     protected function logError(string $type, string $nomor, string $message, array $context = []): void
     {
-        if (!$this->loggingEnabled) return;
+        if (! $this->loggingEnabled) {
+            return;
+        }
 
         Log::channel($this->config['logging']['channels']['error'] ?? 'single')->error("WhatsApp {$type}", array_merge([
             'recipient' => $nomor,
@@ -432,7 +446,9 @@ class WhatsappService
 
     protected function logInfo(string $message, array $context = []): void
     {
-        if (!$this->loggingEnabled) return;
+        if (! $this->loggingEnabled) {
+            return;
+        }
 
         Log::info($message, $context);
     }
@@ -442,7 +458,7 @@ class WhatsappService
      */
     protected function updateMetrics(string $type, float $duration): void
     {
-        $key = "whatsapp_metrics_{$type}_" . date('Y-m-d-H');
+        $key = "whatsapp_metrics_{$type}_".date('Y-m-d-H');
         $data = Cache::get($key, ['count' => 0, 'total_duration' => 0]);
 
         $data['count']++;
@@ -457,7 +473,7 @@ class WhatsappService
      */
     protected function trackPresensiMetrics(string $jenis, string $status, bool $isBulk, bool $success): void
     {
-        $key = 'whatsapp_presensi_stats_' . date('Y-m-d');
+        $key = 'whatsapp_presensi_stats_'.date('Y-m-d');
         $stats = Cache::get($key, []);
 
         $stats['total'] = ($stats['total'] ?? 0) + 1;
@@ -474,7 +490,7 @@ class WhatsappService
      */
     protected function trackInformasiMetrics(string $judul, bool $hasAttachment, bool $success): void
     {
-        $key = 'whatsapp_informasi_stats_' . date('Y-m-d');
+        $key = 'whatsapp_informasi_stats_'.date('Y-m-d');
         $stats = Cache::get($key, []);
 
         $stats['total'] = ($stats['total'] ?? 0) + 1;
@@ -489,8 +505,8 @@ class WhatsappService
      */
     public function getHealthStatus(): array
     {
-        $successKey = 'whatsapp_metrics_success_' . date('Y-m-d-H');
-        $errorKey = 'whatsapp_metrics_error_' . date('Y-m-d-H');
+        $successKey = 'whatsapp_metrics_success_'.date('Y-m-d-H');
+        $errorKey = 'whatsapp_metrics_error_'.date('Y-m-d-H');
 
         $success = Cache::get($successKey, ['count' => 0, 'avg_duration' => 0]);
         $errors = Cache::get($errorKey, ['count' => 0]);

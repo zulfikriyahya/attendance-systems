@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources\PresensiPegawaiResource\Widgets;
 
+use App\Models\PresensiPegawai;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Models\PresensiPegawai;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class FirstRecordPegawai extends BaseWidget
 {
     protected static ?string $heading = '5 Presensi Pegawai Pertama';
+
     // protected int | string | array $columnSpan = 'full';
     public function table(Table $table): Table
     {
@@ -17,7 +18,7 @@ class FirstRecordPegawai extends BaseWidget
             ->query(
                 PresensiPegawai::query()
                     ->with('pegawai')
-                    ->latest('tanggal') 
+                    ->latest('tanggal')
                     ->whereNotIn('statusPresensi', ['Izin', 'Alfa', 'Sakit', 'Dinas Luar', 'Libur'])
                     ->limit(5)
             )

@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\KelasResource\Pages;
 
-use Filament\Actions;
+use App\Filament\Resources\KelasResource;
 use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
-use App\Filament\Resources\KelasResource;
-use Filament\Resources\Pages\ListRecords;
 
 class ListKelas extends ListRecords
 {
@@ -24,6 +23,7 @@ class ListKelas extends ListRecords
                     ->color(Color::Emerald),
             ];
         }
+
         return [];
     }
 }

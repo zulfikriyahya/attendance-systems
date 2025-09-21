@@ -2,22 +2,22 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Jobs\SendWhatsappMessage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 class MonitorWhatsappQueue extends Command
 {
     protected $signature = 'whatsapp:monitor {--clear-cache : Clear hourly cache counters}';
+
     protected $description = 'Monitor WhatsApp queue status and statistics';
 
     public function handle()
     {
         if ($this->option('clear-cache')) {
             $this->clearCacheCounters();
+
             return 0;
         }
 
@@ -35,7 +35,7 @@ class MonitorWhatsappQueue extends Command
     {
         $this->info('WhatsApp Queue Monitoring Dashboard');
         $this->info('====================================');
-        $this->line('Current Time: ' . now()->format('Y-m-d H:i:s'));
+        $this->line('Current Time: '.now()->format('Y-m-d H:i:s'));
         $this->newLine();
     }
 
@@ -67,12 +67,13 @@ class MonitorWhatsappQueue extends Command
                 ->map(function ($job) {
                     $payload = json_decode($job->payload, true);
                     $className = $payload['displayName'] ?? 'Unknown';
+
                     return basename(str_replace('\\', '/', $className));
                 })
                 ->countBy()
                 ->toArray();
 
-            if (!empty($jobs)) {
+            if (! empty($jobs)) {
                 $this->line('Job Types:');
                 foreach ($jobs as $type => $count) {
                     $this->line("  - {$type}: {$count}");
@@ -107,7 +108,7 @@ class MonitorWhatsappQueue extends Command
         $presensiLimit = 35; // From your WhatsappDelayService
         $bulkLimit = 20;     // From your WhatsappDelayService
 
-        $this->line("Rate limits:");
+        $this->line('Rate limits:');
         $this->line("  - Presensi: {$presensiLimit} messages/minute");
         $this->line("  - Bulk Operations: {$bulkLimit} messages/minute");
 
@@ -172,7 +173,7 @@ class MonitorWhatsappQueue extends Command
             $count = Cache::get($key, 0);
 
             $totalLast3Hours += $count;
-            $hourlyBreakdown[] = sprintf("%s:%s - %d messages", $hourStr, '00', $count);
+            $hourlyBreakdown[] = sprintf('%s:%s - %d messages', $hourStr, '00', $count);
         }
 
         foreach ($hourlyBreakdown as $breakdown) {
@@ -236,23 +237,23 @@ class MonitorWhatsappQueue extends Command
         $recommendations = [];
 
         if ($pendingJobs > 5000) {
-            $recommendations[] = "Consider scaling up queue workers";
-            $recommendations[] = "Check if WhatsApp service is responding properly";
+            $recommendations[] = 'Consider scaling up queue workers';
+            $recommendations[] = 'Check if WhatsApp service is responding properly';
         }
 
         if ($failedJobs > 20) {
-            $recommendations[] = "Review failed jobs: php artisan queue:failed";
-            $recommendations[] = "Consider retrying failed jobs: php artisan queue:retry all";
+            $recommendations[] = 'Review failed jobs: php artisan queue:failed';
+            $recommendations[] = 'Consider retrying failed jobs: php artisan queue:retry all';
         }
 
-        $currentHourCount = Cache::get("whatsapp_hourly_" . now()->format('Y-m-d_H'), 0);
+        $currentHourCount = Cache::get('whatsapp_hourly_'.now()->format('Y-m-d_H'), 0);
         if ($currentHourCount > 1500) {
-            $recommendations[] = "Monitor WhatsApp API rate limits";
-            $recommendations[] = "Consider implementing circuit breaker pattern";
+            $recommendations[] = 'Monitor WhatsApp API rate limits';
+            $recommendations[] = 'Consider implementing circuit breaker pattern';
         }
 
         if (empty($recommendations)) {
-            $this->info("✅ No specific recommendations at this time");
+            $this->info('✅ No specific recommendations at this time');
         } else {
             foreach ($recommendations as $recommendation) {
                 $this->line("• {$recommendation}");
