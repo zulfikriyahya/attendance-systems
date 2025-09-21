@@ -69,13 +69,19 @@ class ProcessKetidakhadiran implements ShouldQueue
 
         info('⏰ Mengecek presensi masuk (Alfa)...');
 
-        $notifCounter = 0; // Counter untuk delay calculation
+        $notifCounter = 0; // Counter untuk kalkulasi delay
 
         // Process Pegawai
         Pegawai::with('jabatan.instansi', 'user')
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
             ->whereDoesntHave('presensiPegawai', fn($q) => $q->whereDate('tanggal', $tanggal))
+            ->where(function ($q) {
+                $q->whereHas('user.pengajuanKartu', function ($subQ) {
+                    $subQ->where('statusAmbil', true);
+                })
+                    ->orWhereDoesntHave('user.pengajuanKartu'); // Tetap proses yang tidak punya pengajuan
+            })
             ->chunk(100, function ($pegawaiBatch) use ($tanggal, &$notifCounter) {
                 foreach ($pegawaiBatch as $pegawai) {
                     PresensiPegawai::create([
@@ -114,6 +120,12 @@ class ProcessKetidakhadiran implements ShouldQueue
             ->where('status', true)
             ->whereIn('jabatan_id', $jabatanIds)
             ->whereDoesntHave('presensiSiswa', fn($q) => $q->whereDate('tanggal', $tanggal))
+            ->where(function ($q) {
+                $q->whereHas('user.pengajuanKartu', function ($subQ) {
+                    $subQ->where('statusAmbil', true);
+                })
+                    ->orWhereDoesntHave('user.pengajuanKartu'); // Tetap proses yang tidak punya pengajuan
+            })
             ->chunk(100, function ($siswaBatch) use ($tanggal, &$notifCounter) {
                 foreach ($siswaBatch as $siswa) {
                     PresensiSiswa::create([
@@ -175,6 +187,12 @@ class ProcessKetidakhadiran implements ShouldQueue
             ->whereNull('jamPulang')
             ->whereNull('statusPulang')
             ->whereHas('pegawai', fn($q) => $q->whereIn('jabatan_id', $jabatanIds))
+            ->where(function ($q) {
+                $q->whereHas('pegawai.user.pengajuanKartu', function ($subQ) {
+                    $subQ->where('statusAmbil', true);
+                })
+                    ->orWhereDoesntHave('pegawai.user.pengajuanKartu'); // Tetap proses yang tidak punya pengajuan
+            })
             ->whereNotIn('statusPresensi', $pengecualianStatus)
             ->chunk(100, function ($presensiBatch) use (&$notifCounter) {
                 foreach ($presensiBatch as $presensi) {
@@ -213,6 +231,12 @@ class ProcessKetidakhadiran implements ShouldQueue
             ->whereNull('jamPulang')
             ->whereNull('statusPulang')
             ->whereHas('siswa', fn($q) => $q->whereIn('jabatan_id', $jabatanIds))
+            ->where(function ($q) {
+                $q->whereHas('siswa.user.pengajuanKartu', function ($subQ) {
+                    $subQ->where('statusAmbil', true);
+                })
+                    ->orWhereDoesntHave('siswa.user.pengajuanKartu'); // Tetap proses yang tidak punya pengajuan
+            })
             ->whereNotIn('statusPresensi', $pengecualianStatus)
             ->chunk(100, function ($presensiBatch) use (&$notifCounter) {
                 foreach ($presensiBatch as $presensi) {
