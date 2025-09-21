@@ -52,4 +52,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     {
         return $this->hasOne(Siswa::class);
     }
+
+    public function pengajuanKartu(): HasOne
+    {
+        return $this->hasOne(PengajuanKartu::class);
+    }
 }
