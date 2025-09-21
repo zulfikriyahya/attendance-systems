@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class WhatsappService
 {
@@ -211,7 +211,7 @@ class WhatsappService
         $templates = $this->config['templates']['informasi'] ?? [];
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-        $urlInformasi = config('app.url') . '/admin/informasi';
+        $urlInformasi = config('app.url').'/admin/informasi';
         // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 200;
         $isiSingkat = strlen($isi) > $maxLength
@@ -222,7 +222,7 @@ class WhatsappService
         $userType = $isSiswa ? 'siswa' : 'pegawai';
         $title = strtoupper($judul);
         $greeting = $templates['greetings'][$userType]
-            ?? ($isSiswa ? "Kepada Bapak/Ibu/Wali Siswa yang terhormat," : 'Kepada Bapak/Ibu yang terhormat,');
+            ?? ($isSiswa ? 'Kepada Bapak/Ibu/Wali Siswa yang terhormat,' : 'Kepada Bapak/Ibu yang terhormat,');
 
         $closing = $templates['closing'][$userType]
             ?? ($isSiswa ? 'Terima kasih atas perhatiannya. Tetap semangat belajar!' : 'Terima kasih atas perhatian dan kerjasamanya.');

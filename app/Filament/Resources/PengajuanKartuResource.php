@@ -2,34 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
+use App\Filament\Resources\PengajuanKartuResource\Pages;
 use App\Models\Instansi;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use App\Models\PengajuanKartu;
-use Filament\Resources\Resource;
+use App\Models\User;
 use App\Services\WhatsappService;
-use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PengajuanKartuResource\Pages;
+use Illuminate\Support\Facades\Auth;
 
 class PengajuanKartuResource extends Resource
 {
@@ -367,7 +367,7 @@ class PengajuanKartuResource extends Resource
                             $tahunIni = date('Y');
                             $namaInstansi = Instansi::all()->first()->nama;
                             $instansi = strtoupper($namaInstansi);
-                            $url = config('app.url') . '/admin/pengajuan-kartu/' . $record->id;
+                            $url = config('app.url').'/admin/pengajuan-kartu/'.$record->id;
                             $message = <<<TEXT
                             *PTSP {$instansi}*
                             

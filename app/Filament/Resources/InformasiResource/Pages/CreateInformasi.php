@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
-use App\Models\User;
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use App\Models\Informasi;
+use App\Filament\Resources\InformasiResource;
 use App\Jobs\SendWhatsappMessage;
+use App\Models\Informasi;
+use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Models\User;
 use App\Services\WhatsappDelayService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\InformasiResource;
 
 class CreateInformasi extends CreateRecord
 {
