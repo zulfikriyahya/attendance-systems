@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\JadwalPresensi;
 use App\Models\User;
+use App\Models\JadwalPresensi;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class JadwalPresensiPolicy

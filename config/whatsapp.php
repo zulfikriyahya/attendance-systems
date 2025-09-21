@@ -128,7 +128,7 @@ return [
             'max_content_length' => env('WHATSAPP_INFO_MAX_LENGTH', 200),
 
             'greetings' => [
-                'siswa' => 'Kepada Siswa/i yang terhormat,',
+                'siswa' => 'Kepada Bapak/Ibu/Wali Siswa yang terhormat,',
                 'pegawai' => 'Kepada Bapak/Ibu yang terhormat,',
             ],
 

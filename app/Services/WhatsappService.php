@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class WhatsappService
 {
@@ -173,7 +173,7 @@ class WhatsappService
         *{$header}*
 
         ———————————————————
-        *Presensi {$ikon}*
+        *🗃️ Presensi {$ikon}*
         ———————————————————
         Nama    : {$nama}
         Status  : *{$status}*
@@ -211,18 +211,18 @@ class WhatsappService
         $templates = $this->config['templates']['informasi'] ?? [];
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
-        $urlPresensi = config('app.url').'/admin';
+        $urlInformasi = config('app.url') . '/admin/informasi';
         // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 200;
         $isiSingkat = strlen($isi) > $maxLength
-            ? substr($isi, 0, $maxLength).'...'
+            ? substr($isi, 0, $maxLength).'... (Baca selengkapnya.)'
             : $isi;
 
         // Get template greetings and closings
         $userType = $isSiswa ? 'siswa' : 'pegawai';
         $title = strtoupper($judul);
         $greeting = $templates['greetings'][$userType]
-            ?? ($isSiswa ? "Halo, {$nama}!" : 'Kepada Bapak/Ibu yang terhormat,');
+            ?? ($isSiswa ? "Kepada Bapak/Ibu/Wali Siswa yang terhormat," : 'Kepada Bapak/Ibu yang terhormat,');
 
         $closing = $templates['closing'][$userType]
             ?? ($isSiswa ? 'Terima kasih atas perhatiannya. Tetap semangat belajar!' : 'Terima kasih atas perhatian dan kerjasamanya.');
@@ -242,9 +242,8 @@ class WhatsappService
         *{$title}*
 
         {$isiSingkat}
-
         ———————————————————
-        Tautan: {$urlPresensi}
+        Tautan: {$urlInformasi}
         ———————————————————
 
         {$closing}
@@ -297,7 +296,7 @@ class WhatsappService
         sleep(2);
 
         $namaFile = basename($lampiran);
-        $attachmentResult = $this->send($nomor, "📎 Lampiran: {$namaFile}", $filePath);
+        $attachmentResult = $this->send($nomor, "Lampiran: {$namaFile}", $filePath);
 
         return array_merge($mainResult, ['attachment_result' => $attachmentResult]);
     }

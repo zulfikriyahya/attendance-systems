@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Pegawai;
 use App\Models\User;
+use App\Models\Pegawai;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PegawaiPolicy
