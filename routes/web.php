@@ -11,9 +11,6 @@ use App\Http\Controllers\VerifikasiLaporanPegawaiController;
 Route::get('/', function () {
     return view('index');
 });
-// Route::get('/', function () {
-//     return redirect('/admin');
-// });
 
 // Pegawai
 Route::get('/pegawai/{pegawai}/presensi/print', [LaporanSinglePegawaiController::class, 'print'])
