@@ -9,12 +9,16 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Select;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -77,28 +81,17 @@ class InformasiResource extends Resource
                     ->directory('lampiranInformasi')
                     ->visibility('public')
                     ->maxSize(1024 * 5),
-                MarkdownEditor::make('isi')
+            MarkdownEditor::make('isi')
                     ->label('Uraian Informasi')
                     ->required()
                     ->columnSpanFull()
                     ->toolbarButtons([
-                        'attachFiles',
-                        'blockquote',
                         'bold',
-                        'bulletList',
-                        'codeBlock',
-                        'heading',
                         'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
                         'strike',
-                        'table',
-                        'undo',
-                    ])
-                    ->fileAttachmentsDisk('local')
-                    ->fileAttachmentsDirectory('lampiran')
-                    ->fileAttachmentsVisibility('private'),
+                        'bulletList',
+                        'orderedList',
+                    ]),
             ]);
     }
 
@@ -107,23 +100,33 @@ class InformasiResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('judul')
-                    ->searchable(Informasi::all()->count() > 10),
-                TextColumn::make('isi')
-                    ->label('Uraian')
-                    ->limit(50)
+                    ->searchable(Informasi::all()->count() > 10)
+                    ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= 50) {
+                        if (strlen($state) <= 15) {
+                            return null;
+                        }
+
+                        return $state;
+                    })
+                ->weight(FontWeight::Medium),
+            TextColumn::make('isi')
+                    ->label('Uraian')
+                    ->limit(15)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 15) {
                             return null;
                         }
 
                         return $state;
                     }),
                 TextColumn::make('tanggal')
-                ->dateTime('l, d F Y')
-                ->sortable(),
-                TextColumn::make('status'),
-                TextColumn::make('lampiran'),
+                ->dateTime('l, d F Y'),
+                BadgeColumn::make('status')
+                ,
+                ImageColumn::make('lampiran'),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -168,6 +171,8 @@ class InformasiResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->orderBy('tanggal', 'desc')
+            ;
     }
 }

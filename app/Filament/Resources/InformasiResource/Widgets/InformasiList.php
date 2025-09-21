@@ -10,14 +10,16 @@ use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Section;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\Placeholder;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class InformasiList extends BaseWidget
 {
-    protected static ?string $heading = 'Informasi';
+    protected static ?string $heading = '🛈 Informasi';
 
     public function table(Table $table): Table
     {
@@ -31,24 +33,35 @@ class InformasiList extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('judul')
                     ->label('Judul')
-                    ->searchable(Informasi::all()->count() > 25)
-                    ->limit(50)
-                    ->tooltip(function ($record) {
-                        return $record->judul;
+                    ->searchable(Informasi::all()->count() > 50)
+                    ->limit(15)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 15) {
+                            return null;
+                        }
+
+                        return $state;
                     })
                     ->weight(FontWeight::Medium),
 
                 Tables\Columns\TextColumn::make('isi')
-                    ->label('Konten')
-                    ->limit(25)
-                    ->html()
-                    ->tooltip(function ($record) {
-                        return strip_tags($record->isi);
+                    ->label('Uraian')
+                    ->limit(15)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 15) {
+                            return null;
+                        }
+
+                        return $state;
                     }),
 
                 Tables\Columns\TextColumn::make('tanggal')
                     ->label('Tanggal')
-                    ->dateTime('l, d F Y H:i:s'),
+                    ->sinceTooltip()
+                    ->dateTime('l, d F Y'),
+                ImageColumn::make('lampiran'),
             ])
             ->actions([
                 ActionGroup::make([
@@ -175,7 +188,7 @@ class InformasiList extends BaseWidget
             ->recordAction('view')
             ->recordUrl(null)
             ->striped()
-            ->paginated([5, 10, 25])
+            ->paginated([5])
             ->defaultPaginationPageOption(5);
     }
 }
