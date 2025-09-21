@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Closure;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Instansi;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\PengajuanKartu;
@@ -28,8 +29,8 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PengajuanKartuResource\Pages;
 
 class PengajuanKartuResource extends Resource
@@ -363,11 +364,15 @@ class PengajuanKartuResource extends Resource
 
                         if ($phoneNumber) {
                             $whatsappService = new WhatsappService;
+                            $tahunIni = date('Y');
+                            $namaInstansi = Instansi::all()->first()->nama;
+                            $instansi = strtoupper($namaInstansi);
+                            $url = config('app.url');
                             $message = <<<TEXT
-                            *PTSP MTSN 1 PANDEGLANG*
+                            *PTSP {$instansi}*
                             
                             ———————————————————
-                            🎉 *Kartu Presensi Sedang Diproses*
+                            🪪 *Kartu Presensi Sedang Diproses*
                             ———————————————————
                             Halo {$userName},
                             Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* sedang diproses.
@@ -375,10 +380,10 @@ class PengajuanKartuResource extends Resource
                             
                             Terima kasih! 🙏
                             ———————————————————
-                            Tautan : https://presensi.mtsn1pandeglang.sch.id/admin/pengajuan-kartu/{$record->id}
+                            Tautan : {$url}/admin/pengajuan-kartu/{$record->id}
                             ———————————————————
                             
-                            *© 2022 - 2025 MTs Negeri 1 Pandeglang*
+                            *© 2022 - {$tahunIni} {$instansi}*
                             TEXT;
                             $whatsappService->send($phoneNumber, $message);
                         }
@@ -425,23 +430,27 @@ class PengajuanKartuResource extends Resource
                         if ($phoneNumber) {
                             $whatsappService = new WhatsappService;
                             $biaya = number_format($record->biaya,0,',','.');
+                            $tahunIni = date('Y');
+                            $namaInstansi = Instansi::all()->first()->nama;
+                            $instansi = strtoupper($namaInstansi);
+                            $url = config('app.url');
                             $message = <<<TEXT
-                            *PTSP MTSN 1 PANDEGLANG*
+                            *PTSP {$instansi}*
                             
                             ———————————————————
-                            🎉 *Kartu Siap Diambil di Ruang PTSP*
+                            🪪 *Kartu Siap Diambil di Ruang PTSP*
                             ———————————————————
                             Halo {$userName},
                             Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.
-                            📍 Silakan ambil di Ruang PTSP
-                            💰 Biaya pembuatan kartu: Rp. *{$biaya}*,-
+                            🏢 Silakan ambil di Ruang PTSP
+                            💸 Biaya pembuatan kartu: Rp. *{$biaya}*,-
                             
                             Terima kasih! 🙏
                             ———————————————————
-                            Tautan : https://presensi.mtsn1pandeglang.sch.id/admin/pengajuan-kartu/{$record->id}
+                            Tautan : {$url}/admin/pengajuan-kartu/{$record->id}
                             ———————————————————
                             
-                            *© 2022 - 2025 MTs Negeri 1 Pandeglang*
+                            *© 2022 - {$tahunIni} {$instansi}*
                             TEXT;
                             $whatsappService->send($phoneNumber, $message);
                         }
@@ -505,7 +514,7 @@ class PengajuanKartuResource extends Resource
             }
         }
 
-        $sequencePadded = str_pad($sequence, 3, '0', STR_PAD_LEFT);
+        $sequencePadded = str_pad($sequence, 4, '0', STR_PAD_LEFT);
 
         return "PK-{$today}-{$userIdPadded}-{$sequencePadded}";
     }
