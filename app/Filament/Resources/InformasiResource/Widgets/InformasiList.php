@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\InformasiResource\Widgets;
 
-use Filament\Tables;
 use App\Models\Informasi;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
@@ -31,7 +30,7 @@ class InformasiList extends BaseWidget
                     ->orderBy('tanggal', 'desc')
             )
             ->columns([
-                Tables\Columns\TextColumn::make('judul')
+                TextColumn::make('judul')
                     ->label('Judul')
                     ->searchable(Informasi::all()->count() > 50)
                     ->limit(15)
@@ -45,7 +44,7 @@ class InformasiList extends BaseWidget
                     })
                     ->weight(FontWeight::Medium),
 
-                Tables\Columns\TextColumn::make('isi')
+                TextColumn::make('isi')
                     ->label('Uraian')
                     ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -57,7 +56,7 @@ class InformasiList extends BaseWidget
                         return $state;
                     }),
 
-                Tables\Columns\TextColumn::make('tanggal')
+                TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->sinceTooltip()
                     ->dateTime('l, d F Y'),

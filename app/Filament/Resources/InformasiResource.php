@@ -78,9 +78,11 @@ class InformasiResource extends Resource
                     ->required(),
                 FileUpload::make('lampiran')
                     ->label('Lampiran Informasi')
+                    ->image()
+                    ->maxFiles(1)
                     ->directory('lampiranInformasi')
                     ->visibility('public')
-                    ->maxSize(1024 * 5),
+                    ->maxSize(2048),
             MarkdownEditor::make('isi')
                     ->label('Uraian Informasi')
                     ->required()

@@ -213,8 +213,9 @@ class WhatsappService
 
         // Get template greetings and closings
         $userType = $isSiswa ? 'siswa' : 'pegawai';
+        $title = strtoupper($judul);
         $greeting = $templates['greetings'][$userType]
-            ?? ($isSiswa ? "Kepada Siswa/i yang terhormat," : "Kepada Bapak/Ibu yang terhormat,");
+            ?? ($isSiswa ? "Halo, {$nama}!" : "Kepada Bapak/Ibu yang terhormat,");
 
         $closing = $templates['closing'][$userType]
             ?? ($isSiswa ? "Terima kasih atas perhatiannya. Tetap semangat belajar!" : "Terima kasih atas perhatian dan kerjasamanya.");
@@ -227,15 +228,13 @@ class WhatsappService
 
         ———————————————————
         📢 *INFORMASI TERBARU*
+        _{$tanggalFormatted}_
         ———————————————————
         {$greeting}
 
-        *{$judul}*
+        *{$title}*
 
         {$isiSingkat}
-
-        Tanggal: {$tanggalFormatted}
-        Penerima: {$nama}
 
         ———————————————————
         Tautan: {$urlPresensi}
