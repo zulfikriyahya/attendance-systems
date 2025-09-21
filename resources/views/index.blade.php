@@ -53,7 +53,7 @@
 <body>
     <header>
         <nav class="container" role="navigation" aria-label="Navigasi utama">
-            <a href="#" class="logo">Presensi MTs Negeri 1 Pandeglang</a>
+            <a href="#" class="logo">Presensi RFID</a>
             <button class="menu-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="main-menu">
                 <span></span>
                 <span></span>
@@ -68,7 +68,7 @@
 
             <div class="auth-links-desktop">
                 <a href="/admin/login" class="cta-button">Login</a>
-                <a href="/admin/register" class="cta-button-outline">Register</a>
+                <a href="/admin" class="cta-button-outline">Register</a>
             </div>
         </nav>
     </header>
@@ -84,9 +84,9 @@
                         cepat, akurat, dan real-time.
                     </p>
                     <div class="code-snippet pulse">
-                        <code><b>ESP32 + PN532 + OLED + Buzzer + HTTP API</b></code>
+                        <code><b>ESP32 + MFRC522 + OLED + Buzzer + HTTP API</b></code>
                     </div>
-                    <a href="/admin" class="cta-button">Coba Sekarang</a>
+                    <a href="/admin" class="cta-button">Login Aplikasi</a>
                 </div>
             </div>
         </section>
@@ -142,8 +142,8 @@
             @include('landing.footer_links')
             </div> --}}
             <div class="footer-bottom">
-                <p>&copy; 2023 - {{ date('Y') }} <a href="https://mtsn1pandeglang.sch.id" target="_blank"
-                        style="color: inherit; text-decoration: none;">MTs Negeri 1 Pandeglang</a>. Seluruh hak cipta
+                <p>&copy; 2022 - {{ date('Y') }} <a href="https://mtsn1pandeglang.sch.id" target="_blank"
+                        style="color: inherit; text-decoration: none;">MTs Negeri 1 Pandeglang</a>.<br>Seluruh hak cipta
                     dilindungi.</p>
             </div>
         </div>
