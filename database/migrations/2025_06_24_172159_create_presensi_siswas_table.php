@@ -1,28 +1,29 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi untuk membuat tabel presensi_siswas.
      */
     public function up(): void
     {
         Schema::create('presensi_siswas', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('id')->primary(); // Primary key dengan tipe UUID
 
-            $table->foreignUuid('siswa_id')
+            $table->foreignUuid('siswa_id') // Relasi ke tabel siswas
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
-            $table->date('tanggal')->nullable();
-            $table->time('jamDatang')->nullable();
-            $table->time('jamPulang')->nullable();
 
-            $table->enum('statusPresensi', [
+            $table->date('tanggal')->nullable(); // Tanggal presensi
+            $table->time('jamDatang')->nullable(); // Jam kedatangan siswa
+            $table->time('jamPulang')->nullable(); // Jam pulang siswa
+
+            $table->enum('statusPresensi', [ // Status kehadiran siswa
                 'Hadir',
                 'Terlambat',
                 'Alfa',
@@ -32,20 +33,24 @@ return new class extends Migration
                 'Dispen',
             ])->nullable();
 
-            $table->enum('statusPulang', [
+            $table->enum('statusPulang', [ // Status kepulangan siswa
                 'Pulang',
                 'Pulang Sebelum Waktunya',
                 'Bolos',
             ])->nullable();
-            $table->boolean('is_synced')->default(false);
-            $table->timestamp('synced_at')->nullable();
-            $table->string('device_id')->nullable();
-            $table->json('sync_metadata')->nullable();
-            $table->text('catatan')->nullable();
-            $table->enum('statusApproval', ['pending', 'approved', 'rejected'])->nullable();
-            $table->string('berkasLampiran')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+
+            $table->boolean('is_synced')->default(false); // Status sinkronisasi data
+            $table->timestamp('synced_at')->nullable(); // Waktu terakhir sinkronisasi
+            $table->string('device_id')->nullable(); // ID perangkat absensi (jika ada)
+            $table->json('sync_metadata')->nullable(); // Data tambahan dari proses sinkronisasi
+            $table->text('catatan')->nullable(); // Catatan tambahan terkait presensi
+            $table->enum('statusApproval', ['pending', 'approved', 'rejected'])->nullable(); // Status persetujuan (misalnya untuk izin/dispensasi)
+            $table->string('berkasLampiran')->nullable(); // Path/URL lampiran file terkait (opsional)
+
+            $table->timestamps(); // created_at & updated_at
+            $table->softDeletes(); // deleted_at untuk soft delete
+
+            // Index untuk optimasi query
             $table->index(['is_synced', 'created_at']);
             $table->index('device_id');
             $table->index(['tanggal', 'siswa_id']);
@@ -53,7 +58,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Rollback migrasi dengan menghapus tabel presensi_siswas.
      */
     public function down(): void
     {
