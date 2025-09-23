@@ -21,7 +21,6 @@
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "pxlrbt/filament-excel": "^2.4",
-        "shuvroroy/filament-spatie-laravel-backup": "^2.2",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
