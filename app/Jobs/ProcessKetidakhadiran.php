@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Models\JadwalPresensi;
-use App\Models\Pegawai;
-use App\Models\PresensiPegawai;
-use App\Models\PresensiSiswa;
-use App\Models\Siswa;
-use App\Services\WhatsappDelayService;
 use Carbon\Carbon;
+use App\Models\Siswa;
+use App\Models\Pegawai;
+use App\Enums\StatusPulang;
+use App\Enums\StatusPresensi;
+use App\Models\PresensiSiswa;
 use Illuminate\Bus\Queueable;
+use App\Models\JadwalPresensi;
+use App\Models\PresensiPegawai;
+use App\Services\WhatsappDelayService;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class ProcessKetidakhadiran implements ShouldQueue
 {
