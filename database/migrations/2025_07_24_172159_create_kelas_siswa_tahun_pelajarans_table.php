@@ -4,15 +4,15 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Jalankan migrasi untuk membuat tabel kelas_siswa_tahun_pelajarans.
      * Tabel ini berfungsi sebagai penghubung relasi antara kelas, siswa, dan tahun pelajaran.
      * Dengan tabel ini, kita bisa melacak siswa masuk ke kelas tertentu pada tahun pelajaran tertentu.
-     */
+    */
     public function up(): void
     {
+        // TODO : Membuat Tabel Enrollment
         Schema::create('kelas_siswa_tahun_pelajarans', function (Blueprint $table) {
             $table->uuid('id')->primary(); // Primary key berbentuk UUID
 
