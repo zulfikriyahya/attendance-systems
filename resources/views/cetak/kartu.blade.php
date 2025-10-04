@@ -66,6 +66,12 @@
             transform: scaleX(-1);
         }
 
+        .kartu.belakang img {
+            transform: scaleY(-1);
+            /* flip vertikal */
+        }
+
+
         @media print {
             body {
                 -webkit-print-color-adjust: exact;
@@ -85,7 +91,7 @@
 </head>
 
 <body onload="window.print()">
-
+    {{-- Bagian Depan --}}
     @foreach ($pengajuans->chunk(10) as $chunk)
         <div class="page">
             @foreach ($chunk as $pengajuan)
@@ -95,6 +101,17 @@
             @endforeach
         </div>
     @endforeach
+    {{-- Bagian Belakang --}}
+    @foreach ($pengajuans->chunk(10) as $chunk)
+        <div class="page">
+            @foreach ($chunk as $pengajuan)
+                <div class="kartu belakang">
+                    <img src="{{ asset('/images/background-kartu.png') }}" alt="{{ $pengajuan->user->name }}">
+                </div>
+            @endforeach
+        </div>
+    @endforeach
+
 </body>
 
 </html>
