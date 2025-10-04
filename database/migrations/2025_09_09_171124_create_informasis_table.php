@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Jalankan migrasi untuk membuat tabel informasis
      */
@@ -27,6 +26,13 @@ return new class extends Migration
             $table->enum('status', ['Draft', 'Publish', 'Archive'])
                 ->default('Draft');
             // Status informasi: Draft (belum publish), Publish (ditampilkan), Archive (diarsipkan)
+
+
+            $table->foreignUuid('jabatan_id')
+                ->constrained('jabatans')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
 
             $table->string('lampiran')->nullable();
             // Lampiran file opsional (misalnya PDF, gambar, dll.)

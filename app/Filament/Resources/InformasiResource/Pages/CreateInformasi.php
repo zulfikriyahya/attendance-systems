@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
-use App\Filament\Resources\InformasiResource;
-use App\Jobs\SendWhatsappMessage;
-use App\Models\Informasi;
-use App\Models\Pegawai;
-use App\Models\Siswa;
 use App\Models\User;
+use App\Models\Siswa;
+use App\Models\Pegawai;
+use App\Models\Informasi;
+use App\Jobs\SendWhatsappMessage;
 use App\Services\WhatsappDelayService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Resources\InformasiResource;
 
 class CreateInformasi extends CreateRecord
 {
@@ -21,6 +21,7 @@ class CreateInformasi extends CreateRecord
         return static::getResource()::getUrl('index');
     }
 
+    // FIXME: filter hanya jabatan aktif
     protected function handleRecordCreation(array $data): Informasi
     {
         $record = Informasi::create($data);
@@ -35,10 +36,18 @@ class CreateInformasi extends CreateRecord
 
             // 🔔 Notifikasi DB ke semua user aktif
             Notification::make()
-                ->title('Informasi Baru: '.$record->judul)
+                ->title('Informasi Baru: ' . $record->judul)
                 ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
                 ->success()
-                ->sendToDatabase(User::query()->where('status', true)->get());
+                ->sendToDatabase(
+                    User::query()
+                        ->where('status', true)
+                        ->where(function ($query) use ($record) {
+                            $query->whereHas('pegawai', fn ($q) => $q->where('jabatan_id', $record->jabatan_id))
+                                ->orWhereHas('siswa', fn ($q) => $q->where('jabatan_id', $record->jabatan_id));
+                        })
+                        ->get()
+                    );
 
             // 📲 Broadcast WA ke semua siswa dan pegawai
             $this->sendInformasiToWhatsapp($record);
@@ -57,6 +66,7 @@ class CreateInformasi extends CreateRecord
 
         // Ambil semua siswa dengan nomor telepon
         $siswa = Siswa::with('jabatan.instansi')
+            ->where('jabatan_id', $informasi->jabatan_id)
             ->whereNotNull('telepon')
             ->where('telepon', '!=', '')
             ->where('status', true)
@@ -64,6 +74,7 @@ class CreateInformasi extends CreateRecord
 
         // Ambil semua pegawai dengan nomor telepon
         $pegawai = Pegawai::with('jabatan.instansi', 'user')
+            ->where('jabatan_id', $informasi->jabatan_id)
             ->whereNotNull('telepon')
             ->where('telepon', '!=', '')
             ->where('status', true)

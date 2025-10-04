@@ -2,33 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InformasiResource\Pages;
-use App\Models\Informasi;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use App\Models\Jabatan;
 use Filament\Forms\Form;
+use App\Models\Informasi;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
 use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use App\Filament\Resources\InformasiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InformasiResource extends Resource
@@ -69,7 +71,12 @@ class InformasiResource extends Resource
                         'Publish' => 'Publish',
                         'Archive' => 'Archive',
                     ])
-                    ->default('Draft')
+                    ->default('Publish')
+                    ->native(false)
+                    ->required(),
+                Select::make('jabatan_id')
+                    ->label('Kepada')
+                    ->relationship('jabatan', 'nama')
                     ->native(false)
                     ->required(),
                 FileUpload::make('lampiran')
@@ -124,7 +131,15 @@ class InformasiResource extends Resource
                     }),
                 TextColumn::make('tanggal')
                     ->dateTime('l, d F Y'),
-                BadgeColumn::make('status'),
+                BadgeColumn::make('status')
+                    ->color(fn (string $state): string => match ($state) {
+                        'Draft' => 'gray',
+                        'Publish' => 'success',
+                        'Archive' => 'warning',
+                        default => 'gray',
+                    }),
+                BadgeColumn::make('jabatan.nama')
+                ->label('Kepada'),
                 ImageColumn::make('lampiran'),
             ])
             ->filters([
@@ -167,10 +182,30 @@ class InformasiResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
+        $user = Auth::user();
+
+        // Kalau super_admin => tampilkan semua
+        if ($user->hasRole('super_admin')) {
+            return parent::getEloquentQuery()
+                ->withoutGlobalScopes([SoftDeletingScope::class])
+                ->orderBy('tanggal', 'desc');
+        }
+
+        // Cari jabatan user (entah dari pegawai atau siswa)
+        $jabatanId = null;
+
+        if ($user->pegawai) {
+            $jabatanId = $user->pegawai?->jabatan_id;
+        } elseif ($user->siswa) {
+            $jabatanId = $user->siswa?->jabatan_id;
+        }
+
         return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ])
+            ->withoutGlobalScopes([SoftDeletingScope::class])
+            ->where('status', 'Publish') // hanya publish
+            ->when($jabatanId, fn ($query) =>
+                $query->where('jabatan_id', $jabatanId)
+            )
             ->orderBy('tanggal', 'desc');
     }
 }
