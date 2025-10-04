@@ -322,6 +322,7 @@ class PengajuanKartuResource extends Resource
                 EditAction::make()
                     ->button()
                     ->outlined()
+                    ->hidden(fn ($record) => $record->statusAmbil === true && Auth::user()->hasRole('super_admin'))
                     ->visible(fn () => Auth::user()->hasRole('super_admin')),
 
                 Action::make('approve')
