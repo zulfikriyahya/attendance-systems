@@ -67,8 +67,8 @@
         }
 
         .kartu.belakang img {
-            transform: scaleY(-1);
             /* flip vertikal */
+            transform: scaleY(-1);
         }
 
 
