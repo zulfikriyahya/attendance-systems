@@ -12,7 +12,7 @@
     </title>
     <style>
         @page {
-            size: A4 landscape;
+            size: 300mm 200mm;
             margin: 0;
         }
 
@@ -30,15 +30,15 @@
         }
 
         .page {
-            width: 297mm;
-            height: 210mm;
+            width: 300mm;
+            height: 200mm;
             page-break-after: always;
             display: flex;
             flex-wrap: wrap;
-            justify-content: justify;
-            align-content: justify;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
             padding: 5mm;
-            gap: 3.4mm;
         }
 
         .page:last-child {
@@ -46,11 +46,11 @@
         }
 
         .kartu {
-            width: 54.6mm;
-            height: 86.8mm;
+            width: 54.98mm;
+            height: 86.6mm;
             background: #fff;
             border: 1px solid #ddd;
-            border-radius: 2mm;
+            border-radius: 3mm;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -62,6 +62,8 @@
             height: 100%;
             object-fit: fill;
             display: block;
+            /* Mirorring */
+            transform: scaleX(-1);
         }
 
         @media print {
@@ -71,8 +73,8 @@
             }
 
             .page {
-                width: 297mm;
-                height: 210mm;
+                width: 300mm;
+                height: 200mm;
             }
 
             @page {
@@ -93,7 +95,6 @@
             @endforeach
         </div>
     @endforeach
-
 </body>
 
 </html>
