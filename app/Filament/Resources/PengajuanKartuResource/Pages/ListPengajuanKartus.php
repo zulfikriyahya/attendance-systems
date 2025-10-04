@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\PengajuanKartuResource\Pages;
 
-use App\Filament\Resources\PengajuanKartuResource;
-use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
+use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\PengajuanKartuResource;
+use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview;
 
 class ListPengajuanKartus extends ListRecords
 {
@@ -33,6 +34,14 @@ class ListPengajuanKartus extends ListRecords
                     ->outlined()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Emerald),
+                    // TODO: Add Print Action
+                Action::make('cetak')
+                    ->label('Cetak Kartu')
+                    ->outlined()
+                    ->icon('heroicon-o-printer')
+                    ->color(Color::Cyan)
+                    ->url(fn (): string => route('cetak-kartu'))
+                    ->openUrlInNewTab(),
             ];
         }
 

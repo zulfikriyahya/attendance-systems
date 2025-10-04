@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CetakKartuController;
 use App\Http\Controllers\LaporanAllSiswaController;
 use App\Http\Controllers\LaporanAllPegawaiController;
 use App\Http\Controllers\LaporanSingleSiswaController;
@@ -31,3 +32,7 @@ Route::get('/laporan/siswa/print-all', [LaporanAllSiswaController::class, 'print
 
 Route::get('/laporan/siswa/verifikasi/{id}', [VerifikasiLaporanSiswaController::class, 'verifikasi'])
     ->name('laporan.siswa.verifikasi');
+
+// Cetak Pengajuan Kartu
+Route::get('/cetak-kartu', [CetakKartuController::class, 'index'])
+    ->name('cetak-kartu');

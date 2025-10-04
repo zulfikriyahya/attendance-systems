@@ -2,54 +2,54 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\SiswaImporter;
-use App\Filament\Resources\SiswaResource\Pages\CetakKartuSiswa;
-use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
-use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
-use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
-use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
-use App\Models\Jabatan;
-use App\Models\Kelas;
-use App\Models\KelasSiswaTahunPelajaran;
-use App\Models\Siswa;
-use App\Models\TahunPelajaran;
 use App\Models\User;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\Jabatan;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\TahunPelajaran;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\ImportAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use App\Filament\Imports\SiswaImporter;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
+use App\Models\KelasSiswaTahunPelajaran;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
+use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
+use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
+use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
+use App\Filament\Resources\SiswaResource\Pages\CetakKartuSiswa;
 
 class SiswaResource extends Resource
 {
@@ -191,7 +191,7 @@ class SiswaResource extends Resource
                                 ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
                                 ->required()
                                 ->helperText('Upload file ZIP yang berisi kartu siswa')
-                                ->maxSize(1024000),
+                                ->maxSize(102400),
 
                             Checkbox::make('overwrite_existing')
                                 ->label('Timpa file yang sudah ada')
