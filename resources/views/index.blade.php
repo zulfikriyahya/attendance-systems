@@ -65,11 +65,6 @@
                 <li><a href="#docs">Dokumentasi</a></li>
                 <li><a href="#testimonials">Testimoni</a></li>
             </ul>
-
-            <div class="auth-links-desktop">
-                <a href="/admin/login" class="cta-button">Login</a>
-                <a href="/admin" class="cta-button-outline">Register</a>
-            </div>
         </nav>
     </header>
 
@@ -110,12 +105,12 @@
             <div class="container">
                 <h2 class="section-title">Contoh Implementasi Firmware</h2>
                 <p class="section-subtitle">
-                    Gunakan ESP32 dan sensor PN532 untuk mengirim data ke server secara otomatis.
+                    Gunakan ESP32 dan sensor MFRC522 untuk mengirim data ke server secara otomatis.
                 </p>
                 <div class="code-container">
                     <div class="code-line"><span class="keyword">#include</span> &lt;WiFi.h&gt;</div>
                     <div class="code-line"><span class="keyword">#include</span> &lt;HTTPClient.h&gt;</div>
-                    <div class="code-line"><span class="keyword">#include</span> &lt;PN532.h&gt;</div>
+                    <div class="code-line"><span class="keyword">#include</span> &lt;MFRC.h&gt;</div>
                     <div class="code-line"><span class="function">void loop()</span> {</div>
                     <div class="code-line"> <span class="function">if (cardDetected())</span> sendToServer(uid);</div>
                     <div class="code-line">}</div>
@@ -143,7 +138,8 @@
             </div> --}}
             <div class="footer-bottom">
                 <p>&copy; 2022 - {{ date('Y') }} <a href="https://mtsn1pandeglang.sch.id" target="_blank"
-                        style="color: inherit; text-decoration: none;">MTs Negeri 1 Pandeglang</a>.<br>Seluruh hak cipta
+                        style="color: inherit; text-decoration: none;">MTs Negeri 1 Pandeglang</a>.<br>Seluruh hak
+                    cipta
                     dilindungi.</p>
             </div>
         </div>

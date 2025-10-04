@@ -61,7 +61,6 @@
             width: 100%;
             height: 100%;
             object-fit: fill;
-            /* tetap sesuai permintaan: resize tanpa crop */
             display: block;
         }
 
