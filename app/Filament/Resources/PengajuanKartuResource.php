@@ -2,34 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages;
-use App\Models\Instansi;
-use App\Models\PengajuanKartu;
-use App\Models\User;
-use App\Services\WhatsappService;
 use Carbon\Carbon;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\User;
+use App\Models\Instansi;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
+use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\PengajuanKartuResource\Pages;
 
 class PengajuanKartuResource extends Resource
 {
@@ -294,10 +294,10 @@ class PengajuanKartuResource extends Resource
                         'success' => 'Selesai',
                     ])
                     ->sortable(),
-
                 ToggleColumn::make('statusAmbil')
                     ->label('Penyerahan')
-                    ->disabledClick(fn ($record) => $record->status === 'Selesai' && Auth::user()->hasRole('super_admin')),
+                    ->disabled(fn ($record) => $record->status !== 'Selesai' && Auth::user()->hasRole('super_admin'))
+                    ->tooltip(fn ($record) => $record->status !== 'Selesai' ? 'Sudah selesai, tidak bisa diubah' : null),
             ])
             ->filters([
                 SelectFilter::make('status')
