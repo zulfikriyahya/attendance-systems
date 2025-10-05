@@ -140,47 +140,45 @@ class ListKelas extends ListRecords
                 ->requiresConfirmation()
                 ->form([
                     Select::make('kelas_tahun_pelajaran_id')
-    ->label('Kelas Aktif')
-    ->options(function () {
-        $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
+                    ->label('Kelas Aktif')
+                    ->options(function () {
+                        $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
 
-        if (! $tahunAktifId) {
-            return [];
-        }
+                        if (! $tahunAktifId) {
+                            return [];
+                        }
 
-        // Ambil semua kelas_tahun_pelajaran yang SUDAH memiliki pegawai di tahun aktif
-        $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
-            $query->where('tahun_pelajaran_id', $tahunAktifId);
-        })->pluck('kelas_tahun_pelajaran_id');
+                        // Ambil semua kelas_tahun_pelajaran yang SUDAH memiliki pegawai di tahun aktif
+                        $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
+                            $query->where('tahun_pelajaran_id', $tahunAktifId);
+                        })->pluck('kelas_tahun_pelajaran_id');
 
-        // Ambil semua kelas_tahun_pelajaran yang BELUM memiliki pegawai
-        return KelasTahunPelajaran::with(['kelas', 'tahunPelajaran'])
-            ->where('tahun_pelajaran_id', $tahunAktifId)
-            ->whereNotIn('id', $sudahTerdaftar)
-            ->get()
-            ->unique('kelas_id')
-            ->mapWithKeys(function ($ktp) {
-                $kelasNama = $ktp->kelas?->nama ?? 'Tanpa Kelas';
-                $tahunNama = $ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun';
-                $jurusan   = $ktp->kelas?->jurusan?->nama ?? null; // opsional jika ada
-                $tingkat   = $ktp->kelas?->tingkat ?? null; // opsional jika ada
+                        // Ambil semua kelas_tahun_pelajaran yang BELUM memiliki pegawai
+                        return KelasTahunPelajaran::with(['kelas', 'tahunPelajaran'])
+                            ->where('tahun_pelajaran_id', $tahunAktifId)
+                            ->whereNotIn('id', $sudahTerdaftar)
+                            ->get()
+                            ->unique('kelas_id')
+                            ->mapWithKeys(function ($ktp) {
+                                $kelasNama = $ktp->kelas?->nama ?? 'Tanpa Kelas';
+                                $tahunNama = $ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun';
+                                $jurusan   = $ktp->kelas?->jurusan?->nama ?? null; // opsional jika ada
+                                $tingkat   = $ktp->kelas?->tingkat ?? null; // opsional jika ada
 
-                $labelParts = array_filter([
-                    $tingkat ? "Tingkat {$tingkat}" : null,
-                    $kelasNama,
-                    $jurusan,
-                    "TP: {$tahunNama}",
-                ]);
+                                $labelParts = array_filter([
+                                    $tingkat ? "Tingkat {$tingkat}" : null,
+                                    $kelasNama,
+                                    $jurusan,
+                                    "TP: {$tahunNama}",
+                                ]);
 
-                $label = implode(' • ', $labelParts);
+                                $label = implode(' • ', $labelParts);
 
-                return [$ktp->id => $label];
-            });
-    })
-    ->searchable()
-    ->required(),
-
-
+                                return [$ktp->id => $label];
+                            });
+                    })
+                    ->searchable()
+                    ->required(),
                     Select::make('pegawai_id')
                         ->label('Pegawai')
                         ->options(function () {

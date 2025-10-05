@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Siswa;
 use App\Models\User;
+use App\Models\Siswa;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SiswaPolicy

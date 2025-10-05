@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\PresensiSiswa;
 use App\Models\User;
+use App\Models\PresensiSiswa;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PresensiSiswaPolicy
