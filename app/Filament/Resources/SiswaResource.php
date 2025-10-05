@@ -239,11 +239,16 @@ class SiswaResource extends Resource
                     ->label('RFID')
                     ->copyable()
                     ->searchable($searchable),
-                TextColumn::make('kelasSaatIni')
+                BadgeColumn::make('kelas')
                     ->label('Kelas')
-                    ->formatStateUsing(
-                        fn ($state, $record) => $record->kelasSaatIni->pluck('nama')->implode(', ')
-                    ),
+                    ->getStateUsing(function ($record) {
+                        return collect($record->kelasSiswas)
+                            ->map(fn ($ks) => $ks->kelasTahunPelajaran?->kelas?->nama)
+                            ->filter()
+                            ->unique()
+                            ->values()
+                            ->all();
+                    }),
                 IconColumn::make('status')
                     ->label('Status')
                     ->boolean(),
@@ -285,60 +290,6 @@ class SiswaResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-                // BulkAction::make('assignKelas')
-                        // ->label('Assign Kelas + TP')
-                        // ->icon('heroicon-o-building-storefront')
-                        // ->form([
-                        //     Select::make('kelas_id')
-                        //         ->label('Kelas')
-                        //         ->options(Kelas::all()->pluck('nama', 'id'))
-                        //         ->required(),
-
-                        //     Select::make('tahun_pelajaran_id')
-                        //         ->label('Tahun Pelajaran')
-                        //         ->options(TahunPelajaran::where('status', true)->pluck('nama', 'id'))
-                        //         ->required(),
-                        // ])
-                        // ->action(function (Collection $records, array $data) {
-                        //     foreach ($records as $siswa) {
-                        //         Enrollment::updateOrCreate([
-                        //             'kelas_id' => $data['kelas_id'],
-                        //             'siswa_id' => $siswa->id,
-                        //             'tahun_pelajaran_id' => $data['tahun_pelajaran_id'],
-                        //         ]);
-                        //     }
-
-                        //     Notification::make()
-                        //         ->title('Berhasil')
-                        //         ->body('Berhasil menetapkan kelas dan tahun pelajaran.')
-                        //         ->success()
-                        //         ->send();
-                        // })
-                        // ->action(function (Collection $records, array $data) {
-                        //     $tahunPelajaranId = $data['tahun_pelajaran_id'];
-                        //     $kelasId = $data['kelas_id'];
-
-                        //     $records = $records->filter(function ($siswa) use ($tahunPelajaranId) {
-                        //         return ! Enrollment::where('siswa_id', $siswa->id)
-                        //             ->where('tahun_pelajaran_id', $tahunPelajaranId)
-                        //             ->exists();
-                        //     });
-
-                        //     foreach ($records as $siswa) {
-                        //         Enrollment::create([
-                        //             'kelas_id' => $kelasId,
-                        //             'siswa_id' => $siswa->id,
-                        //             'tahun_pelajaran_id' => $tahunPelajaranId,
-                        //         ]);
-                        //     }
-
-                        //     Notification::make()
-                        //         ->title('Berhasil')
-                        //         ->body("Berhasil menetapkan kelas dan tahun pelajaran untuk {$records->count()} siswa.")
-                        //         ->success()
-                        //         ->send();
-                        // })
-                        // ->visible(fn () => Auth::user()->hasRole('super_admin')),
             ]);
     }
 
@@ -521,4 +472,10 @@ class SiswaResource extends Resource
             ->duration(10000)
             ->send();
     }
+
+    protected function getTableQuery()
+{
+    return parent::getTableQuery()
+        ->with(['kelasSiswas.kelasTahunPelajaran.kelas']);
+}
 }

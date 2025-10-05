@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use App\Models\Pegawai;
 use App\Models\Enrollment;
 use App\Models\KelasSiswa;
+use App\Models\KelasPegawai;
 use Filament\Actions\Action;
 use App\Models\TahunPelajaran;
 use Filament\Actions\CreateAction;
@@ -37,8 +38,8 @@ class ListKelas extends ListRecords
                 ->color(Color::Emerald),
 
                 // TODO: Enrollment Siswa ke Kelas Tahun Pelajaran
-            Action::make('enrollment')
-                ->label('Enrollment')
+            Action::make('enrollment-siswa')
+                ->label('Enrollment Siswa')
                 ->outlined()
                 ->visible(fn () =>
                     Siswa::exists() &&
@@ -122,6 +123,121 @@ class ListKelas extends ListRecords
                     Notification::make()
                         ->title('Enrollment Berhasil')
                         ->body('Jumlah siswa yang di-enroll: ' . $baru->count())
+                        ->success()
+                        ->send();
+                }),
+
+                // TODO: Enrollment pegawai ke Kelas Tahun Pelajaran
+            Action::make('enrollment-pegawai')
+                ->label('Enrollment Wali Kelas')
+                ->outlined()
+                ->visible(fn () =>
+                    pegawai::exists() &&
+                    KelasTahunPelajaran::exists()
+                )
+                ->icon('heroicon-o-building-library')
+                ->color(Color::Cyan)
+                ->requiresConfirmation()
+                ->form([
+                    Select::make('kelas_tahun_pelajaran_id')
+    ->label('Kelas Aktif')
+    ->options(function () {
+        $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
+
+        if (! $tahunAktifId) {
+            return [];
+        }
+
+        // Ambil semua kelas_tahun_pelajaran yang SUDAH memiliki pegawai di tahun aktif
+        $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
+            $query->where('tahun_pelajaran_id', $tahunAktifId);
+        })->pluck('kelas_tahun_pelajaran_id');
+
+        // Ambil semua kelas_tahun_pelajaran yang BELUM memiliki pegawai
+        return KelasTahunPelajaran::with(['kelas', 'tahunPelajaran'])
+            ->where('tahun_pelajaran_id', $tahunAktifId)
+            ->whereNotIn('id', $sudahTerdaftar)
+            ->get()
+            ->unique('kelas_id')
+            ->mapWithKeys(function ($ktp) {
+                $kelasNama = $ktp->kelas?->nama ?? 'Tanpa Kelas';
+                $tahunNama = $ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun';
+                $jurusan   = $ktp->kelas?->jurusan?->nama ?? null; // opsional jika ada
+                $tingkat   = $ktp->kelas?->tingkat ?? null; // opsional jika ada
+
+                $labelParts = array_filter([
+                    $tingkat ? "Tingkat {$tingkat}" : null,
+                    $kelasNama,
+                    $jurusan,
+                    "TP: {$tahunNama}",
+                ]);
+
+                $label = implode(' • ', $labelParts);
+
+                return [$ktp->id => $label];
+            });
+    })
+    ->searchable()
+    ->required(),
+
+
+                    Select::make('pegawai_id')
+                        ->label('Pegawai')
+                        ->options(function () {
+                            $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
+
+                            if (! $tahunAktifId) {
+                                return [];
+                            }
+
+                            // Ambil semua pegawai yang SUDAH terdaftar di tahun aktif
+                            $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
+                                $query->where('tahun_pelajaran_id', $tahunAktifId);
+                            })->pluck('pegawai_id');
+
+                            // Ambil pegawai yang BELUM terdaftar
+                            return pegawai::with('user')
+                                ->whereNotIn('id', $sudahTerdaftar)
+                                ->get()
+                                ->mapWithKeys(function ($pegawai) {
+                                    $label = ($pegawai->user?->name ?? 'Tanpa Nama') . ' (' . $pegawai->nip . ')';
+                                    return [$pegawai->id => $label];
+                                });
+                        })
+                        ->searchable()
+                        ->required(),
+
+                ])
+                ->action(function (array $data) {
+                    $kelasTahunPelajaranId = $data['kelas_tahun_pelajaran_id'];
+                    $pegawaiIds = $data['pegawai_id'];
+
+                    $baru = collect($pegawaiIds)->filter(function ($pegawaiId) use ($kelasTahunPelajaranId) {
+                        return ! KelasPegawai::where('kelas_tahun_pelajaran_id', $kelasTahunPelajaranId)
+                            ->where('pegawai_id', $pegawaiId)
+                            ->exists();
+                    });
+
+                    foreach ($baru as $pegawaiId) {
+                        KelasPegawai::create([
+                            'kelas_tahun_pelajaran_id' => $kelasTahunPelajaranId,
+                            'pegawai_id' => $pegawaiId,
+                        ]);
+                    }
+
+                    if ($baru->isEmpty()) {
+                        Notification::make()
+                            ->title('Tidak Ada pegawai Baru')
+                            ->body('Semua pegawai sudah terdaftar di kelas tersebut.')
+                            ->warning()
+                            ->send();
+
+                        return;
+                    }
+
+                    Notification::make()
+                        ->title('Enrollment Berhasil')
+                        ->body('Jumlah pegawai yang di-enroll: ' . $baru->count())
                         ->success()
                         ->send();
                 }),

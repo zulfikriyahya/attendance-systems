@@ -47,6 +47,11 @@ class Siswa extends Model
         return $this->hasMany(KelasSiswa::class);
     }
 
+    public function kelasTahunPelajaran()
+    {
+        return $this->hasManyThrough(KelasTahunPelajaran::class, KelasSiswa::class);
+    }
+
     public function scopeAktif($query)
     {
         return $query->where('status', true);
