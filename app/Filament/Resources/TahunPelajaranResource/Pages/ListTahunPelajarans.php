@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use App\Models\TahunPelajaran;
 use Filament\Actions\CreateAction;
 use Filament\Support\Colors\Color;
+use App\Models\KelasTahunPelajaran;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -32,6 +33,7 @@ class ListTahunPelajarans extends ListRecords
                 ->icon('heroicon-o-plus-circle')
                 ->color(Color::Emerald),
 
+                // TODO: Enrollment Kelas ke Tahun Pelajaran
             Action::make('enrollment')
                 ->label('Enrollment')
                 ->outlined()
@@ -62,38 +64,38 @@ class ListTahunPelajarans extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    $kelasIds = $data['kelas_id'];
-                    $tahunPelajaranId = $data['tahun_pelajaran_id'];
+                $kelasIds = $data['kelas_id'];
+                $tahunPelajaranId = $data['tahun_pelajaran_id'];
 
-                    $kelasBaru = collect($kelasIds)->filter(function ($kelasId) use ($tahunPelajaranId) {
-                        return ! TahunPelajaran::where('kelas_id', $kelasId)
-                            ->where('tahun_pelajaran_id', $tahunPelajaranId)
-                            ->exists();
-                    });
+                $kelasBaru = collect($kelasIds)->filter(function ($kelasId) use ($tahunPelajaranId) {
+                    return ! KelasTahunPelajaran::where('kelas_id', $kelasId)
+                        ->where('tahun_pelajaran_id', $tahunPelajaranId)
+                        ->exists();
+                });
 
-                    foreach ($kelasBaru as $kelasId) {
-                        TahunPelajaran::create([
-                            'kelas_id' => $kelasId,
-                            'tahun_pelajaran_id' => $tahunPelajaranId,
-                        ]);
-                    }
+                foreach ($kelasBaru as $kelasId) {
+                    KelasTahunPelajaran::create([
+                        'kelas_id' => $kelasId,
+                        'tahun_pelajaran_id' => $tahunPelajaranId,
+                    ]);
+                }
 
-                    if ($kelasBaru->isEmpty()) {
-                        Notification::make()
-                            ->title('Tidak Ada Kelas Baru')
-                            ->body('Semua kelas sudah terdaftar pada tahun pelajaran tersebut.')
-                            ->warning()
-                            ->send();
-
-                        return;
-                    }
-
+                if ($kelasBaru->isEmpty()) {
                     Notification::make()
-                        ->title('Enrollment Berhasil')
-                        ->body("Berhasil mendaftarkan {$kelasBaru->count()} kelas ke tahun pelajaran aktif.")
-                        ->success()
+                        ->title('Tidak Ada Kelas Baru')
+                        ->body('Semua kelas sudah terdaftar pada tahun pelajaran tersebut.')
+                        ->warning()
                         ->send();
-                }),
+
+                    return;
+                }
+
+                Notification::make()
+                    ->title('Enrollment Berhasil')
+                    ->body("Berhasil mendaftarkan {$kelasBaru->count()} kelas ke tahun pelajaran aktif.")
+                    ->success()
+                    ->send();
+            }),
         ];
     }
 }
