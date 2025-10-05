@@ -7,6 +7,7 @@ use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\Jabatan;
 use Filament\Forms\Form;
+use App\Models\Enrollment;
 use Filament\Tables\Table;
 use App\Models\TahunPelajaran;
 use Filament\Resources\Resource;
@@ -21,11 +22,9 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
-use App\Models\KelasSiswaTahunPelajaran;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
@@ -34,7 +33,6 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\ImportAction;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
@@ -49,7 +47,6 @@ use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
 use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
 use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
 use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
-use App\Filament\Resources\SiswaResource\Pages\CetakKartuSiswa;
 
 class SiswaResource extends Resource
 {
@@ -209,8 +206,6 @@ class SiswaResource extends Resource
                     ->hiddenLabel()
                     ->icon('heroicon-o-rectangle-group')
                     ->color(Color::Emerald),
-                // ->button()
-                // ->outlined()
             ])
             ->columns([
                 ImageColumn::make('user.avatar')
@@ -257,25 +252,9 @@ class SiswaResource extends Resource
             ->filters([
                 TrashedFilter::make()
                     ->visible(Auth::user()->hasAnyRole(['super_admin', 'wali_kelas']) && Siswa::all()->count() > 0),
-                SelectFilter::make('kelas_id')
-                    ->label('Kelas')
-                    ->options(fn () => \App\Models\Kelas::whereHas('siswaSaatIni')
-                        ->orderBy('nama')
-                        ->pluck('nama', 'id'))
-                    ->query(function ($query, array $data): \Illuminate\Database\Eloquent\Builder {
-                        if (empty($data['value'])) {
-                            return $query;
-                        }
-
-                        return $query->whereHas('kelasSaatIni', function ($query) use ($data) {
-                            $query->where('kelas.id', $data['value']);
-                        });
-                    })
-                    ->visible(Auth::user()->hasAnyRole(['super_admin', 'wali_kelas']) && Siswa::all()->count() > 0),
             ])
             ->actions([
                 ActionGroup::make([
-                    // ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                     RestoreAction::make(),
@@ -305,37 +284,61 @@ class SiswaResource extends Resource
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                    BulkAction::make('assignKelas')
-                        ->label('Assign Kelas + TP')
-                        ->icon('heroicon-o-building-storefront')
-                        ->form([
-                            Select::make('kelas_id')
-                                ->label('Kelas')
-                                ->options(Kelas::all()->pluck('nama', 'id'))
-                                ->required(),
-
-                            Select::make('tahun_pelajaran_id')
-                                ->label('Tahun Pelajaran')
-                                ->options(TahunPelajaran::where('status', true)->pluck('nama', 'id'))
-                                ->required(),
-                        ])
-                        ->action(function (Collection $records, array $data) {
-                            foreach ($records as $siswa) {
-                                KelasSiswaTahunPelajaran::updateOrCreate([
-                                    'kelas_id' => $data['kelas_id'],
-                                    'siswa_id' => $siswa->id,
-                                    'tahun_pelajaran_id' => $data['tahun_pelajaran_id'],
-                                ]);
-                            }
-
-                            Notification::make()
-                                ->title('Berhasil')
-                                ->body('Berhasil menetapkan kelas dan tahun pelajaran.')
-                                ->success()
-                                ->send();
-                        })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
                 ]),
+                // BulkAction::make('assignKelas')
+                        // ->label('Assign Kelas + TP')
+                        // ->icon('heroicon-o-building-storefront')
+                        // ->form([
+                        //     Select::make('kelas_id')
+                        //         ->label('Kelas')
+                        //         ->options(Kelas::all()->pluck('nama', 'id'))
+                        //         ->required(),
+
+                        //     Select::make('tahun_pelajaran_id')
+                        //         ->label('Tahun Pelajaran')
+                        //         ->options(TahunPelajaran::where('status', true)->pluck('nama', 'id'))
+                        //         ->required(),
+                        // ])
+                        // ->action(function (Collection $records, array $data) {
+                        //     foreach ($records as $siswa) {
+                        //         Enrollment::updateOrCreate([
+                        //             'kelas_id' => $data['kelas_id'],
+                        //             'siswa_id' => $siswa->id,
+                        //             'tahun_pelajaran_id' => $data['tahun_pelajaran_id'],
+                        //         ]);
+                        //     }
+
+                        //     Notification::make()
+                        //         ->title('Berhasil')
+                        //         ->body('Berhasil menetapkan kelas dan tahun pelajaran.')
+                        //         ->success()
+                        //         ->send();
+                        // })
+                        // ->action(function (Collection $records, array $data) {
+                        //     $tahunPelajaranId = $data['tahun_pelajaran_id'];
+                        //     $kelasId = $data['kelas_id'];
+
+                        //     $records = $records->filter(function ($siswa) use ($tahunPelajaranId) {
+                        //         return ! Enrollment::where('siswa_id', $siswa->id)
+                        //             ->where('tahun_pelajaran_id', $tahunPelajaranId)
+                        //             ->exists();
+                        //     });
+
+                        //     foreach ($records as $siswa) {
+                        //         Enrollment::create([
+                        //             'kelas_id' => $kelasId,
+                        //             'siswa_id' => $siswa->id,
+                        //             'tahun_pelajaran_id' => $tahunPelajaranId,
+                        //         ]);
+                        //     }
+
+                        //     Notification::make()
+                        //         ->title('Berhasil')
+                        //         ->body("Berhasil menetapkan kelas dan tahun pelajaran untuk {$records->count()} siswa.")
+                        //         ->success()
+                        //         ->send();
+                        // })
+                        // ->visible(fn () => Auth::user()->hasRole('super_admin')),
             ]);
     }
 
@@ -350,7 +353,6 @@ class SiswaResource extends Resource
             'index' => ListSiswas::route('/'),
             'create' => CreateSiswa::route('/create'),
             'view' => ViewSiswa::route('/{record}'),
-            'print' => CetakKartuSiswa::route('/{record}/print'),
             'edit' => EditSiswa::route('/{record}/edit'),
         ];
     }

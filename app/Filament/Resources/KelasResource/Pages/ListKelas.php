@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources\KelasResource\Pages;
 
-use App\Filament\Resources\KelasResource;
+use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\Pegawai;
+use App\Models\Enrollment;
+use Filament\Actions\Action;
+use App\Models\TahunPelajaran;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
+use App\Filament\Resources\KelasResource;
+use Filament\Resources\Pages\ListRecords;
 
 class ListKelas extends ListRecords
 {
@@ -23,7 +31,6 @@ class ListKelas extends ListRecords
                     ->color(Color::Emerald),
             ];
         }
-
         return [];
     }
 }

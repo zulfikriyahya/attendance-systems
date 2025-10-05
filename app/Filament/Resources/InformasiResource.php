@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Jabatan;
 use Filament\Forms\Form;
 use App\Models\Informasi;
 use Filament\Tables\Table;

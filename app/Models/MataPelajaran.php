@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use App\Models\GuruMataPelajaran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Jurusan extends Model
+class MataPelajaran extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
-    public function instansi(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(Instansi::class);
+        return [
+            'status' => 'boolean',
+        ];
     }
-        public function kelas(): HasMany
+    public function guruMataPelajarans(): HasMany
     {
-        return $this->hasMany(Kelas::class);
+        return $this->hasMany(GuruMataPelajaran::class);
     }
 }

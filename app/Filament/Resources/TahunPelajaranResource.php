@@ -2,37 +2,41 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
-use App\Models\TahunPelajaran;
 use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use App\Models\Kelas;
 use Filament\Forms\Form;
+use App\Models\Enrollment;
+use Filament\Tables\Table;
+use App\Models\TahunPelajaran;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Columns\ToggleColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
+use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
 
 class TahunPelajaranResource extends Resource
 {
@@ -61,14 +65,20 @@ class TahunPelajaranResource extends Resource
                     ->required(),
                 TextInput::make('nama')
                     ->label('Tahun Pelajaran')
-                    ->placeholder('2025/2026')
+                    ->placeholder('Contoh: 2025/2026')
                     ->minLength(9)
                     ->maxLength(9)
+                    ->unique(
+                        ignorable: fn ($record) => $record,
+                        table: TahunPelajaran::class,
+                        column: 'nama',
+                    )
                     ->required()
                     ->validationMessages([
                         'min' => 'Tahun Pelajaran tidak boleh kurang dari 9 karakter.',
                         'max' => 'Tahun Pelajaran tidak boleh lebih dari 9 karakter.',
                         'required' => 'Form ini harus diisi.',
+                        'unique' => 'Tahun Pelajaran sudah ada.',
                     ]),
 
                 DatePicker::make('mulai')
@@ -88,20 +98,14 @@ class TahunPelajaranResource extends Resource
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')
                     ->columnSpanFull(),
+                    
                 Toggle::make('status')
                     ->label('Status')
                     ->default(true)
                     ->required()
                     ->validationMessages([
                         'required' => 'Form ini harus diisi.',
-                    ])
-                    ->afterStateUpdated(function ($state, $record) {
-                        if ($state) {
-                            TahunPelajaran::where('id', '!=', optional($record)->id)
-                                ->where('status', true)
-                                ->update(['status' => false]);
-                        }
-                    }),
+                    ]),
 
             ]);
     }
@@ -129,9 +133,10 @@ class TahunPelajaranResource extends Resource
                     ->label('Tanggal Selesai')
                     ->date('d F Y')
                     ->sortable(),
-                IconColumn::make('status')
+                ToggleColumn::make('status')
                     ->label('Status')
-                    ->boolean(),
+                    ->disabled(! Auth::user()->hasRole('super_admin'))
+                    ->tooltip(fn ($state) => $state !== true ? 'Aktifkan!' : 'Nonaktifkan!'),
             ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([

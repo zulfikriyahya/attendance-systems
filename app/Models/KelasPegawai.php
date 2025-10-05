@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use App\Models\Pegawai;
+use App\Models\KelasTahunPelajaran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Jurusan extends Model
+class KelasPegawai extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
-    public function instansi(): BelongsTo
+    public function kelasTahunPelajaran(): BelongsTo
     {
-        return $this->belongsTo(Instansi::class);
+        return $this->belongsTo(KelasTahunPelajaran::class);
     }
-        public function kelas(): HasMany
+
+    public function pegawai(): BelongsTo
     {
-        return $this->hasMany(Kelas::class);
+        return $this->belongsTo(Pegawai::class);
     }
 }

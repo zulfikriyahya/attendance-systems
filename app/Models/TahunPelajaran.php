@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TahunPelajaran extends Model
 {
@@ -27,39 +28,37 @@ class TahunPelajaran extends Model
         return $this->belongsTo(Instansi::class);
     }
 
-    // Pivot
-
-    public function kelasSiswaTahunPelajaran(): HasMany
+    public function kelasTahunPelajarans(): HasMany
     {
-        return $this->hasMany(KelasSiswaTahunPelajaran::class);
+        return $this->hasMany(KelasTahunPelajaran::class);
     }
 
-    public function kelasSiswa()
+    protected static function booted()
     {
-        return $this->hasManyThrough(
-            Siswa::class,
-            KelasSiswaTahunPelajaran::class,
-            'tahun_pelajaran_id',
-            'id',
-            'id',
-            'siswa_id'
-        );
+        static::saving(function ($model) {
+            // Jika akan diaktifkan
+            if ($model->isDirty('status') && $model->status === true) {
+                static::where('status', true)
+                    ->where('id', '!=', $model->id)
+                    ->update(['status' => false]);
+            }
+
+            // Jika akan dinonaktifkan dan ini satu-satunya yang aktif
+            if ($model->isDirty('status') && $model->status === false) {
+                $jumlahAktif = static::where('status', true)->count();
+
+                if ($jumlahAktif === 1) {
+                    Notification::make()
+                        ->title('Gagal Menonaktifkan')
+                        ->body('Minimal satu tahun pelajaran harus tetap aktif.')
+                        ->danger()
+                        ->send();
+
+                    // Batalkan penyimpanan
+                    return false;
+                }
+            }
+        });
     }
 
-    public function semuaKelas()
-    {
-        return $this->hasManyThrough(
-            Kelas::class,
-            KelasSiswaTahunPelajaran::class,
-            'tahun_pelajaran_id',
-            'id',
-            'id',
-            'kelas_id'
-        )->distinct();
-    }
-
-    public function scopeAktif($query)
-    {
-        return $query->where('status', true);
-    }
 }
