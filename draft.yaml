@@ -8,6 +8,7 @@ models:
   KelasTahunPelajaran:
     relationships:
       belongsTo: Kelas, TahunPelajaran
+      hasMany: KelasSiswa, KelasPegawai
   Siswa:
     relationships:
       hasMany: KelasSiswa
