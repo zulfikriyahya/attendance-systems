@@ -1,0 +1,23 @@
+models:
+  TahunPelajaran:
+    relationships:
+      hasMany: KelasTahunPelajaran
+  Kelas:
+    relationships:
+      hasMany: KelasTahunPelajaran
+  KelasTahunPelajaran:
+    relationships:
+      belongsTo: Kelas, TahunPelajaran
+  Siswa:
+    relationships:
+      hasMany: KelasSiswa
+  Pegawai:
+    relationships:
+      hasMany: KelasPegawai
+  KelasSiswa:
+    relationships:
+      belongsTo: KelasTahunPelajaran, Siswa
+  KelasPegawai:
+    relationships:
+      belongsTo: KelasTahunPelajaran, Pegawai
+
