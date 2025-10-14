@@ -154,7 +154,7 @@ return [
                 'username' => env('REDIS_USERNAME'),
                 'password' => env('REDIS_PASSWORD'),
                 'port' => env('REDIS_PORT', '6379'),
-                'database' => env('REDIS_DB', '3'),
+                'database' => env('REDIS_DB', '0'),
             ],
             'cache' => [
                 'url' => env('REDIS_URL'),
@@ -162,7 +162,7 @@ return [
                 'username' => env('REDIS_USERNAME'),
                 'password' => env('REDIS_PASSWORD'),
                 'port' => env('REDIS_PORT', '6379'),
-                'database' => env('REDIS_CACHE_DB', '4'),
+                'database' => env('REDIS_CACHE_DB', '1'),
             ],
             // ⭐ TAMBAHKAN INI
             'queue' => [
@@ -171,7 +171,7 @@ return [
                 'username' => env('REDIS_USERNAME'),
                 'password' => env('REDIS_PASSWORD'),
                 'port' => env('REDIS_PORT', '6379'),
-                'database' => env('REDIS_QUEUE_DB', '5'),
+                'database' => env('REDIS_QUEUE_DB', '2'),
             ],
         ],
 ];
