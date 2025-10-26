@@ -1,0 +1,387 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "dependencies": {
+        "aos": "^2.3.4",
+      },
+      "devDependencies": {
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/typography": "^0.5.16",
+        "@tailwindcss/vite": "^4.0.0",
+        "autoprefixer": "^10.4.21",
+        "axios": "^1.8.2",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^4.1.11",
+        "vite": "^6.2.4",
+      },
+    },
+  },
+  "packages": {
+    "@emnapi/core": ["@emnapi/core@1.5.0", "", { "dependencies": { "@emnapi/wasi-threads": "1.1.0", "tslib": "^2.4.0" } }, "sha512-sbP8GzB1WDzacS8fgNPpHlp6C9VZe+SJP3F90W9rLemaQj2PzIuTEl1qDOYQf58YIpyjViI24y9aPWCjEzY2cg=="],
+
+    "@emnapi/runtime": ["@emnapi/runtime@1.5.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-97/BJ3iXHww3djw6hYIfErCZFee7qCtrneuLa20UXFCOTCfBM2cvQHjWJ2EG0s0MtdNwInarqCTz35i4wWXHsQ=="],
+
+    "@emnapi/wasi-threads": ["@emnapi/wasi-threads@1.1.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ=="],
+
+    "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.25.9.tgz", {}],
+
+    "@esbuild/android-arm": ["@esbuild/android-arm@https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.25.9.tgz", {}],
+
+    "@esbuild/android-arm64": ["@esbuild/android-arm64@https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/android-x64": ["@esbuild/android-x64@https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.25.9.tgz", {}],
+
+    "@esbuild/darwin-arm64": ["@esbuild/darwin-arm64@https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/darwin-x64": ["@esbuild/darwin-x64@https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.25.9.tgz", {}],
+
+    "@esbuild/freebsd-arm64": ["@esbuild/freebsd-arm64@https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/freebsd-x64": ["@esbuild/freebsd-x64@https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.25.9.tgz", {}],
+
+    "@esbuild/linux-arm": ["@esbuild/linux-arm@https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.25.9.tgz", {}],
+
+    "@esbuild/linux-arm64": ["@esbuild/linux-arm64@https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/linux-ia32": ["@esbuild/linux-ia32@https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.25.9.tgz", {}],
+
+    "@esbuild/linux-loong64": ["@esbuild/linux-loong64@https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.25.9.tgz", {}],
+
+    "@esbuild/linux-mips64el": ["@esbuild/linux-mips64el@https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.25.9.tgz", {}],
+
+    "@esbuild/linux-ppc64": ["@esbuild/linux-ppc64@https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.25.9.tgz", {}],
+
+    "@esbuild/linux-riscv64": ["@esbuild/linux-riscv64@https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.25.9.tgz", {}],
+
+    "@esbuild/linux-s390x": ["@esbuild/linux-s390x@https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.25.9.tgz", {}],
+
+    "@esbuild/linux-x64": ["@esbuild/linux-x64@https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.9.tgz", {}],
+
+    "@esbuild/netbsd-arm64": ["@esbuild/netbsd-arm64@https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/netbsd-x64": ["@esbuild/netbsd-x64@https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.25.9.tgz", {}],
+
+    "@esbuild/openbsd-arm64": ["@esbuild/openbsd-arm64@https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/openbsd-x64": ["@esbuild/openbsd-x64@https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.25.9.tgz", {}],
+
+    "@esbuild/openharmony-arm64": ["@esbuild/openharmony-arm64@https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/sunos-x64": ["@esbuild/sunos-x64@https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.25.9.tgz", {}],
+
+    "@esbuild/win32-arm64": ["@esbuild/win32-arm64@https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.25.9.tgz", {}],
+
+    "@esbuild/win32-ia32": ["@esbuild/win32-ia32@https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.25.9.tgz", {}],
+
+    "@esbuild/win32-x64": ["@esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.9.tgz", {}],
+
+    "@isaacs/fs-minipass": ["@isaacs/fs-minipass@https://registry.npmjs.org/@isaacs/fs-minipass/-/fs-minipass-4.0.1.tgz", { "dependencies": { "minipass": "^7.0.4" } }],
+
+    "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }],
+
+    "@jridgewell/remapping": ["@jridgewell/remapping@https://registry.npmjs.org/@jridgewell/remapping/-/remapping-2.3.5.tgz", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }],
+
+    "@jridgewell/resolve-uri": ["@jridgewell/resolve-uri@https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz", {}],
+
+    "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz", {}],
+
+    "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.30.tgz", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }],
+
+    "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@0.2.12", "", { "dependencies": { "@emnapi/core": "^1.4.3", "@emnapi/runtime": "^1.4.3", "@tybys/wasm-util": "^0.10.0" } }, "sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ=="],
+
+    "@rollup/rollup-android-arm-eabi": ["@rollup/rollup-android-arm-eabi@https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.50.1.tgz", {}],
+
+    "@rollup/rollup-android-arm64": ["@rollup/rollup-android-arm64@https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-darwin-arm64": ["@rollup/rollup-darwin-arm64@https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-darwin-x64": ["@rollup/rollup-darwin-x64@https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-freebsd-arm64": ["@rollup/rollup-freebsd-arm64@https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-freebsd-x64": ["@rollup/rollup-freebsd-x64@https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-arm-gnueabihf": ["@rollup/rollup-linux-arm-gnueabihf@https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-arm-musleabihf": ["@rollup/rollup-linux-arm-musleabihf@https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-arm64-gnu": ["@rollup/rollup-linux-arm64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-arm64-musl": ["@rollup/rollup-linux-arm64-musl@https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-loongarch64-gnu": ["@rollup/rollup-linux-loongarch64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-loongarch64-gnu/-/rollup-linux-loongarch64-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-ppc64-gnu": ["@rollup/rollup-linux-ppc64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-riscv64-gnu": ["@rollup/rollup-linux-riscv64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-riscv64-musl": ["@rollup/rollup-linux-riscv64-musl@https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-s390x-gnu": ["@rollup/rollup-linux-s390x-gnu@https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-x64-gnu": ["@rollup/rollup-linux-x64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.50.1.tgz", {}],
+
+    "@rollup/rollup-linux-x64-musl": ["@rollup/rollup-linux-x64-musl@https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.50.1.tgz", {}],
+
+    "@rollup/rollup-openharmony-arm64": ["@rollup/rollup-openharmony-arm64@https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.50.1.tgz", {}],
+
+    "@rollup/rollup-win32-arm64-msvc": ["@rollup/rollup-win32-arm64-msvc@https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.50.1.tgz", {}],
+
+    "@rollup/rollup-win32-ia32-msvc": ["@rollup/rollup-win32-ia32-msvc@https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.50.1.tgz", {}],
+
+    "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.50.1.tgz", {}],
+
+    "@tailwindcss/forms": ["@tailwindcss/forms@https://registry.npmjs.org/@tailwindcss/forms/-/forms-0.5.10.tgz", { "dependencies": { "mini-svg-data-uri": "^1.2.3" } }],
+
+    "@tailwindcss/node": ["@tailwindcss/node@https://registry.npmjs.org/@tailwindcss/node/-/node-4.1.13.tgz", { "dependencies": { "@jridgewell/remapping": "^2.3.4", "enhanced-resolve": "^5.18.3", "jiti": "^2.5.1", "lightningcss": "1.30.1", "magic-string": "^0.30.18", "source-map-js": "^1.2.1", "tailwindcss": "4.1.13" } }],
+
+    "@tailwindcss/oxide": ["@tailwindcss/oxide@https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.1.13.tgz", { "dependencies": { "detect-libc": "^2.0.4", "tar": "^7.4.3" }, "optionalDependencies": { "@tailwindcss/oxide-android-arm64": "4.1.13", "@tailwindcss/oxide-darwin-arm64": "4.1.13", "@tailwindcss/oxide-darwin-x64": "4.1.13", "@tailwindcss/oxide-freebsd-x64": "4.1.13", "@tailwindcss/oxide-linux-arm-gnueabihf": "4.1.13", "@tailwindcss/oxide-linux-arm64-gnu": "4.1.13", "@tailwindcss/oxide-linux-arm64-musl": "4.1.13", "@tailwindcss/oxide-linux-x64-gnu": "4.1.13", "@tailwindcss/oxide-linux-x64-musl": "4.1.13", "@tailwindcss/oxide-wasm32-wasi": "4.1.13", "@tailwindcss/oxide-win32-arm64-msvc": "4.1.13", "@tailwindcss/oxide-win32-x64-msvc": "4.1.13" } }],
+
+    "@tailwindcss/oxide-android-arm64": ["@tailwindcss/oxide-android-arm64@https://registry.npmjs.org/@tailwindcss/oxide-android-arm64/-/oxide-android-arm64-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-darwin-arm64": ["@tailwindcss/oxide-darwin-arm64@https://registry.npmjs.org/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-darwin-x64": ["@tailwindcss/oxide-darwin-x64@https://registry.npmjs.org/@tailwindcss/oxide-darwin-x64/-/oxide-darwin-x64-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-freebsd-x64": ["@tailwindcss/oxide-freebsd-x64@https://registry.npmjs.org/@tailwindcss/oxide-freebsd-x64/-/oxide-freebsd-x64-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-linux-arm-gnueabihf": ["@tailwindcss/oxide-linux-arm-gnueabihf@https://registry.npmjs.org/@tailwindcss/oxide-linux-arm-gnueabihf/-/oxide-linux-arm-gnueabihf-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-linux-arm64-gnu": ["@tailwindcss/oxide-linux-arm64-gnu@https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-gnu/-/oxide-linux-arm64-gnu-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-linux-arm64-musl": ["@tailwindcss/oxide-linux-arm64-musl@https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-musl/-/oxide-linux-arm64-musl-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-linux-x64-gnu": ["@tailwindcss/oxide-linux-x64-gnu@https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-linux-x64-musl": ["@tailwindcss/oxide-linux-x64-musl@https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-wasm32-wasi": ["@tailwindcss/oxide-wasm32-wasi@https://registry.npmjs.org/@tailwindcss/oxide-wasm32-wasi/-/oxide-wasm32-wasi-4.1.13.tgz", { "dependencies": { "@emnapi/core": "^1.4.5", "@emnapi/runtime": "^1.4.5", "@emnapi/wasi-threads": "^1.0.4", "@napi-rs/wasm-runtime": "^0.2.12", "@tybys/wasm-util": "^0.10.0", "tslib": "^2.8.0" } }],
+
+    "@tailwindcss/oxide-win32-arm64-msvc": ["@tailwindcss/oxide-win32-arm64-msvc@https://registry.npmjs.org/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.1.13.tgz", {}],
+
+    "@tailwindcss/oxide-win32-x64-msvc": ["@tailwindcss/oxide-win32-x64-msvc@https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.1.13.tgz", {}],
+
+    "@tailwindcss/typography": ["@tailwindcss/typography@https://registry.npmjs.org/@tailwindcss/typography/-/typography-0.5.16.tgz", { "dependencies": { "lodash.castarray": "^4.4.0", "lodash.isplainobject": "^4.0.6", "lodash.merge": "^4.6.2", "postcss-selector-parser": "6.0.10" } }],
+
+    "@tailwindcss/vite": ["@tailwindcss/vite@https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.1.13.tgz", { "dependencies": { "@tailwindcss/node": "4.1.13", "@tailwindcss/oxide": "4.1.13", "tailwindcss": "4.1.13" } }],
+
+    "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
+
+    "@types/estree": ["@types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz", {}],
+
+    "ansi-regex": ["ansi-regex@https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz", {}],
+
+    "ansi-styles": ["ansi-styles@https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz", { "dependencies": { "color-convert": "^2.0.1" } }],
+
+    "aos": ["aos@https://registry.npmjs.org/aos/-/aos-2.3.4.tgz", { "dependencies": { "classlist-polyfill": "^1.0.3", "lodash.debounce": "^4.0.6", "lodash.throttle": "^4.0.1" } }],
+
+    "asynckit": ["asynckit@https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz", {}],
+
+    "autoprefixer": ["autoprefixer@https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.21.tgz", { "dependencies": { "browserslist": "^4.24.4", "caniuse-lite": "^1.0.30001702", "fraction.js": "^4.3.7", "normalize-range": "^0.1.2", "picocolors": "^1.1.1", "postcss-value-parser": "^4.2.0" } }],
+
+    "axios": ["axios@https://registry.npmjs.org/axios/-/axios-1.11.0.tgz", { "dependencies": { "follow-redirects": "^1.15.6", "form-data": "^4.0.4", "proxy-from-env": "^1.1.0" } }],
+
+    "browserslist": ["browserslist@https://registry.npmjs.org/browserslist/-/browserslist-4.25.4.tgz", { "dependencies": { "caniuse-lite": "^1.0.30001737", "electron-to-chromium": "^1.5.211", "node-releases": "^2.0.19", "update-browserslist-db": "^1.1.3" } }],
+
+    "call-bind-apply-helpers": ["call-bind-apply-helpers@https://registry.npmjs.org/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz", { "dependencies": { "es-errors": "^1.3.0", "function-bind": "^1.1.2" } }],
+
+    "caniuse-lite": ["caniuse-lite@https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001741.tgz", {}],
+
+    "chalk": ["chalk@https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }],
+
+    "chownr": ["chownr@https://registry.npmjs.org/chownr/-/chownr-3.0.0.tgz", {}],
+
+    "classlist-polyfill": ["classlist-polyfill@https://registry.npmjs.org/classlist-polyfill/-/classlist-polyfill-1.2.0.tgz", {}],
+
+    "cliui": ["cliui@https://registry.npmjs.org/cliui/-/cliui-8.0.1.tgz", { "dependencies": { "string-width": "^4.2.0", "strip-ansi": "^6.0.1", "wrap-ansi": "^7.0.0" } }],
+
+    "color-convert": ["color-convert@https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz", { "dependencies": { "color-name": "~1.1.4" } }],
+
+    "color-name": ["color-name@https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz", {}],
+
+    "combined-stream": ["combined-stream@https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.8.tgz", { "dependencies": { "delayed-stream": "~1.0.0" } }],
+
+    "concurrently": ["concurrently@https://registry.npmjs.org/concurrently/-/concurrently-9.2.1.tgz", { "dependencies": { "chalk": "4.1.2", "rxjs": "7.8.2", "shell-quote": "1.8.3", "supports-color": "8.1.1", "tree-kill": "1.2.2", "yargs": "17.7.2" } }],
+
+    "cssesc": ["cssesc@https://registry.npmjs.org/cssesc/-/cssesc-3.0.0.tgz", {}],
+
+    "delayed-stream": ["delayed-stream@https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz", {}],
+
+    "detect-libc": ["detect-libc@https://registry.npmjs.org/detect-libc/-/detect-libc-2.0.4.tgz", {}],
+
+    "dunder-proto": ["dunder-proto@https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz", { "dependencies": { "call-bind-apply-helpers": "^1.0.1", "es-errors": "^1.3.0", "gopd": "^1.2.0" } }],
+
+    "electron-to-chromium": ["electron-to-chromium@https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.215.tgz", {}],
+
+    "emoji-regex": ["emoji-regex@https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz", {}],
+
+    "enhanced-resolve": ["enhanced-resolve@https://registry.npmjs.org/enhanced-resolve/-/enhanced-resolve-5.18.3.tgz", { "dependencies": { "graceful-fs": "^4.2.4", "tapable": "^2.2.0" } }],
+
+    "es-define-property": ["es-define-property@https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz", {}],
+
+    "es-errors": ["es-errors@https://registry.npmjs.org/es-errors/-/es-errors-1.3.0.tgz", {}],
+
+    "es-object-atoms": ["es-object-atoms@https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz", { "dependencies": { "es-errors": "^1.3.0" } }],
+
+    "es-set-tostringtag": ["es-set-tostringtag@https://registry.npmjs.org/es-set-tostringtag/-/es-set-tostringtag-2.1.0.tgz", { "dependencies": { "es-errors": "^1.3.0", "get-intrinsic": "^1.2.6", "has-tostringtag": "^1.0.2", "hasown": "^2.0.2" } }],
+
+    "esbuild": ["esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.25.9.tgz", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.25.9", "@esbuild/android-arm": "0.25.9", "@esbuild/android-arm64": "0.25.9", "@esbuild/android-x64": "0.25.9", "@esbuild/darwin-arm64": "0.25.9", "@esbuild/darwin-x64": "0.25.9", "@esbuild/freebsd-arm64": "0.25.9", "@esbuild/freebsd-x64": "0.25.9", "@esbuild/linux-arm": "0.25.9", "@esbuild/linux-arm64": "0.25.9", "@esbuild/linux-ia32": "0.25.9", "@esbuild/linux-loong64": "0.25.9", "@esbuild/linux-mips64el": "0.25.9", "@esbuild/linux-ppc64": "0.25.9", "@esbuild/linux-riscv64": "0.25.9", "@esbuild/linux-s390x": "0.25.9", "@esbuild/linux-x64": "0.25.9", "@esbuild/netbsd-arm64": "0.25.9", "@esbuild/netbsd-x64": "0.25.9", "@esbuild/openbsd-arm64": "0.25.9", "@esbuild/openbsd-x64": "0.25.9", "@esbuild/openharmony-arm64": "0.25.9", "@esbuild/sunos-x64": "0.25.9", "@esbuild/win32-arm64": "0.25.9", "@esbuild/win32-ia32": "0.25.9", "@esbuild/win32-x64": "0.25.9" } }],
+
+    "escalade": ["escalade@https://registry.npmjs.org/escalade/-/escalade-3.2.0.tgz", {}],
+
+    "fdir": ["fdir@https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz", {}],
+
+    "follow-redirects": ["follow-redirects@https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.11.tgz", {}],
+
+    "form-data": ["form-data@https://registry.npmjs.org/form-data/-/form-data-4.0.4.tgz", { "dependencies": { "asynckit": "^0.4.0", "combined-stream": "^1.0.8", "es-set-tostringtag": "^2.1.0", "hasown": "^2.0.2", "mime-types": "^2.1.12" } }],
+
+    "fraction.js": ["fraction.js@https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz", {}],
+
+    "fsevents": ["fsevents@https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz", {}],
+
+    "function-bind": ["function-bind@https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz", {}],
+
+    "get-caller-file": ["get-caller-file@https://registry.npmjs.org/get-caller-file/-/get-caller-file-2.0.5.tgz", {}],
+
+    "get-intrinsic": ["get-intrinsic@https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.3.0.tgz", { "dependencies": { "call-bind-apply-helpers": "^1.0.2", "es-define-property": "^1.0.1", "es-errors": "^1.3.0", "es-object-atoms": "^1.1.1", "function-bind": "^1.1.2", "get-proto": "^1.0.1", "gopd": "^1.2.0", "has-symbols": "^1.1.0", "hasown": "^2.0.2", "math-intrinsics": "^1.1.0" } }],
+
+    "get-proto": ["get-proto@https://registry.npmjs.org/get-proto/-/get-proto-1.0.1.tgz", { "dependencies": { "dunder-proto": "^1.0.1", "es-object-atoms": "^1.0.0" } }],
+
+    "gopd": ["gopd@https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz", {}],
+
+    "graceful-fs": ["graceful-fs@https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz", {}],
+
+    "has-flag": ["has-flag@https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz", {}],
+
+    "has-symbols": ["has-symbols@https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz", {}],
+
+    "has-tostringtag": ["has-tostringtag@https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz", { "dependencies": { "has-symbols": "^1.0.3" } }],
+
+    "hasown": ["hasown@https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz", { "dependencies": { "function-bind": "^1.1.2" } }],
+
+    "is-fullwidth-code-point": ["is-fullwidth-code-point@https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-3.0.0.tgz", {}],
+
+    "jiti": ["jiti@https://registry.npmjs.org/jiti/-/jiti-2.5.1.tgz", {}],
+
+    "laravel-vite-plugin": ["laravel-vite-plugin@https://registry.npmjs.org/laravel-vite-plugin/-/laravel-vite-plugin-1.3.0.tgz", { "dependencies": { "picocolors": "^1.0.0", "vite-plugin-full-reload": "^1.1.0" } }],
+
+    "lightningcss": ["lightningcss@https://registry.npmjs.org/lightningcss/-/lightningcss-1.30.1.tgz", { "dependencies": { "detect-libc": "^2.0.3" }, "optionalDependencies": { "lightningcss-darwin-arm64": "1.30.1", "lightningcss-darwin-x64": "1.30.1", "lightningcss-freebsd-x64": "1.30.1", "lightningcss-linux-arm-gnueabihf": "1.30.1", "lightningcss-linux-arm64-gnu": "1.30.1", "lightningcss-linux-arm64-musl": "1.30.1", "lightningcss-linux-x64-gnu": "1.30.1", "lightningcss-linux-x64-musl": "1.30.1", "lightningcss-win32-arm64-msvc": "1.30.1", "lightningcss-win32-x64-msvc": "1.30.1" } }],
+
+    "lightningcss-darwin-arm64": ["lightningcss-darwin-arm64@https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.30.1.tgz", {}],
+
+    "lightningcss-darwin-x64": ["lightningcss-darwin-x64@https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.30.1.tgz", {}],
+
+    "lightningcss-freebsd-x64": ["lightningcss-freebsd-x64@https://registry.npmjs.org/lightningcss-freebsd-x64/-/lightningcss-freebsd-x64-1.30.1.tgz", {}],
+
+    "lightningcss-linux-arm-gnueabihf": ["lightningcss-linux-arm-gnueabihf@https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf/-/lightningcss-linux-arm-gnueabihf-1.30.1.tgz", {}],
+
+    "lightningcss-linux-arm64-gnu": ["lightningcss-linux-arm64-gnu@https://registry.npmjs.org/lightningcss-linux-arm64-gnu/-/lightningcss-linux-arm64-gnu-1.30.1.tgz", {}],
+
+    "lightningcss-linux-arm64-musl": ["lightningcss-linux-arm64-musl@https://registry.npmjs.org/lightningcss-linux-arm64-musl/-/lightningcss-linux-arm64-musl-1.30.1.tgz", {}],
+
+    "lightningcss-linux-x64-gnu": ["lightningcss-linux-x64-gnu@https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.30.1.tgz", {}],
+
+    "lightningcss-linux-x64-musl": ["lightningcss-linux-x64-musl@https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.30.1.tgz", {}],
+
+    "lightningcss-win32-arm64-msvc": ["lightningcss-win32-arm64-msvc@https://registry.npmjs.org/lightningcss-win32-arm64-msvc/-/lightningcss-win32-arm64-msvc-1.30.1.tgz", {}],
+
+    "lightningcss-win32-x64-msvc": ["lightningcss-win32-x64-msvc@https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.30.1.tgz", {}],
+
+    "lodash.castarray": ["lodash.castarray@https://registry.npmjs.org/lodash.castarray/-/lodash.castarray-4.4.0.tgz", {}],
+
+    "lodash.debounce": ["lodash.debounce@https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz", {}],
+
+    "lodash.isplainobject": ["lodash.isplainobject@https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz", {}],
+
+    "lodash.merge": ["lodash.merge@https://registry.npmjs.org/lodash.merge/-/lodash.merge-4.6.2.tgz", {}],
+
+    "lodash.throttle": ["lodash.throttle@https://registry.npmjs.org/lodash.throttle/-/lodash.throttle-4.1.1.tgz", {}],
+
+    "magic-string": ["magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.19.tgz", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }],
+
+    "math-intrinsics": ["math-intrinsics@https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz", {}],
+
+    "mime-db": ["mime-db@https://registry.npmjs.org/mime-db/-/mime-db-1.52.0.tgz", {}],
+
+    "mime-types": ["mime-types@https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz", { "dependencies": { "mime-db": "1.52.0" } }],
+
+    "mini-svg-data-uri": ["mini-svg-data-uri@https://registry.npmjs.org/mini-svg-data-uri/-/mini-svg-data-uri-1.4.4.tgz", {}],
+
+    "minipass": ["minipass@https://registry.npmjs.org/minipass/-/minipass-7.1.2.tgz", {}],
+
+    "minizlib": ["minizlib@https://registry.npmjs.org/minizlib/-/minizlib-3.0.2.tgz", { "dependencies": { "minipass": "^7.1.2" } }],
+
+    "mkdirp": ["mkdirp@https://registry.npmjs.org/mkdirp/-/mkdirp-3.0.1.tgz", {}],
+
+    "nanoid": ["nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz", {}],
+
+    "node-releases": ["node-releases@https://registry.npmjs.org/node-releases/-/node-releases-2.0.20.tgz", {}],
+
+    "normalize-range": ["normalize-range@https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz", {}],
+
+    "picocolors": ["picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz", {}],
+
+    "picomatch": ["picomatch@https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz", {}],
+
+    "postcss": ["postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz", { "dependencies": { "nanoid": "^3.3.11", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }],
+
+    "postcss-selector-parser": ["postcss-selector-parser@https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz", { "dependencies": { "cssesc": "^3.0.0", "util-deprecate": "^1.0.2" } }],
+
+    "postcss-value-parser": ["postcss-value-parser@https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz", {}],
+
+    "proxy-from-env": ["proxy-from-env@https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz", {}],
+
+    "require-directory": ["require-directory@https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz", {}],
+
+    "rollup": ["rollup@https://registry.npmjs.org/rollup/-/rollup-4.50.1.tgz", { "dependencies": { "@types/estree": "1.0.8" }, "optionalDependencies": { "@rollup/rollup-android-arm-eabi": "4.50.1", "@rollup/rollup-android-arm64": "4.50.1", "@rollup/rollup-darwin-arm64": "4.50.1", "@rollup/rollup-darwin-x64": "4.50.1", "@rollup/rollup-freebsd-arm64": "4.50.1", "@rollup/rollup-freebsd-x64": "4.50.1", "@rollup/rollup-linux-arm-gnueabihf": "4.50.1", "@rollup/rollup-linux-arm-musleabihf": "4.50.1", "@rollup/rollup-linux-arm64-gnu": "4.50.1", "@rollup/rollup-linux-arm64-musl": "4.50.1", "@rollup/rollup-linux-loongarch64-gnu": "4.50.1", "@rollup/rollup-linux-ppc64-gnu": "4.50.1", "@rollup/rollup-linux-riscv64-gnu": "4.50.1", "@rollup/rollup-linux-riscv64-musl": "4.50.1", "@rollup/rollup-linux-s390x-gnu": "4.50.1", "@rollup/rollup-linux-x64-gnu": "4.50.1", "@rollup/rollup-linux-x64-musl": "4.50.1", "@rollup/rollup-openharmony-arm64": "4.50.1", "@rollup/rollup-win32-arm64-msvc": "4.50.1", "@rollup/rollup-win32-ia32-msvc": "4.50.1", "@rollup/rollup-win32-x64-msvc": "4.50.1", "fsevents": "~2.3.2" } }],
+
+    "rxjs": ["rxjs@https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz", { "dependencies": { "tslib": "^2.1.0" } }],
+
+    "shell-quote": ["shell-quote@https://registry.npmjs.org/shell-quote/-/shell-quote-1.8.3.tgz", {}],
+
+    "source-map-js": ["source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz", {}],
+
+    "string-width": ["string-width@https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz", { "dependencies": { "emoji-regex": "^8.0.0", "is-fullwidth-code-point": "^3.0.0", "strip-ansi": "^6.0.1" } }],
+
+    "strip-ansi": ["strip-ansi@https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz", { "dependencies": { "ansi-regex": "^5.0.1" } }],
+
+    "supports-color": ["supports-color@https://registry.npmjs.org/supports-color/-/supports-color-8.1.1.tgz", { "dependencies": { "has-flag": "^4.0.0" } }],
+
+    "tailwindcss": ["tailwindcss@https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.13.tgz", {}],
+
+    "tapable": ["tapable@https://registry.npmjs.org/tapable/-/tapable-2.2.3.tgz", {}],
+
+    "tar": ["tar@https://registry.npmjs.org/tar/-/tar-7.4.3.tgz", { "dependencies": { "@isaacs/fs-minipass": "^4.0.0", "chownr": "^3.0.0", "minipass": "^7.1.2", "minizlib": "^3.0.1", "mkdirp": "^3.0.1", "yallist": "^5.0.0" } }],
+
+    "tinyglobby": ["tinyglobby@https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.15.tgz", { "dependencies": { "fdir": "^6.5.0", "picomatch": "^4.0.3" } }],
+
+    "tree-kill": ["tree-kill@https://registry.npmjs.org/tree-kill/-/tree-kill-1.2.2.tgz", {}],
+
+    "tslib": ["tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz", {}],
+
+    "update-browserslist-db": ["update-browserslist-db@https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.1.3.tgz", { "dependencies": { "escalade": "^3.2.0", "picocolors": "^1.1.1" } }],
+
+    "util-deprecate": ["util-deprecate@https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz", {}],
+
+    "vite": ["vite@https://registry.npmjs.org/vite/-/vite-6.3.6.tgz", { "dependencies": { "esbuild": "^0.25.0", "fdir": "^6.4.4", "picomatch": "^4.0.2", "postcss": "^8.5.3", "rollup": "^4.34.9", "tinyglobby": "^0.2.13" }, "optionalDependencies": { "fsevents": "~2.3.3" } }],
+
+    "vite-plugin-full-reload": ["vite-plugin-full-reload@https://registry.npmjs.org/vite-plugin-full-reload/-/vite-plugin-full-reload-1.2.0.tgz", { "dependencies": { "picocolors": "^1.0.0", "picomatch": "^2.3.1" } }],
+
+    "wrap-ansi": ["wrap-ansi@https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz", { "dependencies": { "ansi-styles": "^4.0.0", "string-width": "^4.1.0", "strip-ansi": "^6.0.0" } }],
+
+    "y18n": ["y18n@https://registry.npmjs.org/y18n/-/y18n-5.0.8.tgz", {}],
+
+    "yallist": ["yallist@https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz", {}],
+
+    "yargs": ["yargs@https://registry.npmjs.org/yargs/-/yargs-17.7.2.tgz", { "dependencies": { "cliui": "^8.0.1", "escalade": "^3.1.1", "get-caller-file": "^2.0.5", "require-directory": "^2.1.1", "string-width": "^4.2.3", "y18n": "^5.0.5", "yargs-parser": "^21.1.1" } }],
+
+    "yargs-parser": ["yargs-parser@https://registry.npmjs.org/yargs-parser/-/yargs-parser-21.1.1.tgz", {}],
+
+    "chalk/supports-color": ["supports-color@https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz", { "dependencies": { "has-flag": "^4.0.0" } }],
+
+    "vite-plugin-full-reload/picomatch": ["picomatch@https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz", {}],
+  }
+}

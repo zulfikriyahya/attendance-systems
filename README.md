@@ -98,7 +98,7 @@ After=network.target
 User=www-data
 Group=www-data
 Restart=always
-ExecStart=/usr/bin/php /var/www/attendance-systems/artisan queue:work --daemon --tries=3 --timeout=120
+ExecStart=/usr/bin/php /var/www/attendance-systems/artisan queue:work --daemon --tries=3 --timeout=300
 WorkingDirectory=/var/www/attendance-systems
 StandardOutput=append:/var/log/laravel-worker.log
 StandardError=append:/var/log/laravel-worker-error.log
@@ -120,8 +120,8 @@ sudo systemctl enable --now cron
 
 ## Login Admin Default
 
-| Email                                             | Password |
-| ------------------------------------------------- | -------- |
+| Email                                                             | Password |
+| ----------------------------------------------------------------- | -------- |
 | [admin@mtsn1pandeglang.sch.id](mailto:adm@mtsn1pandeglang.sch.id) | P@ssw0rd |
 
 > **Segera ganti kredensial ini setelah login pertama.**
