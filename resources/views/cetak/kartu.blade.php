@@ -96,8 +96,7 @@
         <div class="page">
             @foreach ($chunk as $pengajuan)
                 <div class="kartu">
-                    <img src="{{ asset('storage/kartu/' . basename($pengajuan->user->avatar)) }}"
-                        alt="{{ $pengajuan->user->name }}">
+                    <img src="{{ asset('storage/kartu/' . basename($pengajuan->user->avatar)) }}" alt="{{ $pengajuan->user->name }}">
                 </div>
             @endforeach
         </div>

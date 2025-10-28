@@ -34,6 +34,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -235,8 +236,8 @@ class UserResource extends Resource
                             ->join(', ')
                     )
                     ->searchable($searchable),
-                IconColumn::make('status')
-                    ->boolean(),
+                ToggleColumn::make('status')
+                    ->label('Status'),
             ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([

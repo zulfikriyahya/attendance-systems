@@ -98,7 +98,7 @@ After=network.target
 User=www-data
 Group=www-data
 Restart=always
-ExecStart=/usr/bin/php /var/www/attendance-systems/artisan queue:work --daemon --tries=3 --timeout=300
+ExecStart=/usr/bin/php /var/www/attendance-systems/artisan queue:work --daemon --tries=3 --timeout=120
 WorkingDirectory=/var/www/attendance-systems
 StandardOutput=append:/var/log/laravel-worker.log
 StandardError=append:/var/log/laravel-worker-error.log
@@ -120,8 +120,8 @@ sudo systemctl enable --now cron
 
 ## Login Admin Default
 
-| Email                                                             | Password |
-| ----------------------------------------------------------------- | -------- |
+| Email                                             | Password |
+| ------------------------------------------------- | -------- |
 | [admin@mtsn1pandeglang.sch.id](mailto:adm@mtsn1pandeglang.sch.id) | P@ssw0rd |
 
 > **Segera ganti kredensial ini setelah login pertama.**
@@ -164,3 +164,28 @@ Untuk informasi lebih lanjut, saran, atau kerja sama pengembangan sistem:
 Jl. Raya Labuan Km. 5.7 - Kaduhejo, Pandeglang, Banten
 
 ---
+
+```bash
+# Monitor queue
+php artisan whatsapp:monitor
+
+# Clear cache
+php artisan whatsapp:monitor --clear-cache
+
+# Health check
+php artisan whatsapp:maintenance health-check
+
+# View statistics
+php artisan whatsapp:maintenance stats --hours=6
+
+# Clear failed jobs
+php artisan whatsapp:maintenance clear-failed --force
+
+# Retry failed jobs
+php artisan whatsapp:maintenance retry-failed --limit=50
+
+# Manage workers
+php artisan whatsapp:worker start --workers=5
+php artisan whatsapp:worker status
+php artisan whatsapp:worker restart
+```

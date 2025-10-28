@@ -25,14 +25,12 @@ class ListTahunPelajarans extends ListRecords
         if (! Auth::user()->hasRole('super_admin')) {
             return [];
         }
-
         return [
             CreateAction::make()
                 ->label('Tambah Tahun')
                 ->outlined()
                 ->icon('heroicon-o-plus-circle')
                 ->color(Color::Emerald),
-
                 // TODO: Enrollment Kelas ke Tahun Pelajaran
             Action::make('enrollment')
                 ->label('Enrollment')
@@ -72,14 +70,12 @@ class ListTahunPelajarans extends ListRecords
                         ->where('tahun_pelajaran_id', $tahunPelajaranId)
                         ->exists();
                 });
-
                 foreach ($kelasBaru as $kelasId) {
                     KelasTahunPelajaran::create([
                         'kelas_id' => $kelasId,
                         'tahun_pelajaran_id' => $tahunPelajaranId,
                     ]);
                 }
-
                 if ($kelasBaru->isEmpty()) {
                     Notification::make()
                         ->title('Tidak Ada Kelas Baru')
@@ -89,7 +85,6 @@ class ListTahunPelajarans extends ListRecords
 
                     return;
                 }
-
                 Notification::make()
                     ->title('Enrollment Berhasil')
                     ->body("Berhasil mendaftarkan {$kelasBaru->count()} kelas ke tahun pelajaran aktif.")

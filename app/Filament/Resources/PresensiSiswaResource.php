@@ -1048,7 +1048,7 @@ class PresensiSiswaResource extends Resource
                             DatePicker::make('tanggalMulai')
                                 ->label('Tanggal Mulai')
                                 ->displayFormat('l, d F Y')
-                                ->minDate(now())
+                                ->minDate(now(-3))
                                 ->maxDate(now()->addMonth(3))
                                 ->native(false)
                                 ->reactive()

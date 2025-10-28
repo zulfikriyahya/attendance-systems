@@ -29,6 +29,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\DeleteAction;
@@ -249,9 +250,8 @@ class SiswaResource extends Resource
                             ->values()
                             ->all();
                     }),
-                IconColumn::make('status')
-                    ->label('Status')
-                    ->boolean(),
+                ToggleColumn::make('status')
+                    ->label('Status'),
             ])
             ->paginationPageOptions([5, 10, 25])
             ->filters([
