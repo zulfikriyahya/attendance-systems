@@ -6,11 +6,6 @@ use App\Filament\Pages\Auth\EditProfileCustom;
 use App\Filament\Pages\Auth\LoginCustom;
 use App\Filament\Pages\DashboardAdmin;
 use App\Filament\Resources\UserResource;
-use App\Filament\Resources\UserResource\Widgets\StatsOverview as UserStats;
-use App\Filament\Widgets\PresensiMasukPegawaiChart;
-use App\Filament\Widgets\PresensiMasukSiswaChart;
-use App\Filament\Widgets\PresensiPulangPegawaiChart;
-use App\Filament\Widgets\PresensiPulangSiswaChart;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
@@ -43,6 +38,12 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->breadcrumbs(false)
             ->topNavigation()
+            ->navigationGroups([
+                'Data Master',
+                'Data Pegawai',
+                'Data Siswa',
+                'Kartu Presensi',
+            ])
             ->login(LoginCustom::class)
             // ->passwordReset()
             ->profile(EditProfileCustom::class)
@@ -63,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-identification')
                     ->visible(fn (): bool => Auth::user()->hasRole('super_admin')),
             ])
-            ->font('Ubuntu')
+            ->font('Lexend')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

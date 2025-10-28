@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\PegawaiResource\Pages;
 
 use App\Filament\Resources\PegawaiResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 
 class ViewPegawai extends ViewRecord
 {
@@ -13,7 +14,12 @@ class ViewPegawai extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 }

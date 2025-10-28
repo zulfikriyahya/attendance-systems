@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\PresensiSiswaResource\Pages;
 
 use App\Filament\Resources\PresensiSiswaResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
 
 class ViewPresensiSiswa extends ViewRecord
@@ -14,7 +15,12 @@ class ViewPresensiSiswa extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 

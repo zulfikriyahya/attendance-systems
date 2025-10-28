@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources\TahunPelajaranResource\Pages;
 
-use App\Models\Kelas;
+use App\Filament\Resources\TahunPelajaranResource;
 use App\Models\Enrollment;
-use Filament\Actions\Action;
-use App\Models\TahunPelajaran;
-use Filament\Actions\CreateAction;
-use Filament\Support\Colors\Color;
+use App\Models\Kelas;
 use App\Models\KelasTahunPelajaran;
-use Illuminate\Support\Facades\Auth;
+use App\Models\TahunPelajaran;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\TahunPelajaranResource;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 
 class ListTahunPelajarans extends ListRecords
 {
@@ -25,18 +25,19 @@ class ListTahunPelajarans extends ListRecords
         if (! Auth::user()->hasRole('super_admin')) {
             return [];
         }
+
         return [
             CreateAction::make()
-                ->label('Tambah Tahun')
-                ->outlined()
+                ->label('Create')
+                ->color(Color::Green)
+                ->size('sm')
                 ->icon('heroicon-o-plus-circle')
-                ->color(Color::Emerald),
-                // TODO: Enrollment Kelas ke Tahun Pelajaran
+                ->outlined(),
+            // TODO: Enrollment Kelas ke Tahun Pelajaran
             Action::make('enrollment')
                 ->label('Enrollment')
                 ->outlined()
-                ->visible(fn () =>
-                    Kelas::exists() &&
+                ->visible(fn () => Kelas::exists() &&
                     TahunPelajaran::where('status', true)->exists()
                 )
                 ->icon('heroicon-o-building-library')
@@ -45,13 +46,11 @@ class ListTahunPelajarans extends ListRecords
                 ->form([
                     Select::make('tahun_pelajaran_id')
                         ->label('Tahun Pelajaran Aktif')
-                        ->options(fn () =>
-                            TahunPelajaran::where('status', true)
-                                ->pluck('nama', 'id')
+                        ->options(fn () => TahunPelajaran::where('status', true)
+                            ->pluck('nama', 'id')
                         )
-                        ->default(fn () =>
-                            TahunPelajaran::where('status', true)
-                                ->first()?->id
+                        ->default(fn () => TahunPelajaran::where('status', true)
+                            ->first()?->id
                         )
                         ->required(),
 
@@ -62,35 +61,35 @@ class ListTahunPelajarans extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                $kelasIds = $data['kelas_id'];
-                $tahunPelajaranId = $data['tahun_pelajaran_id'];
+                    $kelasIds = $data['kelas_id'];
+                    $tahunPelajaranId = $data['tahun_pelajaran_id'];
 
-                $kelasBaru = collect($kelasIds)->filter(function ($kelasId) use ($tahunPelajaranId) {
-                    return ! KelasTahunPelajaran::where('kelas_id', $kelasId)
-                        ->where('tahun_pelajaran_id', $tahunPelajaranId)
-                        ->exists();
-                });
-                foreach ($kelasBaru as $kelasId) {
-                    KelasTahunPelajaran::create([
-                        'kelas_id' => $kelasId,
-                        'tahun_pelajaran_id' => $tahunPelajaranId,
-                    ]);
-                }
-                if ($kelasBaru->isEmpty()) {
+                    $kelasBaru = collect($kelasIds)->filter(function ($kelasId) use ($tahunPelajaranId) {
+                        return ! KelasTahunPelajaran::where('kelas_id', $kelasId)
+                            ->where('tahun_pelajaran_id', $tahunPelajaranId)
+                            ->exists();
+                    });
+                    foreach ($kelasBaru as $kelasId) {
+                        KelasTahunPelajaran::create([
+                            'kelas_id' => $kelasId,
+                            'tahun_pelajaran_id' => $tahunPelajaranId,
+                        ]);
+                    }
+                    if ($kelasBaru->isEmpty()) {
+                        Notification::make()
+                            ->title('Tidak Ada Kelas Baru')
+                            ->body('Semua kelas sudah terdaftar pada tahun pelajaran tersebut.')
+                            ->warning()
+                            ->send();
+
+                        return;
+                    }
                     Notification::make()
-                        ->title('Tidak Ada Kelas Baru')
-                        ->body('Semua kelas sudah terdaftar pada tahun pelajaran tersebut.')
-                        ->warning()
+                        ->title('Enrollment Berhasil')
+                        ->body("Berhasil mendaftarkan {$kelasBaru->count()} kelas ke tahun pelajaran aktif.")
+                        ->success()
                         ->send();
-
-                    return;
-                }
-                Notification::make()
-                    ->title('Enrollment Berhasil')
-                    ->body("Berhasil mendaftarkan {$kelasBaru->count()} kelas ke tahun pelajaran aktif.")
-                    ->success()
-                    ->send();
-            }),
+                }),
         ];
     }
 }

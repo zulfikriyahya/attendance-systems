@@ -2,22 +2,22 @@
 
 namespace App\Filament\Resources\KelasResource\Pages;
 
-use App\Models\Kelas;
-use App\Models\Siswa;
-use App\Models\Pegawai;
+use App\Filament\Resources\KelasResource;
 use App\Models\Enrollment;
-use App\Models\KelasSiswa;
+use App\Models\Kelas;
 use App\Models\KelasPegawai;
-use Filament\Actions\Action;
-use App\Models\TahunPelajaran;
-use Filament\Actions\CreateAction;
-use Filament\Support\Colors\Color;
+use App\Models\KelasSiswa;
 use App\Models\KelasTahunPelajaran;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Models\TahunPelajaran;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use App\Filament\Resources\KelasResource;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 
 class ListKelas extends ListRecords
 {
@@ -32,17 +32,17 @@ class ListKelas extends ListRecords
 
         return [
             CreateAction::make()
-                ->label('Tambah Kelas')
-                ->outlined()
+                ->label('Create')
+                ->color(Color::Green)
+                ->size('sm')
                 ->icon('heroicon-o-plus-circle')
-                ->color(Color::Emerald),
+                ->outlined(),
 
-                // TODO: Enrollment Siswa ke Kelas Tahun Pelajaran
+            // TODO: Enrollment Siswa ke Kelas Tahun Pelajaran
             Action::make('enrollment-siswa')
                 ->label('Enrollment Siswa')
                 ->outlined()
-                ->visible(fn () =>
-                    Siswa::exists() &&
+                ->visible(fn () => Siswa::exists() &&
                     KelasTahunPelajaran::exists()
                 )
                 ->icon('heroicon-o-building-library')
@@ -51,16 +51,16 @@ class ListKelas extends ListRecords
                 ->form([
                     Select::make('kelas_tahun_pelajaran_id')
                         ->label('Kelas Aktif')
-                        ->options(fn () =>
-                            KelasTahunPelajaran::with('kelas', 'tahunPelajaran')
+                        ->options(fn () => KelasTahunPelajaran::with('kelas', 'tahunPelajaran')
                             ->where('tahun_pelajaran_id', TahunPelajaran::where('status', true)->first()?->id)
-                                ->get()
-                                ->mapWithKeys(function ($ktp) {
-                                    $label = ($ktp->kelas?->nama ?? 'Tanpa Kelas')
-                                        . ' - '
-                                        . ($ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun');
-                                    return [$ktp->id => $label];
-                                })
+                            ->get()
+                            ->mapWithKeys(function ($ktp) {
+                                $label = ($ktp->kelas?->nama ?? 'Tanpa Kelas')
+                                    .' - '
+                                    .($ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun');
+
+                                return [$ktp->id => $label];
+                            })
                         )
                         ->searchable()
                         ->required(),
@@ -85,7 +85,8 @@ class ListKelas extends ListRecords
                                 ->whereNotIn('id', $sudahTerdaftar)
                                 ->get()
                                 ->mapWithKeys(function ($siswa) {
-                                    $label = ($siswa->user?->name ?? 'Tanpa Nama') . ' (' . $siswa->nisn . ')';
+                                    $label = ($siswa->user?->name ?? 'Tanpa Nama').' ('.$siswa->nisn.')';
+
                                     return [$siswa->id => $label];
                                 });
                         })
@@ -122,17 +123,16 @@ class ListKelas extends ListRecords
 
                     Notification::make()
                         ->title('Enrollment Berhasil')
-                        ->body('Jumlah siswa yang di-enroll: ' . $baru->count())
+                        ->body('Jumlah siswa yang di-enroll: '.$baru->count())
                         ->success()
                         ->send();
                 }),
 
-                // TODO: Enrollment pegawai ke Kelas Tahun Pelajaran
+            // TODO: Enrollment pegawai ke Kelas Tahun Pelajaran
             Action::make('enrollment-pegawai')
                 ->label('Enrollment Wali Kelas')
                 ->outlined()
-                ->visible(fn () =>
-                    pegawai::exists() &&
+                ->visible(fn () => pegawai::exists() &&
                     KelasTahunPelajaran::exists()
                 )
                 ->icon('heroicon-o-building-library')
@@ -140,45 +140,45 @@ class ListKelas extends ListRecords
                 ->requiresConfirmation()
                 ->form([
                     Select::make('kelas_tahun_pelajaran_id')
-                    ->label('Kelas Aktif')
-                    ->options(function () {
-                        $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
+                        ->label('Kelas Aktif')
+                        ->options(function () {
+                            $tahunAktifId = TahunPelajaran::where('status', true)->first()?->id;
 
-                        if (! $tahunAktifId) {
-                            return [];
-                        }
+                            if (! $tahunAktifId) {
+                                return [];
+                            }
 
-                        // Ambil semua kelas_tahun_pelajaran yang SUDAH memiliki pegawai di tahun aktif
-                        $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
-                            $query->where('tahun_pelajaran_id', $tahunAktifId);
-                        })->pluck('kelas_tahun_pelajaran_id');
+                            // Ambil semua kelas_tahun_pelajaran yang SUDAH memiliki pegawai di tahun aktif
+                            $sudahTerdaftar = KelasPegawai::whereHas('kelasTahunPelajaran', function ($query) use ($tahunAktifId) {
+                                $query->where('tahun_pelajaran_id', $tahunAktifId);
+                            })->pluck('kelas_tahun_pelajaran_id');
 
-                        // Ambil semua kelas_tahun_pelajaran yang BELUM memiliki pegawai
-                        return KelasTahunPelajaran::with(['kelas', 'tahunPelajaran'])
-                            ->where('tahun_pelajaran_id', $tahunAktifId)
-                            ->whereNotIn('id', $sudahTerdaftar)
-                            ->get()
-                            ->unique('kelas_id')
-                            ->mapWithKeys(function ($ktp) {
-                                $kelasNama = $ktp->kelas?->nama ?? 'Tanpa Kelas';
-                                $tahunNama = $ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun';
-                                $jurusan   = $ktp->kelas?->jurusan?->nama ?? null; // opsional jika ada
-                                $tingkat   = $ktp->kelas?->tingkat ?? null; // opsional jika ada
+                            // Ambil semua kelas_tahun_pelajaran yang BELUM memiliki pegawai
+                            return KelasTahunPelajaran::with(['kelas', 'tahunPelajaran'])
+                                ->where('tahun_pelajaran_id', $tahunAktifId)
+                                ->whereNotIn('id', $sudahTerdaftar)
+                                ->get()
+                                ->unique('kelas_id')
+                                ->mapWithKeys(function ($ktp) {
+                                    $kelasNama = $ktp->kelas?->nama ?? 'Tanpa Kelas';
+                                    $tahunNama = $ktp->tahunPelajaran?->nama ?? 'Tanpa Tahun';
+                                    $jurusan = $ktp->kelas?->jurusan?->nama ?? null; // opsional jika ada
+                                    $tingkat = $ktp->kelas?->tingkat ?? null; // opsional jika ada
 
-                                $labelParts = array_filter([
-                                    $tingkat ? "Tingkat {$tingkat}" : null,
-                                    $kelasNama,
-                                    $jurusan,
-                                    "TP: {$tahunNama}",
-                                ]);
+                                    $labelParts = array_filter([
+                                        $tingkat ? "Tingkat {$tingkat}" : null,
+                                        $kelasNama,
+                                        $jurusan,
+                                        "TP: {$tahunNama}",
+                                    ]);
 
-                                $label = implode(' • ', $labelParts);
+                                    $label = implode(' • ', $labelParts);
 
-                                return [$ktp->id => $label];
-                            });
-                    })
-                    ->searchable()
-                    ->required(),
+                                    return [$ktp->id => $label];
+                                });
+                        })
+                        ->searchable()
+                        ->required(),
                     Select::make('pegawai_id')
                         ->label('Pegawai')
                         ->options(function () {
@@ -198,7 +198,8 @@ class ListKelas extends ListRecords
                                 ->whereNotIn('id', $sudahTerdaftar)
                                 ->get()
                                 ->mapWithKeys(function ($pegawai) {
-                                    $label = ($pegawai->user?->name ?? 'Tanpa Nama') . ' (' . $pegawai->nip . ')';
+                                    $label = ($pegawai->user?->name ?? 'Tanpa Nama').' ('.$pegawai->nip.')';
+
                                     return [$pegawai->id => $label];
                                 });
                         })
@@ -235,7 +236,7 @@ class ListKelas extends ListRecords
 
                     Notification::make()
                         ->title('Enrollment Berhasil')
-                        ->body('Jumlah pegawai yang di-enroll: ' . $baru->count())
+                        ->body('Jumlah pegawai yang di-enroll: '.$baru->count())
                         ->success()
                         ->send();
                 }),

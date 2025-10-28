@@ -2,11 +2,8 @@
 
 namespace App\Filament\Resources\TahunPelajaranResource\Pages;
 
-use App\Models\Enrollment;
-use App\Models\TahunPelajaran;
-use Illuminate\Support\Facades\Log;
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\TahunPelajaranResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateTahunPelajaran extends CreateRecord
 {

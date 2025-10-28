@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\TahunPelajaranResource\Pages;
 
 use App\Filament\Resources\TahunPelajaranResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 
 class ViewTahunPelajaran extends ViewRecord
 {
@@ -13,7 +14,12 @@ class ViewTahunPelajaran extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 }

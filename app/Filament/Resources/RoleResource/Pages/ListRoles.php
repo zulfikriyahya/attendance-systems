@@ -17,10 +17,11 @@ class ListRoles extends ListRecords
         if (Auth::user()->hasRole('super_admin')) {
             return [
                 CreateAction::make()
-                    ->label('Tambah Peran')
-                    ->outlined()
+                    ->label('Create')
+                    ->color(Color::Green)
+                    ->size('sm')
                     ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Emerald),
+                    ->outlined(),
             ];
         }
 

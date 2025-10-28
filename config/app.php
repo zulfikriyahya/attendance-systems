@@ -16,7 +16,6 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
     'biaya_kartu' => env('BIAYA_KARTU', '15000'),
 
-
     /*
     |--------------------------------------------------------------------------
     | Application Environment

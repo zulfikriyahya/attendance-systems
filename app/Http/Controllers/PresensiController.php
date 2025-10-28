@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use Illuminate\Http\Request;
-use App\Models\PresensiSiswa;
 use App\Models\JadwalPresensi;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\PresensiSiswa;
+use App\Models\Siswa;
 use App\Services\PresensiService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 // With Cache
 class PresensiController extends Controller
@@ -26,12 +26,13 @@ class PresensiController extends Controller
 
     // Cache TTL constants untuk data yang tidak berubah per hari
     public const CACHE_RFID_TTL = 86400; // 24 jam - data RFID jarang berubah
+
     public const CACHE_HEALTH_TTL = 30; // 30 detik - health check tetap pendek
 
     public function getJadwalHariIni()
     {
         $now = now();
-        $cacheKey = 'jadwal_presensi_' . $now->toDateString();
+        $cacheKey = 'jadwal_presensi_'.$now->toDateString();
 
         $jadwal = Cache::remember($cacheKey, $this->getCacheTTLUntilEndOfDay(), function () use ($now) {
             return JadwalPresensi::where('status', true)
@@ -39,7 +40,7 @@ class PresensiController extends Controller
                 ->first();
         });
 
-        if (!$jadwal) {
+        if (! $jadwal) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tidak ada jadwal presensi untuk hari ini',
@@ -79,7 +80,7 @@ class PresensiController extends Controller
                         'status' => $presensi->statusPresensi?->label(),
                         'tanggal' => $presensi->tanggal,
                     ] : null,
-                    'sudah_presensi_masuk' => (bool)$presensi,
+                    'sudah_presensi_masuk' => (bool) $presensi,
                     'sudah_presensi_pulang' => $presensi && $presensi->jamPulang !== null,
                 ],
             ];
@@ -88,6 +89,7 @@ class PresensiController extends Controller
                 $presensi = PresensiPegawai::where('pegawai_id', $pegawai->id)
                     ->whereDate('tanggal', $today)
                     ->first();
+
                 return ['response' => $buildData($pegawai, 'pegawai', $presensi), 'found' => true];
             }
 
@@ -95,17 +97,18 @@ class PresensiController extends Controller
                 $presensi = PresensiSiswa::where('siswa_id', $siswa->id)
                     ->whereDate('tanggal', $today)
                     ->first();
+
                 return ['response' => $buildData($siswa, 'siswa', $presensi), 'found' => true];
             }
 
             return ['found' => false];
         });
 
-        if (!$result['found']) {
+        if (! $result['found']) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'RFID tidak ditemukan',
-                'data' => null
+                'data' => null,
             ], 404);
         }
 
@@ -120,10 +123,10 @@ class PresensiController extends Controller
 
         $rfid = $request->input('rfid');
 
-        if (!$rfid) {
+        if (! $rfid) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'RFID tidak boleh kosong'
+                'message' => 'RFID tidak boleh kosong',
             ], 400);
         }
 
@@ -136,19 +139,20 @@ class PresensiController extends Controller
             if (Siswa::where('rfid', $rfid)->exists()) {
                 return ['valid' => true, 'type' => 'siswa'];
             }
+
             return ['valid' => false];
         });
 
-        if (!$result['valid']) {
+        if (! $result['valid']) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'RFID tidak dikenali'
+                'message' => 'RFID tidak dikenali',
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Valid ' . ucfirst($result['type'])
+            'message' => 'Valid '.ucfirst($result['type']),
         ]);
     }
 
@@ -220,7 +224,7 @@ class PresensiController extends Controller
                     DB::getSchemaBuilder()->hasTable('presensi_siswas') &&
                     DB::getSchemaBuilder()->hasTable('jadwal_presensis');
 
-                if (!$tablesExist) {
+                if (! $tablesExist) {
                     throw new \Exception('Database tables not found');
                 }
 
@@ -352,7 +356,7 @@ class PresensiController extends Controller
             Cache::tags(['presensi'])->flush();
 
             // Atau clear specific patterns
-            Cache::forget('jadwal_presensi_' . now()->toDateString());
+            Cache::forget('jadwal_presensi_'.now()->toDateString());
             Cache::forget('system_health_check');
 
             return response()->json([

@@ -3,8 +3,12 @@
 namespace App\Filament\Resources\PegawaiResource\Pages;
 
 use App\Filament\Resources\PegawaiResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Colors\Color;
 
 class EditPegawai extends EditRecord
 {
@@ -18,10 +22,30 @@ class EditPegawai extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            ViewAction::make()
+                ->label('View')
+                ->color(Color::Zinc)
+                ->size('sm')
+                ->icon('heroicon-o-eye')
+                ->outlined(),
+            DeleteAction::make()
+                ->label('Delete')
+                ->color(Color::Red)
+                ->size('sm')
+                ->icon('heroicon-o-minus-circle')
+                ->outlined(),
+            ForceDeleteAction::make()
+                ->label('Force Delete')
+                ->color(Color::Red)
+                ->size('sm')
+                ->icon('heroicon-o-trash')
+                ->outlined(),
+            RestoreAction::make()
+                ->label('Restore')
+                ->color(Color::Blue)
+                ->size('sm')
+                ->icon('heroicon-o-arrow-path')
+                ->outlined(),
         ];
     }
 }

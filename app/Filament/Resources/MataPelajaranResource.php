@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Resources\MataPelajaranResource\Pages;
 use App\Models\MataPelajaran;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\MataPelajaranResource\Pages;
-use App\Filament\Resources\MataPelajaranResource\RelationManagers;
 
 class MataPelajaranResource extends Resource
 {
     protected static ?string $model = MataPelajaran::class;
+
     protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $navigationGroup = 'Data Master';
@@ -27,6 +27,7 @@ class MataPelajaranResource extends Resource
     protected static ?int $navigationSort = 9;
 
     protected static ?string $slug = 'mata-pelajaran';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

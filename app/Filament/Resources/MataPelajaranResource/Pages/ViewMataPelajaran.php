@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\MataPelajaranResource\Pages;
 
 use App\Filament\Resources\MataPelajaranResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 
 class ViewMataPelajaran extends ViewRecord
 {
@@ -13,7 +14,12 @@ class ViewMataPelajaran extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 }

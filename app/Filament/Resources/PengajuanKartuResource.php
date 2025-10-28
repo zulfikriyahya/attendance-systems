@@ -2,34 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
+use App\Filament\Resources\PengajuanKartuResource\Pages;
 use App\Models\Instansi;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use App\Models\PengajuanKartu;
-use Filament\Resources\Resource;
+use App\Models\User;
 use App\Services\WhatsappService;
-use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PengajuanKartuResource\Pages;
+use Illuminate\Support\Facades\Auth;
 
 class PengajuanKartuResource extends Resource
 {
@@ -75,82 +77,125 @@ class PengajuanKartuResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('Pengguna')
-                    ->options(function ($get) {
-                        $currentUserId = $get('user_id');
+                Grid::make([
+                    'default' => 1,
+                    'sm' => 1,
+                    'md' => 12,
+                ])
+                    ->schema([
+                        Section::make('Pengajuan Kartu')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 1,
+                                'md' => 8,
+                            ])
+                            ->columns(3)
+                            ->schema([
+                                Select::make('user_id')
+                                    ->label('Nama Pengguna')
+                                    ->options(function ($get) {
+                                        $currentUserId = $get('user_id');
 
-                        return User::where('status', true)
-                            ->where('username', '!=', 'administrator')
-                            ->whereDoesntHave('roles', function ($q) {
-                                $q->whereIn('name', ['administrator']);
-                            })
-                            ->pluck('name', 'id');
-                    })
-                    ->required()
-                    ->searchable()
-                    ->preload()
-                    ->disabledOn('edit')
-                    ->hidden(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
-                    ->default(fn () => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
-                    ->rules([
-                        'required',
-                        function () {
-                            return function (string $attribute, $value, \Closure $fail) {
-                                if ($value) {
-                                    $existingPengajuan = PengajuanKartu::where('user_id', $value)
-                                        ->whereIn('status', ['Pending', 'Proses'])
-                                        ->exists();
+                                        return User::where('status', true)
+                                            ->where('username', '!=', 'administrator')
+                                            ->whereDoesntHave('roles', function ($q) {
+                                                $q->whereIn('name', ['administrator']);
+                                            })
+                                            ->pluck('name', 'id');
+                                    })
+                                    ->required()
+                                    ->searchable()
+                                    ->preload()
+                                    ->disabledOn('edit')
+                                    ->hidden(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas']))
+                                    ->default(fn () => Auth::user()->hasRole(['super_admin', 'wali_kelas']) ? null : Auth::id())
+                                    ->rules([
+                                        'required',
+                                        function () {
+                                            return function (string $attribute, $value, \Closure $fail) {
+                                                if ($value) {
+                                                    $existingPengajuan = PengajuanKartu::where('user_id', $value)
+                                                        ->whereIn('status', ['Pending', 'Proses'])
+                                                        ->exists();
 
-                                    if ($existingPengajuan) {
-                                        $fail('Pengguna ini masih memiliki pengajuan kartu yang sedang diproses.');
-                                    }
-                                }
-                            };
-                        },
+                                                    if ($existingPengajuan) {
+                                                        $fail('Pengguna ini masih memiliki pengajuan kartu yang sedang diproses.');
+                                                    }
+                                                }
+                                            };
+                                        },
+                                    ]),
+
+                                Select::make('alasanPengajuanKartu')
+                                    ->label('Alasan Pengajuan')
+                                    ->required()
+                                    ->native(false)
+                                    ->options([
+                                        'Baru' => 'Pembuatan Baru',
+                                        'Rusak' => 'Kartu Rusak',
+                                        'Hilang' => 'Kartu Hilang',
+                                    ])
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if ($state === 'Baru') {
+                                            $set('biaya', 0);
+                                        } else {
+                                            $set('biaya', config('app.biaya_kartu'));
+                                        }
+                                    }),
+
+                                DateTimePicker::make('tanggalPengajuanKartu')
+                                    ->label('Tanggal Pengajuan')
+                                    ->required()
+                                    ->displayFormat('l, d F Y H:i')
+                                    ->native(false)
+                                    ->default(now())
+                                    ->maxDate(now()),
+                            ]),
+
+                        Section::make('Detail')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 1,
+                                'md' => 4,
+                            ])
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('biaya')
+                                    ->label('Biaya Pembuatan Kartu')
+                                    ->prefix('Rp.')
+                                    ->integer()
+                                    ->default(function (callable $get) {
+                                        return $get('alasanPengajuanKartu') === 'Baru'
+                                            ? 0
+                                            : config('app.biaya_kartu');
+                                    })
+                                    ->maxValue(50000)
+                                    ->maxLength(5)
+                                    ->minLength(1)
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi',
+                                    ])
+                                    ->placeholder('Gratis = 0')
+                                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+
+                                Select::make('status')
+                                    ->label('Status')
+                                    ->options([
+                                        'Pending' => 'Pending',
+                                        'Proses' => 'Proses',
+                                        'Selesai' => 'Selesai',
+                                    ])
+                                    ->native(false)
+                                    ->default('Pending')
+                                    ->required()
+                                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
+                            ]),
                     ]),
-
-                TextInput::make('biaya')
-                    ->label('Biaya Pembuatan Kartu')
-                    ->prefix('Rp.')
-                    ->integer()
-                    ->default(config('app.biaya_kartu'))
-                    ->maxValue(50000)
-                    ->maxLength(5)
-                    ->minLength(1)
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi',
-                    ])
-                    ->placeholder('Gratis = 0')
-                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
-
-                DateTimePicker::make('tanggalPengajuanKartu')
-                    ->label('Tanggal Pengajuan')
-                    ->required()
-                    ->displayFormat('l, d F Y H:i')
-                    ->native(false)
-                    ->default(now())
-                    ->maxDate(now()),
-
-                Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Pending' => 'Pending',
-                        'Proses' => 'Proses',
-                        'Selesai' => 'Selesai',
-                    ])
-                    ->default('Pending')
-                    ->required()
-                    ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
-
-                Textarea::make('alasanPengajuanKartu')
-                    ->label('Alasan Pengajuan')
-                    ->required()
-                    ->columnSpanFull()
-                    ->placeholder('Contoh: Kartu hilang, kartu rusak, dll.')
-                    ->rows(3),
-            ])->columns(3);
+            ]);
     }
 
     public static function table(Table $table): Table

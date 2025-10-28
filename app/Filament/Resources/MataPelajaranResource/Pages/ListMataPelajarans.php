@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\MataPelajaranResource\Pages;
 
 use App\Filament\Resources\MataPelajaranResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Colors\Color;
 
 class ListMataPelajarans extends ListRecords
 {
@@ -13,7 +14,12 @@ class ListMataPelajarans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make()
+                ->label('Create')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-plus-circle')
+                ->outlined(),
         ];
     }
 }

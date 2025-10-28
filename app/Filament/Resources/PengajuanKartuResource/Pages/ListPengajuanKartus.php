@@ -2,13 +2,14 @@
 
 namespace App\Filament\Resources\PengajuanKartuResource\Pages;
 
-use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\PengajuanKartuResource;
 use App\Filament\Resources\PengajuanKartuResource\Widgets\StatsOverview;
+use App\Models\PengajuanKartu;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 
 class ListPengajuanKartus extends ListRecords
 {
@@ -30,18 +31,21 @@ class ListPengajuanKartus extends ListRecords
         if (Auth::user()->hasRole('super_admin')) {
             return [
                 CreateAction::make()
-                    ->label('Buat Pengajuan')
-                    ->outlined()
+                    ->label('Create')
+                    ->color(Color::Green)
+                    ->size('sm')
                     ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Emerald),
-                    // TODO: Add Print Action
+                    ->outlined(),
+
                 Action::make('cetak')
-                    ->label('Cetak Kartu')
-                    ->outlined()
+                    ->label('Print')
+                    ->color(Color::Blue)
+                    ->size('sm')
                     ->icon('heroicon-o-printer')
-                    ->color(Color::Cyan)
+                    ->outlined()
                     ->url(fn (): string => route('cetak-kartu'))
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab()
+                    ->visible(PengajuanKartu::where('status', 'Proses')->count() >= 10), // Tampilkan tombol jika status Proses lebih, atau sama dengan 10.
             ];
         }
 

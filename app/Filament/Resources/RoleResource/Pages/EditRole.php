@@ -4,8 +4,12 @@ namespace App\Filament\Resources\RoleResource\Pages;
 
 use App\Filament\Resources\RoleResource;
 use BezhanSalleh\FilamentShield\Support\Utils;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Colors\Color;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -20,10 +24,33 @@ class EditRole extends EditRecord
         return static::getResource()::getUrl('index');
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            // Actions\DeleteAction::make(),
+            ViewAction::make()
+                ->label('View')
+                ->color(Color::Zinc)
+                ->size('sm')
+                ->icon('heroicon-o-eye')
+                ->outlined(),
+            DeleteAction::make()
+                ->label('Delete')
+                ->color(Color::Red)
+                ->size('sm')
+                ->icon('heroicon-o-minus-circle')
+                ->outlined(),
+            ForceDeleteAction::make()
+                ->label('Force Delete')
+                ->color(Color::Red)
+                ->size('sm')
+                ->icon('heroicon-o-trash')
+                ->outlined(),
+            RestoreAction::make()
+                ->label('Restore')
+                ->color(Color::Blue)
+                ->size('sm')
+                ->icon('heroicon-o-arrow-path')
+                ->outlined(),
         ];
     }
 

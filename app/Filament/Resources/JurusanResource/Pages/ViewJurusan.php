@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\JurusanResource\Pages;
 
 use App\Filament\Resources\JurusanResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 
 class ViewJurusan extends ViewRecord
 {
@@ -13,7 +14,12 @@ class ViewJurusan extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
-use App\Models\User;
-use App\Models\Siswa;
-use App\Models\Pegawai;
-use App\Models\Informasi;
+use App\Filament\Resources\InformasiResource;
 use App\Jobs\SendWhatsappMessage;
+use App\Models\Informasi;
+use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Models\User;
 use App\Services\WhatsappDelayService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\InformasiResource;
 
 class CreateInformasi extends CreateRecord
 {
@@ -36,7 +36,7 @@ class CreateInformasi extends CreateRecord
 
             // 🔔 Notifikasi DB ke semua user aktif
             Notification::make()
-                ->title('Informasi Baru: ' . $record->judul)
+                ->title('Informasi Baru: '.$record->judul)
                 ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
                 ->success()
                 ->sendToDatabase(
@@ -47,7 +47,7 @@ class CreateInformasi extends CreateRecord
                                 ->orWhereHas('siswa', fn ($q) => $q->where('jabatan_id', $record->jabatan_id));
                         })
                         ->get()
-                    );
+                );
 
             // 📲 Broadcast WA ke semua siswa dan pegawai
             $this->sendInformasiToWhatsapp($record);

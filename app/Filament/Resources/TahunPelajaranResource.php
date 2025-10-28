@@ -2,41 +2,38 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\Kelas;
-use Filament\Forms\Form;
-use App\Models\Enrollment;
-use Filament\Tables\Table;
+use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
+use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
 use App\Models\TahunPelajaran;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Columns\ToggleColumn;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\TahunPelajaranResource\Pages\EditTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ViewTahunPelajaran;
-use App\Filament\Resources\TahunPelajaranResource\Pages\ListTahunPelajarans;
-use App\Filament\Resources\TahunPelajaranResource\Pages\CreateTahunPelajaran;
+use Illuminate\Support\Facades\Auth;
 
 class TahunPelajaranResource extends Resource
 {
@@ -98,7 +95,7 @@ class TahunPelajaranResource extends Resource
                 Textarea::make('deskripsi')
                     ->label('Deskripsi')
                     ->columnSpanFull(),
-                    
+
                 Toggle::make('status')
                     ->label('Status')
                     ->default(true)

@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\PresensiPegawaiResource\Pages;
 
 use App\Filament\Resources\PresensiPegawaiResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
 
 class ViewPresensiPegawai extends ViewRecord
@@ -14,7 +15,12 @@ class ViewPresensiPegawai extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->label('Edit')
+                ->color(Color::Green)
+                ->size('sm')
+                ->icon('heroicon-o-pencil-square')
+                ->outlined(),
         ];
     }
 
