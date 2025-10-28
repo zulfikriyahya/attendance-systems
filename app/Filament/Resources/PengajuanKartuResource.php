@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages;
+use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
 use App\Models\Instansi;
 use App\Models\PengajuanKartu;
 use App\Models\User;
@@ -306,6 +309,7 @@ class PengajuanKartuResource extends Resource
                     ->label('Nomor Pengajuan')
                     ->searchable(PengajuanKartu::all()->count() > 10)
                     ->sortable()
+                    ->badge()
                     ->copyable(),
 
                 TextColumn::make('user.name')
@@ -320,15 +324,13 @@ class PengajuanKartuResource extends Resource
 
                 TextColumn::make('alasanPengajuanKartu')
                     ->label('Alasan Pengajuan')
-                    ->limit(15)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 15) {
-                            return null;
-                        }
-
-                        return $state;
-                    }),
+                    ->badge()
+                    ->colors([
+                        'info' => 'Baru',
+                        'warning' => 'Rusak',
+                        'danger' => 'Hilang',
+                    ])
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label('Status')
@@ -342,7 +344,8 @@ class PengajuanKartuResource extends Resource
                 ToggleColumn::make('statusAmbil')
                     ->label('Penyerahan')
                     ->disabled(fn ($record) => $record->status !== 'Selesai' && Auth::user()->hasRole('super_admin'))
-                    ->tooltip(fn ($record) => $record->status !== 'Selesai' ? 'Sudah selesai, tidak bisa diubah' : null),
+                    ->tooltip(fn ($record) => $record->status !== 'Selesai' ? 'Sudah selesai, tidak bisa diubah' : null)
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -520,10 +523,10 @@ class PengajuanKartuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPengajuanKartus::route('/'),
-            'create' => Pages\CreatePengajuanKartu::route('/create'),
-            'view' => Pages\ViewPengajuanKartu::route('/{record}'),
-            'edit' => Pages\EditPengajuanKartu::route('/{record}/edit'),
+            'index' => ListPengajuanKartus::route('/'),
+            'create' => CreatePengajuanKartu::route('/create'),
+            'view' => ViewPengajuanKartu::route('/{record}'),
+            'edit' => EditPengajuanKartu::route('/{record}/edit'),
         ];
     }
 
@@ -579,7 +582,7 @@ class PengajuanKartuResource extends Resource
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('lihat')
                         ->label('Lihat Detail')
-                        ->url(Pages\ViewPengajuanKartu::getUrl(['record' => $pengajuanKartu]))
+                        ->url(ViewPengajuanKartu::getUrl(['record' => $pengajuanKartu]))
                         ->button(),
                 ])
                 ->sendToDatabase($admin);
