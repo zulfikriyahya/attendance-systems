@@ -114,7 +114,7 @@ class PengajuanKartuResource extends Resource
                     ->label('Biaya Pembuatan Kartu')
                     ->prefix('Rp.')
                     ->integer()
-                    ->default(getenv('BIAYA_KARTU'))
+                    ->default(config('app.biaya_kartu'))
                     ->maxValue(50000)
                     ->maxLength(5)
                     ->minLength(1)
@@ -197,7 +197,7 @@ class PengajuanKartuResource extends Resource
                             ->maxValue(50000)
                             ->maxLength(5)
                             ->minLength(1)
-                            ->default(getenv('BIAYA_KARTU'))
+                            ->default(config('app.biaya_kartu'))
                             ->dehydrated()
                             ->required()
                             ->validationMessages([

@@ -2,35 +2,35 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\EditProfileCustom;
-use App\Filament\Pages\Auth\LoginCustom;
-use App\Filament\Pages\DashboardAdmin;
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\UserResource\Widgets\StatsOverview as UserStats;
-use App\Filament\Widgets\PresensiMasukPegawaiChart;
-use App\Filament\Widgets\PresensiMasukSiswaChart;
-use App\Filament\Widgets\PresensiPulangPegawaiChart;
-use App\Filament\Widgets\PresensiPulangSiswaChart;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
-use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
-use Filament\Enums\ThemeMode;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Pages\DashboardAdmin;
+use App\Filament\Pages\Auth\LoginCustom;
+use App\Filament\Resources\UserResource;
+use Filament\Http\Middleware\Authenticate;
+use App\Filament\Pages\Auth\EditProfileCustom;
+use Illuminate\Session\Middleware\StartSession;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use App\Filament\Widgets\PresensiMasukSiswaChart;
+use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Widgets\PresensiPulangSiswaChart;
+use App\Filament\Widgets\PresensiMasukPegawaiChart;
+use App\Filament\Widgets\PresensiPulangPegawaiChart;
+use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Filament\Resources\UserResource\Widgets\StatsOverview as UserStats;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -50,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->unsavedChangesAlerts()
             ->databaseNotifications()
-            ->darkMode(false)
+            // ->darkMode(false)
             ->defaultThemeMode(ThemeMode::Light)
             ->favicon(asset('/favicon.ico'))
             ->darkModeBrandLogo(asset('/images/brand-darkmode.png'))
