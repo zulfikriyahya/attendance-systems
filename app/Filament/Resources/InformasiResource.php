@@ -2,11 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InformasiResource\Pages;
+use App\Filament\Resources\InformasiResource\Pages\CreateInformasi;
+use App\Filament\Resources\InformasiResource\Pages\EditInformasi;
+use App\Filament\Resources\InformasiResource\Pages\ListInformasis;
+use App\Filament\Resources\InformasiResource\Pages\ViewInformasi;
 use App\Models\Informasi;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -22,7 +27,6 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
@@ -54,49 +58,78 @@ class InformasiResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('judul')
-                    ->label('Judul Informasi')
-                    ->required(),
-                DateTimePicker::make('tanggal')
-                    ->label('Tanggal Informasi')
-                    ->required()
-                    ->displayFormat('l, d F Y H:i')
-                    ->native(false)
-                    ->default(now())
-                    ->maxDate(now()),
-                Select::make('status')
-                    ->options([
-                        'Draft' => 'Draft',
-                        'Publish' => 'Publish',
-                        'Archive' => 'Archive',
-                    ])
-                    ->default('Publish')
-                    ->native(false)
-                    ->required(),
-                Select::make('jabatan_id')
-                    ->label('Kepada')
-                    ->relationship('jabatan', 'nama')
-                    ->native(false)
-                    ->required(),
-                FileUpload::make('lampiran')
-                    ->label('Lampiran Informasi')
-                    ->image()
-                    ->maxFiles(1)
-                    ->downloadable()
-                    ->previewable()
-                    ->directory('lampiranInformasi')
-                    ->visibility('public')
-                    ->maxSize(2048),
-                MarkdownEditor::make('isi')
-                    ->label('Uraian Informasi')
-                    ->required()
-                    ->columnSpanFull()
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'strike',
-                        'bulletList',
-                        'orderedList',
+                Grid::make([
+                    'default' => 1,
+                    'sm' => 1,
+                    'md' => 12,
+                ])
+                    ->schema([
+                        Section::make('Informasi')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 2,
+                                'md' => 7,
+                            ])
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('judul')
+                                    ->label('Judul Informasi')
+                                    ->required(),
+                                Select::make('jabatan_id')
+                                    ->label('Kepada')
+                                    ->relationship('jabatan', 'nama')
+                                    ->native(false)
+                                    ->required(),
+                                MarkdownEditor::make('isi')
+                                    ->label('Uraian Informasi')
+                                    ->required()
+                                    ->columnSpanFull()
+                                    ->toolbarButtons([
+                                        'bold',
+                                        'italic',
+                                        'strike',
+                                        'bulletList',
+                                        'orderedList',
+                                    ]),
+                            ]),
+
+                        Section::make('Detail')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 2,
+                                'md' => 5,
+                            ])
+                            ->columns(2)
+                            ->schema([
+                                DateTimePicker::make('tanggal')
+                                    ->label('Tanggal Informasi')
+                                    ->required()
+                                    ->displayFormat('l, d F Y')
+                                    ->native(false)
+                                    ->default(now())
+                                    ->maxDate(now()),
+                                Select::make('status')
+                                    ->options([
+                                        'Draft' => 'Draft',
+                                        'Publish' => 'Publish',
+                                        'Archive' => 'Archive',
+                                    ])
+                                    ->default('Publish')
+                                    ->native(false)
+                                    ->required(),
+                                FileUpload::make('lampiran')
+                                    ->label('Lampiran Informasi')
+                                    ->image()
+                                    ->maxFiles(1)
+                                    ->columnSpanFull()
+                                    ->downloadable()
+                                    ->openable()
+                                    ->directory('lampiranInformasi')
+                                    ->visibility('public')
+                                    ->maxSize(2048),
+                            ]),
                     ]),
             ]);
     }
@@ -105,7 +138,11 @@ class InformasiResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('jabatan.nama')
+                    ->badge()
+                    ->label('Kepada'),
                 TextColumn::make('judul')
+                    ->label('Judul')
                     ->searchable(Informasi::all()->count() > 10)
                     ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -117,6 +154,9 @@ class InformasiResource extends Resource
                         return $state;
                     })
                     ->weight(FontWeight::Medium),
+                TextColumn::make('tanggal')
+                    ->label('Tanggal')
+                    ->dateTime('l, d F Y'),
                 TextColumn::make('isi')
                     ->label('Uraian')
                     ->limit(15)
@@ -128,18 +168,16 @@ class InformasiResource extends Resource
 
                         return $state;
                     }),
-                TextColumn::make('tanggal')
-                    ->dateTime('l, d F Y'),
-                BadgeColumn::make('status')
-                    ->color(fn (string $state): string => match ($state) {
-                        'Draft' => 'gray',
-                        'Publish' => 'success',
-                        'Archive' => 'warning',
-                        default => 'gray',
-                    }),
-                BadgeColumn::make('jabatan.nama')
-                    ->label('Kepada'),
-                ImageColumn::make('lampiran'),
+                ImageColumn::make('lampiran')
+                    ->label('Lampiran'),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'gray' => 'Draft',
+                        'success' => 'Publish',
+                        'warning' => 'Archive',
+                    ]),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -172,10 +210,10 @@ class InformasiResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInformasis::route('/'),
-            'create' => Pages\CreateInformasi::route('/create'),
-            'view' => Pages\ViewInformasi::route('/{record}'),
-            'edit' => Pages\EditInformasi::route('/{record}/edit'),
+            'index' => ListInformasis::route('/'),
+            'create' => CreateInformasi::route('/create'),
+            'view' => ViewInformasi::route('/{record}'),
+            'edit' => EditInformasi::route('/{record}/edit'),
         ];
     }
 
