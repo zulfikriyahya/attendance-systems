@@ -2,15 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MataPelajaranResource\Pages;
-use App\Models\MataPelajaran;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\MataPelajaran;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\MataPelajaranResource\Pages;
 
 class MataPelajaranResource extends Resource
 {
@@ -76,11 +81,30 @@ class MataPelajaranResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                DeleteBulkAction::make()
+                    ->label('Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                ForceDeleteBulkAction::make()
+                    ->label('Force Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-trash')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                RestoreBulkAction::make()
+                    ->label('Restore')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color(Color::Blue)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

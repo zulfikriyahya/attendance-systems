@@ -2,24 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RoleResource\Pages;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
-use BezhanSalleh\FilamentShield\Support\Utils;
-use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Enums\ActionsPosition;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Pages\SubNavigationPosition;
+use Filament\Tables\Enums\ActionsPosition;
+use Illuminate\Contracts\Support\Arrayable;
+use Filament\Tables\Actions\DeleteBulkAction;
+use App\Filament\Resources\RoleResource\Pages;
+use BezhanSalleh\FilamentShield\Support\Utils;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
 
 class RoleResource extends Resource implements HasShieldPermissions
 {
@@ -131,7 +136,30 @@ class RoleResource extends Resource implements HasShieldPermissions
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                DeleteBulkAction::make()
+                    ->label('Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                ForceDeleteBulkAction::make()
+                    ->label('Force Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-trash')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                RestoreBulkAction::make()
+                    ->label('Restore')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color(Color::Blue)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

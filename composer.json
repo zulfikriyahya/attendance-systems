@@ -24,6 +24,7 @@
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.6",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.88",
         "laravel-shift/blueprint": "^2.12",

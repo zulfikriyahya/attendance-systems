@@ -2,39 +2,39 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InformasiResource\Pages\CreateInformasi;
-use App\Filament\Resources\InformasiResource\Pages\EditInformasi;
-use App\Filament\Resources\InformasiResource\Pages\ListInformasis;
-use App\Filament\Resources\InformasiResource\Pages\ViewInformasi;
-use App\Models\Informasi;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use App\Models\Informasi;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
+use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\InformasiResource\Pages\EditInformasi;
+use App\Filament\Resources\InformasiResource\Pages\ViewInformasi;
+use App\Filament\Resources\InformasiResource\Pages\ListInformasis;
+use App\Filament\Resources\InformasiResource\Pages\CreateInformasi;
 
 class InformasiResource extends Resource
 {
@@ -192,11 +192,30 @@ class InformasiResource extends Resource
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                DeleteBulkAction::make()
+                    ->label('Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                ForceDeleteBulkAction::make()
+                    ->label('Force Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-trash')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                RestoreBulkAction::make()
+                    ->label('Restore')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color(Color::Blue)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

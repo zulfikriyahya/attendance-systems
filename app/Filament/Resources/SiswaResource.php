@@ -2,46 +2,45 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\SiswaImporter;
-use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
-use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
-use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
-use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
-use App\Models\Jabatan;
-use App\Models\Siswa;
 use App\Models\User;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use App\Models\Siswa;
+use App\Models\Jabatan;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use App\Filament\Imports\SiswaImporter;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\ImportAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\ToggleColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
+use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
+use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
+use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
 
 class SiswaResource extends Resource
 {
@@ -279,11 +278,30 @@ class SiswaResource extends Resource
                     ->openUrlInNewTab(true),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                DeleteBulkAction::make()
+                    ->label('Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                ForceDeleteBulkAction::make()
+                    ->label('Force Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-trash')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                RestoreBulkAction::make()
+                    ->label('Restore')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color(Color::Blue)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

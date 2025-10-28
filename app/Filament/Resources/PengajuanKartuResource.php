@@ -2,39 +2,38 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
-use App\Models\Instansi;
-use App\Models\PengajuanKartu;
-use App\Models\User;
-use App\Services\WhatsappService;
 use Carbon\Carbon;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\User;
+use App\Models\Instansi;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
+use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
+use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
 
 class PengajuanKartuResource extends Resource
 {
@@ -182,7 +181,6 @@ class PengajuanKartuResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi',
                                     ])
-                                    ->placeholder('Gratis = 0')
                                     ->disabled(fn () => ! Auth::user()->hasRole(['super_admin', 'wali_kelas'])),
 
                                 Select::make('status')
@@ -506,16 +504,30 @@ class PengajuanKartuResource extends Resource
                     }),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
-
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
-
-                    RestoreBulkAction::make()
-                        ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
-                ]),
+                DeleteBulkAction::make()
+                    ->label('Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                ForceDeleteBulkAction::make()
+                    ->label('Force Delete')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-trash')
+                    ->color(Color::Red)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                RestoreBulkAction::make()
+                    ->label('Restore')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color(Color::Blue)
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ])
             ->defaultSort('created_at', 'desc');
     }
