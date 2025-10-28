@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Jurusan $jurusan
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\KelasTahunPelajaran> $kelasTahunPelajarans
  * @property-read int|null $kelas_tahun_pelajarans_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas onlyTrashed()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kelas withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Kelas extends Model

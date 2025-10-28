@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Filament\Imports\UserImporter;
+use App\Filament\Resources\UserResource;
+use App\Filament\Resources\UserResource\Widgets\StatsOverview;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ImportAction;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
-use App\Filament\Imports\UserImporter;
 use Filament\Forms\Components\Checkbox;
-use App\Filament\Resources\UserResource;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\UserResource\Widgets\StatsOverview;
+use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 
 class ListUsers extends ListRecords
 {

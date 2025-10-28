@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PresensiSiswa> $presensiSiswa
  * @property-read int|null $presensi_siswa_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa aktif()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa newQuery()
@@ -50,6 +51,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Siswa withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Siswa extends Model

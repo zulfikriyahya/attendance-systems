@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string $nama_lengkap
  * @property-read string|null $siswa_user_name
  * @property-read \App\Models\Siswa $siswa
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa onlyTrashed()
@@ -55,6 +56,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiSiswa withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PresensiSiswa extends Model

@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $pegawai_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Siswa> $siswa
  * @property-read int|null $siswa_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan onlyTrashed()
@@ -42,6 +43,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jabatan withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Jabatan extends Model

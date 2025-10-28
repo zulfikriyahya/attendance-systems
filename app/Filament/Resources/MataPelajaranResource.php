@@ -2,20 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Resources\MataPelajaranResource\Pages;
 use App\Models\MataPelajaran;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\MataPelajaranResource\Pages;
+use Illuminate\Support\Facades\Auth;
 
 class MataPelajaranResource extends Resource
 {
@@ -77,9 +84,34 @@ class MataPelajaranResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            ])
+                ActionGroup::make([
+                    ViewAction::make()
+                        ->label('View')
+                        ->color(Color::Zinc)
+                        ->size('sm')
+                        ->icon('heroicon-o-eye'),
+                    EditAction::make()
+                        ->label('Edit')
+                        ->color(Color::Green)
+                        ->size('sm')
+                        ->icon('heroicon-o-pencil-square'),
+                    DeleteAction::make()
+                        ->label('Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-minus-circle'),
+                    ForceDeleteAction::make()
+                        ->label('Force Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-trash'),
+                    RestoreAction::make()
+                        ->label('Restore')
+                        ->color(Color::Blue)
+                        ->size('sm')
+                        ->icon('heroicon-o-arrow-path'),
+                ]),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 DeleteBulkAction::make()
                     ->label('Delete')

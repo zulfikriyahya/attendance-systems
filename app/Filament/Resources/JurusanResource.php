@@ -2,34 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\JurusanResource\Pages\CreateJurusan;
+use App\Filament\Resources\JurusanResource\Pages\EditJurusan;
+use App\Filament\Resources\JurusanResource\Pages\ListJurusans;
+use App\Filament\Resources\JurusanResource\Pages\ViewJurusan;
 use App\Models\Jurusan;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Support\Colors\Color;
-use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Actions\DeleteAction;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\JurusanResource\Pages\EditJurusan;
-use App\Filament\Resources\JurusanResource\Pages\ViewJurusan;
-use App\Filament\Resources\JurusanResource\Pages\ListJurusans;
-use App\Filament\Resources\JurusanResource\Pages\CreateJurusan;
+use Illuminate\Support\Facades\Auth;
 
 class JurusanResource extends Resource
 {
@@ -83,11 +83,31 @@ class JurusanResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
-                    RestoreAction::make(),
-                    ForceDeleteAction::make(),
+                    ViewAction::make()
+                        ->label('View')
+                        ->color(Color::Zinc)
+                        ->size('sm')
+                        ->icon('heroicon-o-eye'),
+                    EditAction::make()
+                        ->label('Edit')
+                        ->color(Color::Green)
+                        ->size('sm')
+                        ->icon('heroicon-o-pencil-square'),
+                    DeleteAction::make()
+                        ->label('Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-minus-circle'),
+                    ForceDeleteAction::make()
+                        ->label('Force Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-trash'),
+                    RestoreAction::make()
+                        ->label('Restore')
+                        ->color(Color::Blue)
+                        ->size('sm')
+                        ->icon('heroicon-o-arrow-path'),
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([

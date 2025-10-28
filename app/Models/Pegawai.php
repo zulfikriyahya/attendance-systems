@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PresensiPegawai> $presensiPegawai
  * @property-read int|null $presensi_pegawai_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai onlyTrashed()
@@ -47,6 +48,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pegawai withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Pegawai extends Model

@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Jabatan> $jabatan
  * @property-read int|null $jabatan_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi onlyTrashed()
@@ -52,6 +53,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi whereWebsite($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Instansi withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Instansi extends Model

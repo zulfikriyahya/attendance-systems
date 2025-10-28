@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Instansi $instansi
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Jabatan> $jabatans
  * @property-read int|null $jabatans_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi aktif()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi newQuery()
@@ -42,6 +43,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JadwalPresensi withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class JadwalPresensi extends Model

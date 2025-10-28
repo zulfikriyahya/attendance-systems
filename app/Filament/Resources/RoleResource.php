@@ -2,29 +2,30 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use App\Filament\Resources\RoleResource\Pages;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
+use BezhanSalleh\FilamentShield\Support\Utils;
+use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
 use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Unique;
+use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Tables\Enums\ActionsPosition;
-use Illuminate\Contracts\Support\Arrayable;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
-use App\Filament\Resources\RoleResource\Pages;
-use BezhanSalleh\FilamentShield\Support\Utils;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class RoleResource extends Resource implements HasShieldPermissions
 {
@@ -131,8 +132,21 @@ class RoleResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    ViewAction::make()
+                        ->label('View')
+                        ->color(Color::Zinc)
+                        ->size('sm')
+                        ->icon('heroicon-o-eye'),
+                    EditAction::make()
+                        ->label('Edit')
+                        ->color(Color::Green)
+                        ->size('sm')
+                        ->icon('heroicon-o-pencil-square'),
+                    DeleteAction::make()
+                        ->label('Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-minus-circle'),
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -143,22 +157,6 @@ class RoleResource extends Resource implements HasShieldPermissions
                     ->size('xs')
                     ->icon('heroicon-o-minus-circle')
                     ->color(Color::Red)
-                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
-                ForceDeleteBulkAction::make()
-                    ->label('Force Delete')
-                    ->button()
-                    ->outlined()
-                    ->size('xs')
-                    ->icon('heroicon-o-trash')
-                    ->color(Color::Red)
-                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
-                RestoreBulkAction::make()
-                    ->label('Restore')
-                    ->button()
-                    ->outlined()
-                    ->size('xs')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color(Color::Blue)
                     ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }

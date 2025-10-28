@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Jabatan $jabatan
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi onlyTrashed()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Informasi withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Informasi extends Model

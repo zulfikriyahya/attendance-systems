@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\KelasTahunPelajaran $kelasTahunPelajaran
  * @property-read \App\Models\Pegawai $pegawai
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai onlyTrashed()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|KelasPegawai withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class KelasPegawai extends Model

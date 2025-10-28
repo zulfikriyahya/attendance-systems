@@ -2,51 +2,51 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jabatan;
-use App\Models\Pegawai;
-use App\Models\Instansi;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
+use App\Enums\StatusPulang;
+use App\Exports\PresensiPegawaiExport;
+use App\Filament\Resources\PresensiPegawaiResource\Pages;
+use App\Models\Instansi;
+use App\Models\Jabatan;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Form;
+use Filament\Notifications\Actions\Action as NotificationAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Radio;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Filament\Forms\Components\Select;
-use App\Exports\PresensiPegawaiExport;
-use Illuminate\Support\Facades\Schema;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TimePicker;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PresensiPegawaiResource\Pages;
-use Filament\Notifications\Actions\Action as NotificationAction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PresensiPegawaiResource extends Resource
 {
@@ -1377,11 +1377,31 @@ class PresensiPegawaiResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    // ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make(),
-                    RestoreAction::make(),
-                    ForceDeleteAction::make(),
+                    ViewAction::make()
+                        ->label('View')
+                        ->color(Color::Zinc)
+                        ->size('sm')
+                        ->icon('heroicon-o-eye'),
+                    EditAction::make()
+                        ->label('Edit')
+                        ->color(Color::Green)
+                        ->size('sm')
+                        ->icon('heroicon-o-pencil-square'),
+                    DeleteAction::make()
+                        ->label('Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-minus-circle'),
+                    ForceDeleteAction::make()
+                        ->label('Force Delete')
+                        ->color(Color::Red)
+                        ->size('sm')
+                        ->icon('heroicon-o-trash'),
+                    RestoreAction::make()
+                        ->label('Restore')
+                        ->color(Color::Blue)
+                        ->size('sm')
+                        ->icon('heroicon-o-arrow-path'),
                     Action::make('approve')
                         ->label('Setujui')
                         ->color('success')

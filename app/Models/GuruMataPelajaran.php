@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\MataPelajaran $mataPelajaran
  * @property-read \App\Models\Pegawai $pegawai
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran onlyTrashed()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GuruMataPelajaran withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class GuruMataPelajaran extends Model

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Instansi $instansi
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kelas> $kelas
  * @property-read int|null $kelas_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan onlyTrashed()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Jurusan withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Jurusan extends Model

@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string $nama_lengkap
  * @property-read string|null $pegawai_user_name
  * @property-read \App\Models\Pegawai $pegawai
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai onlyTrashed()
@@ -55,6 +56,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PresensiPegawai withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PresensiPegawai extends Model

@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-write mixed $tanggal_pengajuan_kartu
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu onlyTrashed()
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanKartu withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PengajuanKartu extends Model

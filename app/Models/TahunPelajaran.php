@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Instansi $instansi
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\KelasTahunPelajaran> $kelasTahunPelajarans
  * @property-read int|null $kelas_tahun_pelajarans_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran onlyTrashed()
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TahunPelajaran withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class TahunPelajaran extends Model
