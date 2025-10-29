@@ -1,27 +1,3 @@
-/*
-BISMILLAAHIRRAHMAANIRRAHIIM - In the Name of Allah, Most Gracious, Most Merciful
-================================================================================
-filename : db/wilayah_kodepos.sql
-purpose  : kodepos vd kode wilayah berdasarkan Keputusan Menteri Dalam Negeri Nomor 300.2.2-2138 tahun 2025
-create   : 2024-08-05 16:55:13
-last edit: 2025-06-30 10:32:27
-author   : cahya dsn
-================================================================================
-This program is free software; you can redistribute it and/or modify it under the
-terms of the MIT License.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-See the MIT License for more details
-
-copyright (c) 2024-2025 by cahya dsn; cahyadsn@gmail.com
-================================================================================*/
 DROP TABLE IF EXISTS wilayah_kodepos;
 CREATE TABLE wilayah_kodepos (
   kode varchar(13) NOT NULL,

@@ -1,32 +1,3 @@
-/*
-BISMILLAAHIRRAHMAANIRRAHIIM - In the Name of Allah, Most Gracious, Most Merciful
-================================================================================
-filename : db/wilayah.sql
-purpose  :
-note     : Data Kode Wilayah sesuai Kepmendagri No 300.2.2-2138 Tahun 2025
-create   : 2025-05-25 14:41:15
-last edit: 2025-10-01 08:45:08
-author   : cahya dsn
-================================================================================
-This program is free software; you can redistribute it and/or modify it under the
-terms of the MIT License.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-See the MIT License for more details
-
-copyright (c) 2025 by cahya dsn; cahyadsn@gmail.com
-================================================================================*/
---
--- Table structure for table wilayah
---
-
 DROP TABLE IF EXISTS wilayah;
 CREATE TABLE IF NOT EXISTS wilayah (
     kode varchar(13) NOT NULL,
