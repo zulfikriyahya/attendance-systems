@@ -9,9 +9,9 @@ use App\Filament\Resources\UserResource\Pages\ViewUser;
 use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -78,79 +78,106 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->label('Nama Lengkap')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                TextInput::make('username')
-                    ->required()
-                    ->rule(fn ($record) => $record === null ? 'unique:users,username' : 'unique:users,username,'.$record->id)
-                    ->unique(ignoreRecord: true)
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                        'unique' => 'Username sudah ada.',
-                    ]),
-                TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->rule(fn ($record) => $record === null ? 'unique:users,email' : 'unique:users,email,'.$record->id)
-                    ->unique(ignoreRecord: true)
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                        'unique' => 'Username sudah ada.',
-                    ]),
-                DateTimePicker::make('email_verified_at')
-                    ->label('Verifikasi Email')
-                    ->default(now()),
-                TextInput::make('password')
-                    ->password()
-                    ->required(fn ($record) => $record === null)
-                    ->dehydrateStateUsing(fn ($state, $record) => $state ? bcrypt($state) : $record->password)
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                FileUpload::make('avatar')
-                    ->avatar()
-                    ->image()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        '1:1' => '1:1',
-                        '3:4' => '3:4',
-                        '4:3' => '4:3',
-                        null,
+                Section::make('Pengguna')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 4,
                     ])
-                    ->circleCropper()
-                    ->maxSize(1024)
-                    ->directory('avatar')
-                    ->visibility('public')
-                    ->getUploadedFileNameForStorageUsing(function ($file, $record) {
-                        $username = $record?->username ?? 'user_'.time();
-                        $fileName = strtolower($username).'.png';
-                        $manager = new ImageManager(new Driver);
-                        $image = $manager->read($file->getRealPath());
-                        // Resize maksimal (jaga performa)
-                        // $image = $image->scaleDown(1024, 1024);
-                        Storage::disk('public')->put('avatar/'.$fileName, (string) $image->toPng());
+                    ->schema([
 
-                        return $fileName;
-                    }),
-                Select::make('roles')
-                    ->label('Peran')
-                    ->relationship('roles', 'name')
-                    ->required()
-                    ->multiple()
-                    ->preload()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                        TextInput::make('name')
+                            ->label('Nama Lengkap')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        TextInput::make('username')
+                            ->required()
+                            ->rule(fn ($record) => $record === null ? 'unique:users,username' : 'unique:users,username,'.$record->id)
+                            ->unique(ignoreRecord: true)
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                                'unique' => 'Username sudah ada.',
+                            ]),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->rule(fn ($record) => $record === null ? 'unique:users,email' : 'unique:users,email,'.$record->id)
+                            ->unique(ignoreRecord: true)
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                                'unique' => 'Username sudah ada.',
+                            ]),
+
+                        TextInput::make('password')
+                            ->password()
+                            ->required(fn ($record) => $record === null)
+                            ->dehydrateStateUsing(fn ($state, $record) => $state ? bcrypt($state) : $record->password)
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+
                     ]),
-                Toggle::make('status')
-                    ->default(true)
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                Section::make('Detail')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 3,
+                    ])
+                    ->schema([
+                        FileUpload::make('avatar')
+                            ->hiddenLabel()
+                            ->alignCenter()
+                            ->columnSpanFull()
+                            ->avatar()
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '1:1' => '1:1',
+                                '3:4' => '3:4',
+                                '4:3' => '4:3',
+                                null,
+                            ])
+                            ->circleCropper()
+                            ->maxSize(1024)
+                            ->directory('avatar')
+                            ->visibility('public')
+                            ->getUploadedFileNameForStorageUsing(function ($file, $record) {
+                                $username = $record?->username ?? 'user_'.time();
+                                $fileName = strtolower($username).'.png';
+                                $manager = new ImageManager(new Driver);
+                                $image = $manager->read($file->getRealPath());
+                                Storage::disk('public')->put('avatar/'.$fileName, (string) $image->toPng());
+
+                                return $fileName;
+                            }),
+                        DateTimePicker::make('email_verified_at')
+                            ->label('Verifikasi Email')
+                            ->default(now()),
+                        Select::make('roles')
+                            ->label('Peran')
+                            ->relationship('roles', 'name')
+                            ->required()
+                            ->multiple()
+                            ->preload()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Select::make('status')
+                            ->default(true)
+                            ->native(false)
+                            ->options([
+                                true => 'Aktif',
+                                false => 'Non Aktif',
+                            ])
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
                     ]),
             ]);
     }
