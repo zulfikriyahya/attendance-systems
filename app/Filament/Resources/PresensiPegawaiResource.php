@@ -17,6 +17,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -70,54 +71,69 @@ class PresensiPegawaiResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('pegawai_id')
-                    ->label('Pegawai')
-                    ->searchable()
-                    ->options(function () {
-                        return Pegawai::with('user')
-                            ->get()
-                            ->pluck('user.name', 'id'); // key = pegawai.id, label = user.name
-                    })
-                    ->disabledOn('edit'),
+                Section::make('Presensi Pegawai')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 4,
+                    ])
+                    ->schema([
+                        Select::make('pegawai_id')
+                            ->label('Pegawai')
+                            ->searchable()
+                            ->options(function () {
+                                return Pegawai::with('user')
+                                    ->get()
+                                    ->pluck('user.name', 'id');
+                            })
+                            ->disabledOn('edit'),
 
-                DateTimePicker::make('jamDatang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate(),
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal')
+                            ->default(now())
+                            ->disabledOn('edit'),
 
-                DateTimePicker::make('jamPulang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate(),
+                        DateTimePicker::make('jamDatang')
+                            ->label('Jam Datang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate(),
 
-                DatePicker::make('tanggal')
-                    ->default(now())
-                    ->disabledOn('edit'),
+                        DateTimePicker::make('jamPulang')
+                            ->label('Jam Pulang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate(),
 
-                Select::make('statusPresensi')
-                    ->label('Status Presensi')
-                    ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
-                    ->required(),
+                        Select::make('statusPresensi')
+                            ->label('Status Presensi')
+                            ->native(false)
+                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
+                            ->required(),
 
-                Select::make('statusPulang')
-                    ->label('Status Pulang')
-                    ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
+                        Select::make('statusPulang')
+                            ->label('Status Pulang')
+                            ->native(false)
+                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
 
-                Select::make('statusApproval')
-                    ->label('Status Persetujuan')
-                    ->options(
-                        collect(StatusApproval::cases())
-                            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-                            ->toArray()
-                    ),
+                        FileUpload::make('berkasLampiran')
+                            ->label('Berkas Lampiran')
+                            ->openable(),
 
-                Textarea::make('catatan')
-                    ->label('Keterangan/Catatan'),
+                        Select::make('statusApproval')
+                            ->label('Status Persetujuan')
+                            ->native(false)
+                            ->options(
+                                collect(StatusApproval::cases())
+                                    ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+                                    ->toArray()
+                            ),
 
-                FileUpload::make('berkasLampiran')
-                    ->label('Berkas Lampiran')
-                    ->openable()
-                    ->columnSpanFull(),
+                        Textarea::make('catatan')
+                            ->label('Keterangan/Catatan')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -1269,20 +1285,25 @@ class PresensiPegawaiResource extends Resource
                     ->label('Foto')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
+
                 TextColumn::make('pegawai.user.name')
                     ->label('Nama Lengkap')
                     ->searchable(PresensiPegawai::count() > 10),
+
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->sortable('desc')
                     ->date('l, d F Y'),
+
                 TextColumn::make('jamDatang')
                     ->label('Jam Datang')
                     ->sortable('desc')
                     ->dateTime('H:i:s'),
+
                 TextColumn::make('jamPulang')
                     ->label('Jam Pulang')
                     ->dateTime('H:i:s'),
+
                 TextColumn::make('statusPresensi')
                     ->label('Status Presensi')
                     ->sortable()
@@ -1295,6 +1316,7 @@ class PresensiPegawaiResource extends Resource
                         StatusPresensi::Cuti => 'primary',
                         default => 'warning',
                     }),
+
                 TextColumn::make('statusPulang')
                     ->label('Status Pulang')
                     ->sortable()
@@ -1305,6 +1327,7 @@ class PresensiPegawaiResource extends Resource
                         StatusPulang::Mangkir => 'danger',
                         default => 'warning',
                     }),
+
                 TextColumn::make('statusApproval')
                     ->label('Status Persetujuan')
                     ->sortable()
@@ -1316,6 +1339,7 @@ class PresensiPegawaiResource extends Resource
                         StatusApproval::Rejected => 'danger',
                         default => 'gray',
                     }),
+
                 TextColumn::make('catatan')
                     ->wrap()
                     ->label('Keterangan'),
@@ -1525,7 +1549,8 @@ class PresensiPegawaiResource extends Resource
     {
         return [
             'index' => Pages\ListPresensiPegawais::route('/'),
-            // 'view' => Pages\ViewPresensiPegawai::route('/{record}'),
+            'create' => Pages\CreatePresensiPegawai::route('/create'),
+            'view' => Pages\ViewPresensiPegawai::route('/{record}'),
             'edit' => Pages\EditPresensiPegawai::route('/{record}/edit'),
         ];
     }

@@ -20,6 +20,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -73,54 +74,69 @@ class PresensiSiswaResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('siswa_id')
-                    ->label('Siswa')
-                    ->searchable()
-                    ->options(function () {
-                        return Siswa::with('user')
-                            ->get()
-                            ->pluck('user.name', 'id'); // key = Siswa.id, label = user.name
-                    })
-                    ->disabledOn('edit'),
+                Section::make('Presensi Siswa')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 4,
+                    ])
+                    ->schema([
+                        Select::make('siswa_id')
+                            ->label('Siswa')
+                            ->searchable()
+                            ->options(function () {
+                                return Siswa::with('user')
+                                    ->get()
+                                    ->pluck('user.name', 'id');
+                            })
+                            ->disabledOn('edit'),
 
-                DateTimePicker::make('jamDatang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate(),
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal')
+                            ->default(now())
+                            ->disabledOn('edit'),
 
-                DateTimePicker::make('jamPulang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate(),
+                        DateTimePicker::make('jamDatang')
+                            ->label('Jam Datang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate(),
 
-                DatePicker::make('tanggal')
-                    ->default(now())
-                    ->disabledOn('edit'),
+                        DateTimePicker::make('jamPulang')
+                            ->label('Jam Pulang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate(),
 
-                Select::make('statusPresensi')
-                    ->label('Status Presensi')
-                    ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
-                    ->required(),
+                        Select::make('statusPresensi')
+                            ->label('Status Presensi')
+                            ->native(false)
+                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
+                            ->required(),
 
-                Select::make('statusPulang')
-                    ->label('Status Pulang')
-                    ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
+                        Select::make('statusPulang')
+                            ->label('Status Pulang')
+                            ->native(false)
+                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
 
-                Select::make('statusApproval')
-                    ->label('Status Persetujuan')
-                    ->options(
-                        collect(StatusApproval::cases())
-                            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
-                            ->toArray()
-                    ),
+                        FileUpload::make('berkasLampiran')
+                            ->label('Berkas Lampiran')
+                            ->openable(),
 
-                Textarea::make('catatan')
-                    ->label('Keterangan/Catatan'),
+                        Select::make('statusApproval')
+                            ->label('Status Persetujuan')
+                            ->native(false)
+                            ->options(
+                                collect(StatusApproval::cases())
+                                    ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+                                    ->toArray()
+                            ),
 
-                FileUpload::make('berkasLampiran')
-                    ->label('Berkas Lampiran')
-                    ->openable()
-                    ->columnSpanFull(),
+                        Textarea::make('catatan')
+                            ->label('Keterangan/Catatan')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
