@@ -14,10 +14,11 @@ use App\Models\Siswa;
 use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -67,94 +68,129 @@ class PegawaiResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('User')
-                    ->options(function ($get) {
-                        $currentUserId = $get('user_id');
+                Grid::make([
+                    'default' => 1,
+                    'sm' => 1,
+                    'md' => 12,
+                ])
+                    ->schema([
+                        Section::make('Pegawai')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 7,
+                                'md' => 10,
+                            ])
+                            ->columns(2)
+                            ->schema([
+                                Select::make('user_id')
+                                    ->label('Pengguna')
+                                    ->options(function ($get) {
+                                        $currentUserId = $get('user_id');
 
-                        return User::where(function ($query) use ($currentUserId) {
-                            $query->where(function ($q) {
-                                $q->whereDoesntHave('pegawai')
-                                    ->whereDoesntHave('siswa');
-                            })
-                                ->orWhere('id', $currentUserId);
-                        })
-                            ->where('status', true)
-                            ->where('username', '!=', 'administrator')
-                            ->whereDoesntHave('roles', function ($q) {
-                                $q->whereIn('name', ['administrator', 'siswa']);
-                            })
-                            ->pluck('name', 'id');
-                    })
-                    ->when(User::count() > 10, fn ($field) => $field->searchable())
-                    ->preload()
-                    ->disabledOn('edit')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                                        return User::where(function ($query) use ($currentUserId) {
+                                            $query->where(function ($q) {
+                                                $q->whereDoesntHave('pegawai')
+                                                    ->whereDoesntHave('siswa');
+                                            })
+                                                ->orWhere('id', $currentUserId);
+                                        })
+                                            ->where('status', true)
+                                            ->where('username', '!=', 'administrator')
+                                            ->whereDoesntHave('roles', function ($q) {
+                                                $q->whereIn('name', ['administrator', 'siswa']);
+                                            })
+                                            ->pluck('name', 'id');
+                                    })
+                                    ->when(User::count() > 10, fn ($field) => $field->searchable())
+                                    ->preload()
+                                    ->disabledOn('edit')
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi.',
+                                    ]),
+                                TextInput::make('nip')
+                                    ->label('NIK/NIP/NUPTK')
+                                    ->unique(ignoreRecord: true)
+                                    ->numeric()
+                                    ->required()
+                                    ->minLength(16)
+                                    ->maxLength(18)
+                                    ->validationMessages([
+                                        'unique' => 'NIK/NIP/NUPTK sudah pernah dipakai.',
+                                        'required' => 'Form ini wajib diisi.',
+                                        'min_digits' => 'Minimal 16 digit.',
+                                        'max_digits' => 'Maksimal 18 digit.',
+                                    ]),
+                                TextInput::make('telepon')
+                                    ->tel()
+                                    ->numeric()
+                                    ->minLength(10)
+                                    ->maxLength(13)
+                                    ->required()
+                                    ->placeholder('Cth: 08**********')
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi.',
+                                        'min_digits' => 'Minimal 10 digit.',
+                                        'max_digits' => 'Maksimal 13 digit.',
+                                    ]),
+                                Select::make('jenisKelamin')
+                                    ->options([
+                                        'Pria' => 'Pria',
+                                        'Wanita' => 'Wanita',
+                                    ])
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi.',
+                                    ]),
+                                Select::make('jabatan_id')
+                                    ->label('Jabatan')
+                                    ->relationship('jabatan', 'nama')
+                                    ->when(Jabatan::count() > 10, fn ($field) => $field->searchable())
+                                    ->required()
+                                    ->preload()
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi.',
+                                    ]),
+                                Select::make('status')
+                                    ->default(true)
+                                    ->native(false)
+                                    ->options([
+                                        true => 'Aktif',
+                                        false => 'Non Aktif',
+                                    ])
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Form ini wajib diisi.',
+                                    ]),
+                                Textarea::make('alamat')
+                                    ->columnSpanFull(),
+                            ]),
+
+                        Section::make('Detail')
+                            ->collapsible()
+                            ->columnSpan([
+                                'default' => 1,
+                                'sm' => 5,
+                                'md' => 2,
+                            ])
+                            ->schema([
+                                TextInput::make('rfid')
+                                    ->label('RFID')
+                                    ->unique(ignoreRecord: true)
+                                    ->numeric()
+                                    ->required()
+                                    ->autofocus()
+                                    ->minLength(10)
+                                    ->maxLength(10)
+                                    ->validationMessages([
+                                        'unique' => 'RFID sudah pernah dipakai.',
+                                        'required' => 'Form ini wajib diisi.',
+                                        'min_digits' => 'Minimal 10 digit.',
+                                        'max_digits' => 'Maksimal 10 digit.',
+                                    ]),
+                            ]),
                     ]),
-                TextInput::make('rfid')
-                    ->label('RFID')
-                    ->unique(ignoreRecord: true)
-                    ->numeric()
-                    ->required()
-                    ->autofocus()
-                    ->minLength(10)
-                    ->maxLength(10)
-                    ->validationMessages([
-                        'unique' => 'RFID sudah pernah dipakai.',
-                        'required' => 'Form ini wajib diisi.',
-                        'min_digits' => 'Minimal 10 digit.',
-                        'max_digits' => 'Maksimal 10 digit.',
-                    ]),
-                TextInput::make('nip')
-                    ->label('NIK/NIP/NUPTK')
-                    ->unique(ignoreRecord: true)
-                    ->numeric()
-                    ->required()
-                    ->minLength(16)
-                    ->maxLength(18)
-                    ->validationMessages([
-                        'unique' => 'NIK/NIP/NUPTK sudah pernah dipakai.',
-                        'required' => 'Form ini wajib diisi.',
-                        'min_digits' => 'Minimal 16 digit.',
-                        'max_digits' => 'Maksimal 18 digit.',
-                    ]),
-                TextInput::make('telepon')
-                    ->tel()
-                    ->numeric()
-                    ->minLength(10)
-                    ->maxLength(13)
-                    ->required()
-                    ->placeholder('Cth: 08**********')
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                        'min_digits' => 'Minimal 10 digit.',
-                        'max_digits' => 'Maksimal 13 digit.',
-                    ]),
-                Select::make('jenisKelamin')
-                    ->options([
-                        'Pria' => 'Pria',
-                        'Wanita' => 'Wanita',
-                    ])
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                Select::make('jabatan_id')
-                    ->label('Jabatan')
-                    ->relationship('jabatan', 'nama')
-                    ->when(Jabatan::count() > 10, fn ($field) => $field->searchable())
-                    ->required()
-                    ->preload()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                Textarea::make('alamat')
-                    ->columnSpanFull(),
-                Toggle::make('status')
-                    ->required()
-                    ->default(true),
             ]);
     }
 
