@@ -2,33 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\JabatanResource\Pages\EditJabatan;
-use App\Filament\Resources\JabatanResource\Pages\ListJabatans;
 use App\Models\Jabatan;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\Instansi;
 use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\JabatanResource\Pages\EditJabatan;
+use App\Filament\Resources\JabatanResource\Pages\ListJabatans;
 
 class JabatanResource extends Resource
 {
@@ -52,32 +54,45 @@ class JabatanResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('instansi_id')
-                    ->relationship('instansi', 'nama')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                TextInput::make('nama')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
+                Section::make('Jabatan')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 2,
+                    ])
+                    ->schema([
+                        Select::make('instansi_id')
+                            ->relationship('instansi', 'nama')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        TextInput::make('nama')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
 
-                CheckboxList::make('jadwalPresensis')
-                    ->label('Jadwal Presensi')
-                    ->relationship(
-                        name: 'jadwalPresensis',
-                        titleAttribute: 'nama',
-                        modifyQueryUsing: fn ($query) => $query->where('status', true)
-                    )
-                    ->required()
-                    ->columns(4)
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                        Textarea::make('deskripsi')
+                            ->columnSpanFull(),
                     ]),
-                Textarea::make('deskripsi')
-                    ->columnSpanFull(),
+                Section::make('Pengaturan Jadwal Presensi')
+                    ->collapsible()
+                    ->schema([
+                        CheckboxList::make('jadwalPresensis')
+                            ->label('Jadwal Presensi')
+                            ->relationship(
+                                name: 'jadwalPresensis',
+                                titleAttribute: 'nama',
+                                modifyQueryUsing: fn ($query) => $query->where('status', true)->orderBy('nama', 'desc')
+                            )
+                            ->required()
+                            ->columns(Instansi::first()->status === 'Negeri' ? 5 : 6)
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                    ]),
             ]);
     }
 

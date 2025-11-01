@@ -58,7 +58,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Instansi extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory;
+    use HasUuids;
+    use SoftDeletes;
 
     protected function casts(): array
     {
@@ -70,5 +72,10 @@ class Instansi extends Model
     public function jabatan()
     {
         return $this->hasMany(Jabatan::class);
+    }
+
+    public function jadwalPresensis()
+    {
+        return $this->hasMany(JadwalPresensi::class);
     }
 }
