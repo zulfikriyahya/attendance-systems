@@ -8,10 +8,10 @@ use App\Filament\Resources\JadwalPresensiResource\Pages\ListJadwalPresensis;
 use App\Filament\Resources\JadwalPresensiResource\Pages\ViewJadwalPresensi;
 use App\Models\JadwalPresensi;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -56,59 +56,74 @@ class JadwalPresensiResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('instansi_id')
-                    ->label('Nama Instansi')
-                    ->relationship('instansi', 'nama')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                TextInput::make('nama')
-                    ->label('Nama Jadwal')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                Select::make('hari')
-                    ->options([
-                        'Senin' => 'Senin',
-                        'Selasa' => 'Selasa',
-                        'Rabu' => 'Rabu',
-                        'Kamis' => 'Kamis',
-                        'Jumat' => 'Jumat',
-                        'Sabtu' => 'Sabtu',
-                        'Minggu' => 'Minggu',
+                Section::make('Jadwal Presensi')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 3,
                     ])
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
+                    ->schema([
+                        Select::make('instansi_id')
+                            ->label('Nama Instansi')
+                            ->relationship('instansi', 'nama')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        TextInput::make('nama')
+                            ->label('Nama Jadwal')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Select::make('hari')
+                            ->options([
+                                'Senin' => 'Senin',
+                                'Selasa' => 'Selasa',
+                                'Rabu' => 'Rabu',
+                                'Kamis' => 'Kamis',
+                                'Jumat' => 'Jumat',
+                                'Sabtu' => 'Sabtu',
+                                'Minggu' => 'Minggu',
+                            ])
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
 
-                DateTimePicker::make('jamDatang')
-                    ->label('Jam Datang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate()
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
+                        DateTimePicker::make('jamDatang')
+                            ->label('Jam Datang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
 
-                DateTimePicker::make('jamPulang')
-                    ->label('Jam Pulang')
-                    ->displayFormat('H:i:s')
-                    ->format('H:i:s')
-                    ->withoutDate()
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                Textarea::make('deskripsi')
-                    ->columnSpanFull(),
-                Toggle::make('status')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                        DateTimePicker::make('jamPulang')
+                            ->label('Jam Pulang')
+                            ->displayFormat('H:i:s')
+                            ->format('H:i:s')
+                            ->withoutDate()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Select::make('status')
+                            ->default(true)
+                            ->native(false)
+                            ->options([
+                                true => 'Aktif',
+                                false => 'Non Aktif',
+                            ])
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Textarea::make('deskripsi')
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
