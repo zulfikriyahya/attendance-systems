@@ -2,52 +2,52 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\StatusApproval;
-use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Exports\PresensiPegawaiExport;
-use App\Filament\Resources\PresensiPegawaiResource\Pages;
-use App\Models\Instansi;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Jabatan;
 use App\Models\Pegawai;
-use App\Models\PresensiPegawai;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
+use App\Models\Instansi;
 use Filament\Forms\Form;
-use Filament\Notifications\Actions\Action as NotificationAction;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Enums\StatusPulang;
+use App\Enums\StatusApproval;
+use App\Enums\StatusPresensi;
+use App\Models\PresensiPegawai;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Radio;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
+use Filament\Forms\Components\Select;
+use App\Exports\PresensiPegawaiExport;
+use Filament\Forms\Components\Section;
+use Illuminate\Support\Facades\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TimePicker;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PresensiPegawaiResource\Pages;
+use Filament\Notifications\Actions\Action as NotificationAction;
 
 class PresensiPegawaiResource extends Resource
 {
@@ -141,7 +141,6 @@ class PresensiPegawaiResource extends Resource
     {
         return $table
             ->headerActions([
-                ActionGroup::make([
                     // Set Hadir Pegawai
                     Action::make('set-hadir')
                         ->label('Set Hadir')
@@ -1274,12 +1273,6 @@ class PresensiPegawaiResource extends Resource
                             }
                         }),
                 ])
-                    ->hiddenLabel()
-                    ->icon('heroicon-o-rectangle-group')
-                    ->color(Color::Emerald),
-                // ->button()
-                // ->outlined()
-            ])
             ->columns([
                 ImageColumn::make('pegawai.user.avatar')
                     ->label('Foto')
