@@ -68,6 +68,7 @@ class TahunPelajaranResource extends Resource
                         Select::make('instansi_id')
                             ->relationship('instansi', 'nama')
                             ->required(),
+
                         TextInput::make('nama')
                             ->label('Tahun Pelajaran')
                             ->placeholder('Contoh: 2025/2026')
@@ -93,6 +94,7 @@ class TahunPelajaranResource extends Resource
                                 'required' => 'Form ini harus diisi.',
                             ])
                             ->default(Carbon::create(now()->year, 7, 1)),
+
                         DatePicker::make('selesai')
                             ->label('Tanggal Selesai')
                             ->required()
@@ -100,6 +102,7 @@ class TahunPelajaranResource extends Resource
                                 'required' => 'Form ini harus diisi.',
                             ])
                             ->default(Carbon::create(now()->year + 1, 6, 30)),
+
                         Select::make('status')
                             ->default(true)
                             ->native(false)
@@ -111,6 +114,7 @@ class TahunPelajaranResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Textarea::make('deskripsi')
                             ->label('Deskripsi')
                             ->columnSpanFull(),

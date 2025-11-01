@@ -79,24 +79,30 @@ class PresensiPegawaiResource extends Resource
                             ->pluck('user.name', 'id'); // key = pegawai.id, label = user.name
                     })
                     ->disabledOn('edit'),
+
                 DateTimePicker::make('jamDatang')
                     ->displayFormat('H:i:s')
                     ->format('H:i:s')
                     ->withoutDate(),
+
                 DateTimePicker::make('jamPulang')
                     ->displayFormat('H:i:s')
                     ->format('H:i:s')
                     ->withoutDate(),
+
                 DatePicker::make('tanggal')
                     ->default(now())
                     ->disabledOn('edit'),
+
                 Select::make('statusPresensi')
                     ->label('Status Presensi')
                     ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
                     ->required(),
+
                 Select::make('statusPulang')
                     ->label('Status Pulang')
                     ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
+
                 Select::make('statusApproval')
                     ->label('Status Persetujuan')
                     ->options(
@@ -104,8 +110,10 @@ class PresensiPegawaiResource extends Resource
                             ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
                             ->toArray()
                     ),
+
                 Textarea::make('catatan')
                     ->label('Keterangan/Catatan'),
+
                 FileUpload::make('berkasLampiran')
                     ->label('Berkas Lampiran')
                     ->openable()

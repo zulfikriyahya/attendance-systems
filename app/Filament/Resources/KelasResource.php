@@ -68,6 +68,7 @@ class KelasResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini harus diisi.',
                             ]),
+
                         Select::make('jurusan_id')
                             ->label('Jurusan')
                             ->relationship('jurusan', 'nama')
@@ -75,6 +76,7 @@ class KelasResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini harus diisi.',
                             ]),
+
                         Textarea::make('deskripsi')
                             ->label('Deskripsi')
                             ->columnSpanFull(),

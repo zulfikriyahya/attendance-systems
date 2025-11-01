@@ -121,6 +121,7 @@ class SiswaResource extends Resource
                                         'min_digits' => 'Minimal 10 digit.',
                                         'max_digits' => 'Maksimal 10 digit.',
                                     ]),
+
                                 TextInput::make('telepon')
                                     ->tel()
                                     ->numeric()
@@ -133,6 +134,7 @@ class SiswaResource extends Resource
                                         'min_digits' => 'Minimal 10 digit.',
                                         'max_digits' => 'Maksimal 13 digit.',
                                     ]),
+
                                 Select::make('jenisKelamin')
                                     ->options([
                                         'Pria' => 'Laki-laki',
@@ -142,6 +144,7 @@ class SiswaResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Select::make('jabatan_id')
                                     ->label('Jabatan')
                                     ->relationship('jabatan', 'nama')
@@ -151,6 +154,7 @@ class SiswaResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Select::make('status')
                                     ->default(true)
                                     ->native(false)
@@ -162,6 +166,7 @@ class SiswaResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Textarea::make('alamat')
                                     ->columnSpanFull(),
                             ]),

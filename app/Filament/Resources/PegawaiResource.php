@@ -109,6 +109,7 @@ class PegawaiResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 TextInput::make('nip')
                                     ->label('NIK/NIP/NUPTK')
                                     ->unique(ignoreRecord: true)
@@ -122,6 +123,7 @@ class PegawaiResource extends Resource
                                         'min_digits' => 'Minimal 16 digit.',
                                         'max_digits' => 'Maksimal 18 digit.',
                                     ]),
+
                                 TextInput::make('telepon')
                                     ->tel()
                                     ->numeric()
@@ -134,6 +136,7 @@ class PegawaiResource extends Resource
                                         'min_digits' => 'Minimal 10 digit.',
                                         'max_digits' => 'Maksimal 13 digit.',
                                     ]),
+
                                 Select::make('jenisKelamin')
                                     ->options([
                                         'Pria' => 'Pria',
@@ -143,6 +146,7 @@ class PegawaiResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Select::make('jabatan_id')
                                     ->label('Jabatan')
                                     ->relationship('jabatan', 'nama')
@@ -152,6 +156,7 @@ class PegawaiResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Select::make('status')
                                     ->default(true)
                                     ->native(false)
@@ -163,6 +168,7 @@ class PegawaiResource extends Resource
                                     ->validationMessages([
                                         'required' => 'Form ini wajib diisi.',
                                     ]),
+
                                 Textarea::make('alamat')
                                     ->columnSpanFull(),
                             ]),

@@ -60,6 +60,7 @@ class MataPelajaranResource extends Resource
                         TextInput::make('nama')
                             ->required()
                             ->maxLength(255),
+
                         Select::make('status')
                             ->default(true)
                             ->native(false)
@@ -71,6 +72,7 @@ class MataPelajaranResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Textarea::make('deskripsi')
                             ->columnSpanFull(),
                     ]),

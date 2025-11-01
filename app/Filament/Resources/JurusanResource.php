@@ -66,9 +66,11 @@ class JurusanResource extends Resource
                             ->label('Instansi')
                             ->relationship('instansi', 'nama')
                             ->required(),
+
                         TextInput::make('nama')
                             ->label('Jurusan')
                             ->required(),
+
                         Textarea::make('deskripsi')
                             ->label('Deskripsi')
                             ->columnSpanFull(),
@@ -84,8 +86,10 @@ class JurusanResource extends Resource
                     ->label('Logo Instansi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
+
                 TextColumn::make('instansi.nama')
                     ->searchable(Jurusan::all()->count() > 10),
+
                 TextColumn::make('nama')
                     ->badge()
                     ->searchable(Jurusan::all()->count() > 10),

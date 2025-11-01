@@ -71,12 +71,14 @@ class JadwalPresensiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         TextInput::make('nama')
                             ->label('Nama Jadwal')
                             ->required()
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Select::make('hari')
                             ->options([
                                 'Senin' => 'Senin',
@@ -111,6 +113,7 @@ class JadwalPresensiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Select::make('status')
                             ->default(true)
                             ->native(false)
@@ -122,6 +125,7 @@ class JadwalPresensiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Textarea::make('deskripsi')
                             ->columnSpanFull(),
                     ]),

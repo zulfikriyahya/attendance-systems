@@ -68,6 +68,7 @@ class JabatanResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         TextInput::make('nama')
                             ->required()
                             ->validationMessages([
@@ -77,6 +78,7 @@ class JabatanResource extends Resource
                         Textarea::make('deskripsi')
                             ->columnSpanFull(),
                     ]),
+
                 Section::make('Pengaturan Jadwal Presensi')
                     ->collapsible()
                     ->schema([

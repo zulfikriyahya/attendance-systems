@@ -76,11 +76,13 @@ class InformasiResource extends Resource
                                 TextInput::make('judul')
                                     ->label('Judul Informasi')
                                     ->required(),
+
                                 Select::make('jabatan_id')
                                     ->label('Kepada')
                                     ->relationship('jabatan', 'nama')
                                     ->native(false)
                                     ->required(),
+
                                 MarkdownEditor::make('isi')
                                     ->label('Uraian Informasi')
                                     ->required()
@@ -110,6 +112,7 @@ class InformasiResource extends Resource
                                     ->native(false)
                                     ->default(now())
                                     ->maxDate(now()),
+
                                 Select::make('status')
                                     ->options([
                                         'Draft' => 'Draft',
@@ -119,6 +122,7 @@ class InformasiResource extends Resource
                                     ->default('Publish')
                                     ->native(false)
                                     ->required(),
+
                                 FileUpload::make('lampiran')
                                     ->label('Lampiran Informasi')
                                     ->image()
@@ -279,7 +283,9 @@ class InformasiResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class])
             ->where('status', 'Publish') // hanya publish
-            ->when($jabatanId, fn ($query) => $query->where('jabatan_id', $jabatanId)
+            ->when(
+                $jabatanId,
+                fn ($query) => $query->where('jabatan_id', $jabatanId)
             )
             ->orderBy('tanggal', 'desc');
     }

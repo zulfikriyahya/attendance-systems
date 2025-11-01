@@ -91,6 +91,7 @@ class InstansiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         TextInput::make('nss')
                             ->label('NSS/NSM')
                             ->maxLength(12)
@@ -102,6 +103,7 @@ class InstansiResource extends Resource
                                 'min_digits' => 'NSS/NSM harus 12 karakter',
                                 'max_digits' => 'NSS/NSM harus 12 karakter',
                             ]),
+
                         TextInput::make('npsn')
                             ->label('NPSN')
                             ->maxLength(8)
@@ -136,6 +138,7 @@ class InstansiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         FileUpload::make('ttePimpinan')
                             ->label('TTE Pimpinan')
                             ->image()
@@ -149,12 +152,14 @@ class InstansiResource extends Resource
                             ->maxSize(1024)
                             ->directory('ttePimpinan')
                             ->visibility('public'),
+
                         TextInput::make('nipPimpinan')
                             ->label('NIP Pimpinan')
                             // ->required(ignoreRecord: true)
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Select::make('akreditasi')
                             ->options([
                                 'A' => 'A',
@@ -166,6 +171,7 @@ class InstansiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Select::make('status')
                             ->options([
                                 'Negeri' => 'Negeri',
@@ -175,8 +181,8 @@ class InstansiResource extends Resource
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
-
                     ]),
+
                 Section::make('Detail')
                     ->collapsible()
                     ->columns([
@@ -186,14 +192,17 @@ class InstansiResource extends Resource
                     ])
                     ->schema([
                         TextInput::make('website'),
+
                         TextInput::make('telepon')
                             ->tel()
                             ->required()
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         TextInput::make('email')
                             ->email(),
+
                         Textarea::make('alamat')
                             ->columnSpanFull()
                             ->maxLength(255)

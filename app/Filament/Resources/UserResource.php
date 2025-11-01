@@ -86,13 +86,13 @@ class UserResource extends Resource
                         'xl' => 4,
                     ])
                     ->schema([
-
                         TextInput::make('name')
                             ->label('Nama Lengkap')
                             ->required()
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         TextInput::make('username')
                             ->required()
                             ->rule(fn ($record) => $record === null ? 'unique:users,username' : 'unique:users,username,'.$record->id)
@@ -102,6 +102,7 @@ class UserResource extends Resource
                                 'required' => 'Form ini wajib diisi.',
                                 'unique' => 'Username sudah ada.',
                             ]),
+
                         TextInput::make('email')
                             ->email()
                             ->required()
@@ -121,6 +122,7 @@ class UserResource extends Resource
                             ]),
 
                     ]),
+
                 Section::make('Detail')
                     ->collapsible()
                     ->columns([
@@ -155,18 +157,20 @@ class UserResource extends Resource
 
                                 return $fileName;
                             }),
+
                         DateTimePicker::make('email_verified_at')
                             ->label('Verifikasi Email')
                             ->default(now()),
+
                         Select::make('roles')
                             ->label('Peran')
                             ->relationship('roles', 'name')
                             ->required()
-                            ->multiple()
                             ->preload()
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',
                             ]),
+
                         Select::make('status')
                             ->default(true)
                             ->native(false)
