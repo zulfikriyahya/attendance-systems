@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\PegawaiImporter;
 use App\Filament\Resources\PegawaiResource\Pages\CetakKartuPegawai;
 use App\Filament\Resources\PegawaiResource\Pages\CreatePegawai;
 use App\Filament\Resources\PegawaiResource\Pages\EditPegawai;
@@ -12,8 +11,6 @@ use App\Models\Jabatan;
 use App\Models\Pegawai;
 use App\Models\Siswa;
 use App\Models\User;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -30,11 +27,9 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -205,49 +200,6 @@ class PegawaiResource extends Resource
         $searchable = Pegawai::count() > 10;
 
         return $table
-            ->headerActions([
-                ActionGroup::make([
-                    ImportAction::make('import')
-                        ->label('Impor Data')
-                        ->outlined()
-                        ->color('primary')
-                        ->icon('heroicon-o-identification')
-                        ->importer(PegawaiImporter::class)
-                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
-                    Action::make('import-kartu')
-                        ->label('Impor Kartu')
-                        ->outlined()
-                        ->color('primary')
-                        ->icon('heroicon-o-photo')
-                        ->requiresConfirmation()
-                        ->visible(fn () => Auth::user()->hasRole('super_admin'))
-                        ->form([
-                            FileUpload::make('zip_file')
-                                ->label('File ZIP Kartu Pegawai')
-                                ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
-                                ->required()
-                                ->helperText('Upload file ZIP yang berisi kartu pegawai')
-                                ->maxSize(1024000),
-
-                            Checkbox::make('overwrite_existing')
-                                ->label('Timpa file yang sudah ada')
-                                ->default(true),
-
-                            Checkbox::make('preserve_structure')
-                                ->label('Pertahankan struktur folder dalam ZIP')
-                                ->default(true)
-                                ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
-                        ])
-                        ->action(function (array $data) {
-                            self::extractZipToStorage($data);
-                        }),
-                ])
-                    ->hiddenLabel()
-                    ->icon('heroicon-o-rectangle-group')
-                    ->color(Color::Emerald),
-                // ->button()
-                // ->outlined()
-            ])
             ->columns([
                 ImageColumn::make('user.avatar')
                     ->label('Foto')
@@ -256,8 +208,9 @@ class PegawaiResource extends Resource
                 TextColumn::make('user.name')
                     ->label('Nama Lengkap')
                     ->searchable($searchable),
-                BadgeColumn::make('jabatan.nama')
+                TextColumn::make('jabatan.nama')
                     ->label('Jabatan')
+                    ->badge()
                     ->color('primary')
                     ->searchable($searchable),
                 TextColumn::make('nip')
@@ -305,10 +258,7 @@ class PegawaiResource extends Resource
                         ->label('Delete')
                         ->color(Color::Red)
                         ->size('sm')
-                        ->icon('heroicon-o-minus-circle')
-                        ->visible(
-                            fn ($record) => ! $record->roles->contains('name', 'super_admin')
-                        ),
+                        ->icon('heroicon-o-minus-circle'),
                     ForceDeleteAction::make()
                         ->label('Force Delete')
                         ->color(Color::Red)

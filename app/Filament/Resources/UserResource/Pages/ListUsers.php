@@ -45,9 +45,7 @@ class ListUsers extends ListRecords
                     ->size('sm')
                     ->icon('heroicon-o-identification')
                     ->outlined()
-                    ->requiresConfirmation()
-                    ->importer(UserImporter::class)
-                    ->visible(fn () => Auth::user()->hasRole('super_admin')),
+                    ->importer(UserImporter::class),
                 Action::make('import-avatar')
                     ->label('Impor Avatar')
                     ->color(Color::Blue)
@@ -55,7 +53,6 @@ class ListUsers extends ListRecords
                     ->icon('heroicon-o-photo')
                     ->outlined()
                     ->requiresConfirmation()
-                    ->visible(fn () => Auth::user()->hasRole('super_admin'))
                     ->form([
                         FileUpload::make('zip_file')
                             ->label('File ZIP Avatar')

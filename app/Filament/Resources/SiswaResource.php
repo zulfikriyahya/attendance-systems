@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\SiswaImporter;
 use App\Filament\Resources\SiswaResource\Pages\CreateSiswa;
 use App\Filament\Resources\SiswaResource\Pages\EditSiswa;
 use App\Filament\Resources\SiswaResource\Pages\ListSiswas;
@@ -10,8 +9,6 @@ use App\Filament\Resources\SiswaResource\Pages\ViewSiswa;
 use App\Models\Jabatan;
 use App\Models\Siswa;
 use App\Models\User;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -28,7 +25,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
@@ -203,47 +199,6 @@ class SiswaResource extends Resource
         $searchable = Siswa::count() > 10;
 
         return $table
-            ->headerActions([
-                ActionGroup::make([
-                    ImportAction::make('import')
-                        ->label('Impor Data')
-                        ->outlined()
-                        ->color('primary')
-                        ->icon('heroicon-o-identification')
-                        ->importer(SiswaImporter::class)
-                        ->visible(fn () => Auth::user()->hasRole('super_admin')),
-                    Action::make('import-kartu')
-                        ->label('Impor Kartu')
-                        ->outlined()
-                        ->color('primary')
-                        ->icon('heroicon-o-photo')
-                        ->requiresConfirmation()
-                        ->visible(fn () => Auth::user()->hasRole('super_admin'))
-                        ->form([
-                            FileUpload::make('zip_file')
-                                ->label('File ZIP Kartu Siswa')
-                                ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
-                                ->required()
-                                ->helperText('Upload file ZIP yang berisi kartu siswa')
-                                ->maxSize(102400),
-
-                            Checkbox::make('overwrite_existing')
-                                ->label('Timpa file yang sudah ada')
-                                ->default(true),
-
-                            Checkbox::make('preserve_structure')
-                                ->label('Pertahankan struktur folder dalam ZIP')
-                                ->default(true)
-                                ->helperText('Jika dicentang, struktur folder dalam ZIP akan dipertahankan'),
-                        ])
-                        ->action(function (array $data) {
-                            self::extractZipToStorage($data);
-                        }),
-                ])
-                    ->hiddenLabel()
-                    ->icon('heroicon-o-rectangle-group')
-                    ->color(Color::Emerald),
-            ])
             ->columns([
                 ImageColumn::make('user.avatar')
                     ->label('Foto')
