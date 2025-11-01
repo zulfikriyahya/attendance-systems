@@ -7,6 +7,7 @@ use App\Filament\Resources\KelasResource\Pages\EditKelas;
 use App\Filament\Resources\KelasResource\Pages\ListKelas;
 use App\Filament\Resources\KelasResource\Pages\ViewKelas;
 use App\Models\Kelas;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -53,21 +54,31 @@ class KelasResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nama')
-                    ->label('Kelas')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini harus diisi.',
+                Section::make('Jurusan')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 2,
+                    ])
+                    ->schema([
+                        TextInput::make('nama')
+                            ->label('Kelas')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini harus diisi.',
+                            ]),
+                        Select::make('jurusan_id')
+                            ->label('Jurusan')
+                            ->relationship('jurusan', 'nama')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini harus diisi.',
+                            ]),
+                        Textarea::make('deskripsi')
+                            ->label('Deskripsi')
+                            ->columnSpanFull(),
                     ]),
-                Select::make('jurusan_id')
-                    ->label('Jurusan')
-                    ->relationship('jurusan', 'nama')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini harus diisi.',
-                    ]),
-                Textarea::make('deskripsi')
-                    ->columnSpanFull(),
             ]);
     }
 
