@@ -2,35 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InstansiResource\Pages\CreateInstansi;
-use App\Filament\Resources\InstansiResource\Pages\EditInstansi;
-use App\Filament\Resources\InstansiResource\Pages\ListInstansis;
-use App\Filament\Resources\InstansiResource\Pages\ViewInstansi;
 use App\Models\Instansi;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\InstansiResource\Pages\EditInstansi;
+use App\Filament\Resources\InstansiResource\Pages\ViewInstansi;
+use App\Filament\Resources\InstansiResource\Pages\ListInstansis;
+use App\Filament\Resources\InstansiResource\Pages\CreateInstansi;
 
 class InstansiResource extends Resource
 {
@@ -54,124 +55,150 @@ class InstansiResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nama')
-                    ->label('Nama Instansi')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                TextInput::make('nss')
-                    ->label('NSS/NSM')
-                    ->maxLength(12)
-                    ->minLength(12)
-                    ->unique(ignoreRecord: true)
-                    ->numeric()
-                    ->validationMessages([
-                        'unique' => 'NSS/NSM sudah pernah diisi.',
-                        'min_digits' => 'NSS/NSM harus 12 karakter',
-                        'max_digits' => 'NSS/NSM harus 12 karakter',
-                    ]),
-                TextInput::make('npsn')
-                    ->label('NPSN')
-                    ->maxLength(8)
-                    ->minLength(8)
-                    ->unique(ignoreRecord: true)
-                    ->numeric()
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                        'unique' => 'NPSN sudah pernah diisi.',
-                        'min_digits' => 'NPSN harus 8 karakter',
-                        'max_digits' => 'NPSN harus 8 karakter',
-                    ]),
-                FileUpload::make('logoInstansi')
-                    ->label('Logo Instansi')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                Section::make('Instansi')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 2,
+                        'xl' => 4,
                     ])
-                    ->image()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        '1:1',
-                        '16:9',
-                        '4:3',
-                        null,
-                    ])
-                    ->maxSize(1024)
-                    ->directory('logoInstansi')
-                    ->visibility('public'),
-                FileUpload::make('logoInstitusi')
-                    ->label('Logo Institusi')
-                    ->image()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        '1:1',
-                        '16:9',
-                        '4:3',
-                        null,
-                    ])
-                    ->maxSize(1024)
-                    ->directory('logoInstitusi')
-                    ->visibility('public'),
-                Textarea::make('alamat')
-                    ->columnSpanFull()
-                    ->maxLength(255)
-                    ->minLength(5),
-                TextInput::make('telepon')
-                    ->tel()
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                    ->schema([
+                        FileUpload::make('logoInstansi')
+                            // ->label('Logo Instansi')
+                            ->avatar()
+                            ->hiddenLabel()
+                            ->alignCenter()
+                            ->columnSpanFull()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ])
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '1:1',
+                                '16:9',
+                                '4:3',
+                                null,
+                            ])
+                            ->maxSize(1024)
+                            ->directory('logoInstansi')
+                            ->visibility('public'),
+
+                        TextInput::make('nama')
+                            ->label('Nama Instansi')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        TextInput::make('nss')
+                            ->label('NSS/NSM')
+                            ->maxLength(12)
+                            ->minLength(12)
+                            ->unique(ignoreRecord: true)
+                            ->numeric()
+                            ->validationMessages([
+                                'unique' => 'NSS/NSM sudah pernah diisi.',
+                                'min_digits' => 'NSS/NSM harus 12 karakter',
+                                'max_digits' => 'NSS/NSM harus 12 karakter',
+                            ]),
+                        TextInput::make('npsn')
+                            ->label('NPSN')
+                            ->maxLength(8)
+                            ->minLength(8)
+                            ->unique(ignoreRecord: true)
+                            ->numeric()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                                'unique' => 'NPSN sudah pernah diisi.',
+                                'min_digits' => 'NPSN harus 8 karakter',
+                                'max_digits' => 'NPSN harus 8 karakter',
+                            ]),
+
+                        // FileUpload::make('logoInstitusi')
+                        //     ->label('Logo Institusi')
+                        //     ->image()
+                        //     ->imageEditor()
+                        //     ->imageEditorAspectRatios([
+                        //         '1:1',
+                        //         '16:9',
+                        //         '4:3',
+                        //         null,
+                        //     ])
+                        //     ->maxSize(1024)
+                        //     ->directory('logoInstitusi')
+                        //     ->visibility('public'),
+
+                        TextInput::make('pimpinan')
+                            ->label('Nama Pimpinan')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        FileUpload::make('ttePimpinan')
+                            ->label('TTE Pimpinan')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '1:1',
+                                '16:9',
+                                '4:3',
+                                null,
+                            ])
+                            ->maxSize(1024)
+                            ->directory('ttePimpinan')
+                            ->visibility('public'),
+                        TextInput::make('nipPimpinan')
+                            ->label('NIP Pimpinan')
+                            // ->required(ignoreRecord: true)
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Select::make('akreditasi')
+                            ->options([
+                                'A' => 'A',
+                                'B' => 'B',
+                                'C' => 'C',
+                                'D' => 'D',
+                            ])
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        Select::make('status')
+                            ->options([
+                                'Negeri' => 'Negeri',
+                                'Swasta' => 'Swasta',
+                            ])
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+
                     ]),
-                TextInput::make('email')
-                    ->email(),
-                TextInput::make('pimpinan')
-                    ->label('Nama Pimpinan')
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                FileUpload::make('ttePimpinan')
-                    ->label('TTE Pimpinan')
-                    ->image()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        '1:1',
-                        '16:9',
-                        '4:3',
-                        null,
+                Section::make('Detail')
+                    ->collapsible()
+                    ->columns([
+                        'sm' => 1,
+                        'md' => 3,
+                        'xl' => 3,
                     ])
-                    ->maxSize(1024)
-                    ->directory('ttePimpinan')
-                    ->visibility('public'),
-                TextInput::make('nipPimpinan')
-                    ->label('NIP Pimpinan')
-                    // ->required(ignoreRecord: true)
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
+                    ->schema([
+                        TextInput::make('website'),
+                        TextInput::make('telepon')
+                            ->tel()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Form ini wajib diisi.',
+                            ]),
+                        TextInput::make('email')
+                            ->email(),
+                        Textarea::make('alamat')
+                            ->columnSpanFull()
+                            ->maxLength(255)
+                            ->minLength(5),
                     ]),
-                Select::make('akreditasi')
-                    ->options([
-                        'A' => 'A',
-                        'B' => 'B',
-                        'C' => 'C',
-                        'D' => 'D',
-                    ])
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                Select::make('status')
-                    ->options([
-                        'Negeri' => 'Negeri',
-                        'Swasta' => 'Swasta',
-                    ])
-                    ->required()
-                    ->validationMessages([
-                        'required' => 'Form ini wajib diisi.',
-                    ]),
-                TextInput::make('website'),
             ]);
     }
 
