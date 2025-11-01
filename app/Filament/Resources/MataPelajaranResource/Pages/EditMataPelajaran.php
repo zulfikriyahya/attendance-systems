@@ -2,16 +2,21 @@
 
 namespace App\Filament\Resources\MataPelajaranResource\Pages;
 
-use App\Filament\Resources\MataPelajaranResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 use Filament\Support\Colors\Color;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use App\Filament\Resources\MataPelajaranResource;
 
 class EditMataPelajaran extends EditRecord
 {
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
+
     protected static string $resource = MataPelajaranResource::class;
 
     protected function getHeaderActions(): array
