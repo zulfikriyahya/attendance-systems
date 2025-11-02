@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Informasi;
+use App\Models\Pegawai;
+use App\Models\Siswa;
+use App\Services\WhatsappDelayService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class BroadcastInformasi implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     *
+     * @var int
+     */
+    public $backoff = 60;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(
+        public Informasi $informasi
+    ) {}
+
+    /**
+     * Execute the job.
+     */
+    public function handle(WhatsappDelayService $delayService): void
+    {
+        $notifCounter = 0;
+
+        // Ambil semua siswa dengan nomor telepon yang valid
+        $siswa = Siswa::with('jabatan.instansi', 'user')
+            ->where('jabatan_id', $this->informasi->jabatan_id)
+            ->whereNotNull('telepon')
+            ->where('telepon', '!=', '')
+            ->where('status', true)
+            ->get();
+
+        // Ambil semua pegawai dengan nomor telepon yang valid
+        $pegawai = Pegawai::with('jabatan.instansi', 'user')
+            ->where('jabatan_id', $this->informasi->jabatan_id)
+            ->whereNotNull('telepon')
+            ->where('telepon', '!=', '')
+            ->where('status', true)
+            ->get();
+
+        $totalRecipients = $siswa->count() + $pegawai->count();
+
+        // Jika tidak ada penerima, return
+        if ($totalRecipients === 0) {
+            logger()->warning('No recipients found for informasi broadcast', [
+                'informasi_id' => $this->informasi->id,
+                'judul' => $this->informasi->judul,
+            ]);
+
+            return;
+        }
+
+        // Proses pengiriman ke siswa
+        foreach ($siswa as $student) {
+            $nama = $student->user?->name ?? $student->nama ?? 'Siswa';
+            $instansi = $student->jabatan?->instansi?->nama ?? 'Instansi';
+
+            $delay = $delayService->calculateBulkDelay($notifCounter, 'informasi');
+
+            SendWhatsappMessage::dispatch(
+                $student->telepon,
+                'informasi',
+                [
+                    'judul' => $this->informasi->judul,
+                    'isi' => $this->informasi->isi,
+                    'nama' => $nama,
+                    'instansi' => $instansi,
+                    'lampiran' => $this->informasi->lampiran,
+                    'isSiswa' => true,
+                ]
+            )->delay($delay);
+
+            $notifCounter++;
+        }
+
+        // Proses pengiriman ke pegawai
+        foreach ($pegawai as $employee) {
+            $nama = $employee->user?->name ?? $employee->nama ?? 'Pegawai';
+            $instansi = $employee->jabatan?->instansi?->nama ?? 'Instansi';
+
+            $delay = $delayService->calculateBulkDelay($notifCounter, 'informasi');
+
+            SendWhatsappMessage::dispatch(
+                $employee->telepon,
+                'informasi',
+                [
+                    'judul' => $this->informasi->judul,
+                    'isi' => $this->informasi->isi,
+                    'nama' => $nama,
+                    'instansi' => $instansi,
+                    'lampiran' => $this->informasi->lampiran,
+                    'isSiswa' => false,
+                ]
+            )->delay($delay);
+
+            $notifCounter++;
+        }
+
+        // Log broadcast
+        logger()->info('Informasi WhatsApp broadcast dispatched', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'total_recipients' => $totalRecipients,
+            'siswa' => $siswa->count(),
+            'pegawai' => $pegawai->count(),
+            'max_delay_minutes' => $delayService->calculateBulkDelay($notifCounter - 1, 'informasi')->diffInMinutes(now()),
+        ]);
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to broadcast informasi', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'error' => $exception->getMessage(),
+        ]);
+    }
+}
