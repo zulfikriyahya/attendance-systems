@@ -112,13 +112,13 @@ class PresensiSiswaResource extends Resource
                         Select::make('statusPresensi')
                             ->label('Status Presensi')
                             ->native(false)
-                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
+                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn($case) => [$case->value => $case->value])->toArray())
                             ->required(),
 
                         Select::make('statusPulang')
                             ->label('Status Pulang')
                             ->native(false)
-                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
+                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn($case) => [$case->value => $case->value])->toArray()),
 
                         FileUpload::make('berkasLampiran')
                             ->label('Berkas Lampiran')
@@ -129,7 +129,7 @@ class PresensiSiswaResource extends Resource
                             ->native(false)
                             ->options(
                                 collect(StatusApproval::cases())
-                                    ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+                                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
                                     ->toArray()
                             ),
 
@@ -145,6 +145,7 @@ class PresensiSiswaResource extends Resource
         return $table
             ->headerActions([
                 ActionGroup::make([
+                    // TODO: Kirim ke worker
                     // Set Hadir Siswa
                     Action::make('set-hadir')
                         ->label('Set Hadir')
@@ -176,13 +177,13 @@ class PresensiSiswaResource extends Resource
                                         ->get()
                                         ->pluck('user.name', 'id')
                                 )
-                                ->when(Siswa::count() > 10, fn ($field) => $field->searchable())
+                                ->when(Siswa::count() > 10, fn($field) => $field->searchable())
                                 ->preload()
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Siswa')
-                                ->required(fn (callable $get) => $get('tipe') === 'single')
-                                ->visible(fn (callable $get) => $get('tipe') === 'single'),
+                                ->required(fn(callable $get) => $get('tipe') === 'single')
+                                ->visible(fn(callable $get) => $get('tipe') === 'single'),
 
                             Select::make('jabatan')
                                 ->label('Pilih Jabatan')
@@ -194,8 +195,8 @@ class PresensiSiswaResource extends Resource
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Jabatan')
-                                ->required(fn (callable $get) => $get('tipe') === 'jabatan')
-                                ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
+                                ->required(fn(callable $get) => $get('tipe') === 'jabatan')
+                                ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
 
                             DatePicker::make('tanggalMulai')
                                 ->label('Tanggal Mulai')
@@ -203,7 +204,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -216,7 +217,7 @@ class PresensiSiswaResource extends Resource
                                                 ->orWhere('statusPresensi', StatusPresensi::Izin);
                                         })
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -230,7 +231,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -243,7 +244,7 @@ class PresensiSiswaResource extends Resource
                                                 ->orWhere('statusPresensi', StatusPresensi::Izin);
                                         })
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -348,8 +349,9 @@ class PresensiSiswaResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                        ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
+                    // TODO: Kirim ke worker
                     // Set Libur Siswa
                     Action::make('set-libur')
                         ->label('Set Libur')
@@ -381,13 +383,13 @@ class PresensiSiswaResource extends Resource
                                         ->get()
                                         ->pluck('user.name', 'id')
                                 )
-                                ->when(Siswa::count() > 10, fn ($field) => $field->searchable())
+                                ->when(Siswa::count() > 10, fn($field) => $field->searchable())
                                 ->preload()
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Siswa')
-                                ->required(fn (callable $get) => $get('tipe') === 'single')
-                                ->visible(fn (callable $get) => $get('tipe') === 'single'),
+                                ->required(fn(callable $get) => $get('tipe') === 'single')
+                                ->visible(fn(callable $get) => $get('tipe') === 'single'),
 
                             Select::make('jabatan')
                                 ->label('Pilih Jabatan')
@@ -399,8 +401,8 @@ class PresensiSiswaResource extends Resource
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Jabatan')
-                                ->required(fn (callable $get) => $get('tipe') === 'jabatan')
-                                ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
+                                ->required(fn(callable $get) => $get('tipe') === 'jabatan')
+                                ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
 
                             DatePicker::make('tanggalMulai')
                                 ->label('Tanggal Mulai')
@@ -410,7 +412,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -424,7 +426,7 @@ class PresensiSiswaResource extends Resource
                                         })
 
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -440,7 +442,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -454,7 +456,7 @@ class PresensiSiswaResource extends Resource
                                         })
 
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -521,8 +523,9 @@ class PresensiSiswaResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                        ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
+                    // TODO: Kirim ke worker
                     // Set Dispen
                     Action::make('set-dispen')
                         ->label('Set Dispen')
@@ -554,13 +557,13 @@ class PresensiSiswaResource extends Resource
                                         ->get()
                                         ->pluck('user.name', 'id')
                                 )
-                                ->when(Siswa::count() > 10, fn ($field) => $field->searchable())
+                                ->when(Siswa::count() > 10, fn($field) => $field->searchable())
                                 ->preload()
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Siswa')
-                                ->required(fn (callable $get) => $get('tipe') === 'single')
-                                ->visible(fn (callable $get) => $get('tipe') === 'single'),
+                                ->required(fn(callable $get) => $get('tipe') === 'single')
+                                ->visible(fn(callable $get) => $get('tipe') === 'single'),
 
                             Select::make('jabatan')
                                 ->label('Pilih Jabatan')
@@ -572,8 +575,8 @@ class PresensiSiswaResource extends Resource
                                 ->reactive()
                                 ->native(false)
                                 ->placeholder('Pilih Jabatan')
-                                ->required(fn (callable $get) => $get('tipe') === 'jabatan')
-                                ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
+                                ->required(fn(callable $get) => $get('tipe') === 'jabatan')
+                                ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
 
                             DatePicker::make('tanggalMulai')
                                 ->label('Tanggal Mulai')
@@ -583,7 +586,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -597,7 +600,7 @@ class PresensiSiswaResource extends Resource
                                         })
 
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -613,7 +616,7 @@ class PresensiSiswaResource extends Resource
                                 ->native(false)
                                 ->reactive()
                                 ->disabledDates(
-                                    fn (callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
+                                    fn(callable $get) => PresensiSiswa::where('siswa_id', $get('namaSiswa'))
                                         ->where(function ($query) {
                                             $query->where('statusPresensi', StatusPresensi::Libur)
                                                 ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -627,7 +630,7 @@ class PresensiSiswaResource extends Resource
                                         })
 
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray()
                                 )
                                 ->required()
@@ -694,8 +697,9 @@ class PresensiSiswaResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                        ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
+                    // TODO: Kirim ke worker
                     // Ekspor Semua Laporan Siswa Berdasarkan Bulan
                     Action::make('export')
                         ->label('Ekspor')
@@ -707,7 +711,7 @@ class PresensiSiswaResource extends Resource
                             Select::make('bulan')
                                 ->label('Bulan')
                                 ->options(
-                                    collect(range(1, 12))->mapWithKeys(fn ($m) => [
+                                    collect(range(1, 12))->mapWithKeys(fn($m) => [
                                         str_pad($m, 2, '0', STR_PAD_LEFT) => Carbon::create()->month($m)->translatedFormat('F'),
                                     ])->toArray()
                                 )
@@ -727,8 +731,9 @@ class PresensiSiswaResource extends Resource
                                 "Rekap Presensi Siswa {$bulan} {$tahun}.xlsx"
                             );
                         })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                        ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
+                    // TODO: Kirim ke worker
                     // Cetak Semua Laporan Siswa Berdasarkan Bulan
                     Action::make('print-all')
                         ->label('Cetak')
@@ -739,7 +744,7 @@ class PresensiSiswaResource extends Resource
                         ->form([
                             Select::make('bulan')
                                 ->label('Bulan')
-                                ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
+                                ->options(collect(range(1, 12))->mapWithKeys(fn($m) => [
                                     $m => Carbon::create()->month($m)->translatedFormat('F'),
                                 ])->toArray())
                                 ->required(),
@@ -766,10 +771,10 @@ class PresensiSiswaResource extends Resource
 
                                 // Ambil daftar siswa yang masih pending (maksimal 5 untuk ditampilkan)
                                 $daftarSiswa = $pendingApprovals->take(5)
-                                    ->map(fn ($record) => "• {$record->siswa->user->name}")
+                                    ->map(fn($record) => "• {$record->siswa->user->name}")
                                     ->join("\n");
 
-                                $sisaData = $jumlahPending > 5 ? "\n... dan ".($jumlahPending - 5).' siswa lainnya.' : '';
+                                $sisaData = $jumlahPending > 5 ? "\n... dan " . ($jumlahPending - 5) . ' siswa lainnya.' : '';
 
                                 // Tampilkan notifikasi error
                                 Notification::make()
@@ -832,7 +837,7 @@ class PresensiSiswaResource extends Resource
 
                             return redirect($url);
                         })
-                        ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                        ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
                     // Cetak Laporan Mandiri
                     Action::make('print-my-report')
@@ -847,7 +852,7 @@ class PresensiSiswaResource extends Resource
                         ->form([
                             Select::make('bulan')
                                 ->label('Bulan')
-                                ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
+                                ->options(collect(range(1, 12))->mapWithKeys(fn($m) => [
                                     $m => Carbon::create()->month($m)->translatedFormat('F'),
                                 ])->toArray())
                                 ->default(now()->month)
@@ -861,7 +866,7 @@ class PresensiSiswaResource extends Resource
                                 ->minValue(2020)
                                 ->maxValue(now()->year)
                                 ->required()
-                                ->helperText('Masukkan tahun laporan (2020 - '.now()->year.')'),
+                                ->helperText('Masukkan tahun laporan (2020 - ' . now()->year . ')'),
                         ])
                         ->action(function (array $data) {
                             $bulan = (int) $data['bulan'];
@@ -932,12 +937,12 @@ class PresensiSiswaResource extends Resource
 
                                 // Ambil maksimal 5 tanggal untuk ditampilkan
                                 $daftarTanggal = $pendingApprovals->take(5)
-                                    ->map(fn ($record) => '• '.$record->tanggal->translatedFormat('d F Y').
+                                    ->map(fn($record) => '• ' . $record->tanggal->translatedFormat('d F Y') .
                                         " ({$record->statusPresensi->label()})")
                                     ->join("\n");
 
                                 $sisaData = $jumlahPending > 5 ?
-                                    "\n... dan ".($jumlahPending - 5).' pengajuan lainnya.' : '';
+                                    "\n... dan " . ($jumlahPending - 5) . ' pengajuan lainnya.' : '';
 
                                 Notification::make()
                                     ->title('Laporan Tidak Dapat Dicetak')
@@ -1093,7 +1098,7 @@ class PresensiSiswaResource extends Resource
                                                 ->orWhere('statusPresensi', StatusPresensi::Izin);
                                         })
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray();
                                 })
                                 ->required()
@@ -1104,7 +1109,7 @@ class PresensiSiswaResource extends Resource
                             DatePicker::make('tanggalSelesai')
                                 ->label('Tanggal Selesai')
                                 ->displayFormat('l, d F Y')
-                                ->minDate(fn (callable $get) => $get('tanggalMulai') ? Carbon::parse($get('tanggalMulai')) : now())
+                                ->minDate(fn(callable $get) => $get('tanggalMulai') ? Carbon::parse($get('tanggalMulai')) : now())
                                 ->maxDate(now()->addMonth(3))
                                 ->native(false)
                                 ->reactive()
@@ -1126,7 +1131,7 @@ class PresensiSiswaResource extends Resource
                                                 ->orWhere('statusPresensi', StatusPresensi::Izin);
                                         })
                                         ->pluck('tanggal')
-                                        ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                        ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
                                         ->toArray();
                                 })
                                 ->required()
@@ -1148,7 +1153,7 @@ class PresensiSiswaResource extends Resource
                                 ->maxSize(2048) // 2MB
                                 ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                 ->helperText('Format yang diterima: PDF, JPG, PNG. Maksimal 2MB.')
-                                ->required(fn (callable $get) => in_array($get('statusPresensi'), [
+                                ->required(fn(callable $get) => in_array($get('statusPresensi'), [
                                     StatusPresensi::Sakit->value,
                                     StatusPresensi::Izin->value,
                                     StatusPresensi::Dispen->value,
@@ -1278,8 +1283,6 @@ class PresensiSiswaResource extends Resource
                     ->hiddenLabel()
                     ->icon('heroicon-o-rectangle-group')
                     ->color(Color::Emerald),
-                // ->button()
-                // ->outlined()
             ])
             ->columns([
                 ImageColumn::make('siswa.user.avatar')
@@ -1303,9 +1306,9 @@ class PresensiSiswaResource extends Resource
                 TextColumn::make('statusPresensi')
                     ->label('Status Presensi')
                     ->sortable()
-                    ->formatStateUsing(fn (StatusPresensi $state) => $state->label())
+                    ->formatStateUsing(fn(StatusPresensi $state) => $state->label())
                     ->badge()
-                    ->color(fn (StatusPresensi $state): string => match ($state) {
+                    ->color(fn(StatusPresensi $state): string => match ($state) {
                         StatusPresensi::Hadir => 'success',
                         StatusPresensi::Alfa => 'danger',
                         StatusPresensi::Libur => 'gray',
@@ -1315,9 +1318,9 @@ class PresensiSiswaResource extends Resource
                 TextColumn::make('statusPulang')
                     ->label('Status Pulang')
                     ->sortable()
-                    ->formatStateUsing(fn (StatusPulang $state) => $state->label())
+                    ->formatStateUsing(fn(StatusPulang $state) => $state->label())
                     ->badge()
-                    ->color(fn (StatusPulang $state): string => match ($state) {
+                    ->color(fn(StatusPulang $state): string => match ($state) {
                         StatusPulang::Pulang => 'success',
                         StatusPulang::Mangkir => 'danger',
                         default => 'warning',
@@ -1325,9 +1328,9 @@ class PresensiSiswaResource extends Resource
                 TextColumn::make('statusApproval')
                     ->label('Status Persetujuan')
                     ->sortable()
-                    ->formatStateUsing(fn (StatusApproval $state) => $state->label())
+                    ->formatStateUsing(fn(StatusApproval $state) => $state->label())
                     ->badge()
-                    ->color(fn (StatusApproval $state): string => match ($state) {
+                    ->color(fn(StatusApproval $state): string => match ($state) {
                         StatusApproval::Approved => 'success',
                         StatusApproval::Pending => 'warning',
                         StatusApproval::Rejected => 'danger',
@@ -1431,7 +1434,7 @@ class PresensiSiswaResource extends Resource
                         ->label('Setujui')
                         ->color('success')
                         ->icon('heroicon-o-check-circle')
-                        ->visible(fn ($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
+                        ->visible(fn($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
                         ->requiresConfirmation()
                         ->action(function ($record) {
                             $record->update([
@@ -1465,7 +1468,7 @@ class PresensiSiswaResource extends Resource
                         ->label('Tolak')
                         ->color('danger')
                         ->icon('heroicon-o-x-circle')
-                        ->visible(fn ($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
+                        ->visible(fn($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
                         ->form([
                             Textarea::make('alasanPenolakan')
                                 ->label('Alasan Penolakan')
@@ -1517,7 +1520,7 @@ class PresensiSiswaResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-minus-circle')
                     ->color(Color::Red)
-                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
                 ForceDeleteBulkAction::make()
                     ->label('Force Delete')
                     ->button()
@@ -1525,7 +1528,7 @@ class PresensiSiswaResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-trash')
                     ->color(Color::Red)
-                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
                 RestoreBulkAction::make()
                     ->label('Restore')
                     ->button()
@@ -1533,7 +1536,7 @@ class PresensiSiswaResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-arrow-path')
                     ->color(Color::Blue)
-                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

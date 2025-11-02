@@ -21,6 +21,7 @@ class CreateInformasi extends CreateRecord
         return static::getResource()::getUrl('index');
     }
 
+    // TODO: Kirim ke Jobs
     // FIXME: filter hanya jabatan aktif
     protected function handleRecordCreation(array $data): Informasi
     {
@@ -29,22 +30,22 @@ class CreateInformasi extends CreateRecord
         if ($record->status === 'Publish') {
             // 🔔 Notifikasi Filament ke user login
             Notification::make()
-                ->title('Informasi Baru: '.$record->judul)
+                ->title('Informasi Baru: ' . $record->judul)
                 ->body('Ada informasi baru yang telah dipublikasikan.')
                 ->success()
                 ->send();
 
             // 🔔 Notifikasi DB ke semua user aktif
             Notification::make()
-                ->title('Informasi Baru: '.$record->judul)
+                ->title('Informasi Baru: ' . $record->judul)
                 ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
                 ->success()
                 ->sendToDatabase(
                     User::query()
                         ->where('status', true)
                         ->where(function ($query) use ($record) {
-                            $query->whereHas('pegawai', fn ($q) => $q->where('jabatan_id', $record->jabatan_id))
-                                ->orWhereHas('siswa', fn ($q) => $q->where('jabatan_id', $record->jabatan_id));
+                            $query->whereHas('pegawai', fn($q) => $q->where('jabatan_id', $record->jabatan_id))
+                                ->orWhereHas('siswa', fn($q) => $q->where('jabatan_id', $record->jabatan_id));
                         })
                         ->get()
                 );
@@ -56,6 +57,7 @@ class CreateInformasi extends CreateRecord
         return $record;
     }
 
+    // TODO: Kirim ke Jobs
     /**
      * Broadcast informasi ke WhatsApp menggunakan unified job system
      */

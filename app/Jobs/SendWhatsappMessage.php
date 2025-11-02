@@ -48,7 +48,7 @@ class SendWhatsappMessage implements ShouldQueue
                         $this->nomor,
                         $this->data['jenis'],
                         // $this->data['status'],
-                        // 'Tidak terdeteksi melakukan presensi. (_Apabila kartu Anda hilang atau mengalami kerusakan, mohon segera menghubungi pihak kami untuk mendapatkan bantuan lebih lanjut._)',
+                        'Tidak terdeteksi melakukan presensi. (_Apabila kartu Anda hilang atau mengalami kerusakan, mohon segera menghubungi kami untuk mendapatkan bantuan lebih lanjut._)',
                         $this->data['waktu'],
                         $this->data['nama'],
                         $this->data['isSiswa'],
