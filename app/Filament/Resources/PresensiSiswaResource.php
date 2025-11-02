@@ -145,7 +145,6 @@ class PresensiSiswaResource extends Resource
         return $table
             ->headerActions([
                 ActionGroup::make([
-                    // TODO: Kirim ke worker
                     // Set Hadir Siswa
                     Action::make('set-hadir')
                         ->label('Set Hadir')
@@ -279,79 +278,16 @@ class PresensiSiswaResource extends Resource
                                 ]),
                         ])
                         ->action(function (array $data) {
-                            $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                            $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                            $catatan = $data['catatan'];
-                            $jamDatang = $data['jamDatang'];
-                            $jamPulang = $data['jamPulang'];
-
-                            $rangeTanggal = collect();
-                            for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                                $rangeTanggal->push($date->format('Y-m-d'));
-                            }
-
-                            $jumlahBerhasil = 0;
-                            $jumlahDiabaikan = 0;
-
-                            if ($data['tipe'] === 'single') {
-                                $siswaIds = [$data['namaSiswa']];
-                            } elseif ($data['tipe'] === 'all') {
-                                $siswaIds = Siswa::where('status', true)->pluck('id')->toArray();
-                            } elseif ($data['tipe'] === 'jabatan') {
-                                $siswaIds = Siswa::whereHas('jabatan', function ($query) use ($data) {
-                                    $query->whereIn('jabatan_id', $data['jabatan']);
-                                })->pluck('id')->toArray();
-                            } else {
-                                $siswaIds = [];
-                            }
-
-                            $instansi = Instansi::first();
-
-                            foreach ($siswaIds as $siswaId) {
-                                foreach ($rangeTanggal as $tanggal) {
-                                    $carbonDate = Carbon::parse($tanggal);
-
-                                    // Cek pengecualian hari
-                                    if ($instansi->status === 'Negeri') {
-                                        if ($carbonDate->isSaturday() || $carbonDate->isSunday()) {
-                                            continue; // skip
-                                        }
-                                    } elseif ($instansi->status === 'Swasta') {
-                                        if ($carbonDate->isSaturday()) {
-                                            continue; // skip
-                                        }
-                                    }
-
-                                    $sudahAda = PresensiSiswa::where('siswa_id', $siswaId)
-                                        ->whereDate('tanggal', $tanggal)
-                                        ->exists();
-
-                                    if (! $sudahAda) {
-                                        PresensiSiswa::create([
-                                            'siswa_id' => $siswaId,
-                                            'tanggal' => $tanggal,
-                                            'statusPresensi' => StatusPresensi::Hadir->value,
-                                            'statusPulang' => StatusPulang::Pulang->value,
-                                            'jamDatang' => $jamDatang,
-                                            'jamPulang' => $jamPulang,
-                                            'catatan' => $catatan,
-                                        ]);
-                                        $jumlahBerhasil++;
-                                    } else {
-                                        $jumlahDiabaikan++;
-                                    }
-                                }
-                            }
+                            \App\Jobs\SetHadirSiswa::dispatch($data, Auth::id());
 
                             Notification::make()
-                                ->title('Penetapan Hadir Selesai')
-                                ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                                ->success()
+                                ->title('Proses Penetapan Hadir Dijadwalkan')
+                                ->body('⏳ Penetapan hadir sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                                ->info()
                                 ->send();
                         })
                         ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
-                    // TODO: Kirim ke worker
                     // Set Libur Siswa
                     Action::make('set-libur')
                         ->label('Set Libur')
@@ -473,59 +409,16 @@ class PresensiSiswaResource extends Resource
                                 ]),
                         ])
                         ->action(function (array $data) {
-                            $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                            $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                            $catatan = $data['catatan'];
-
-                            $rangeTanggal = collect();
-                            for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                                $rangeTanggal->push($date->format('Y-m-d'));
-                            }
-
-                            $jumlahBerhasil = 0;
-                            $jumlahDiabaikan = 0;
-
-                            if ($data['tipe'] === 'single') {
-                                $siswaIds = [$data['namaSiswa']];
-                            } elseif ($data['tipe'] === 'all') {
-                                $siswaIds = Siswa::where('status', true)->pluck('id')->toArray();
-                            } elseif ($data['tipe'] === 'jabatan') {
-                                $siswaIds = Siswa::whereHas('jabatan', function ($query) use ($data) {
-                                    $query->whereIn('jabatan_id', $data['jabatan']);
-                                })->pluck('id')->toArray();
-                            } else {
-                                $siswaIds = [];
-                            }
-
-                            foreach ($siswaIds as $siswaId) {
-                                foreach ($rangeTanggal as $tanggal) {
-                                    $sudahAda = PresensiSiswa::where('siswa_id', $siswaId)
-                                        ->whereDate('tanggal', $tanggal)
-                                        ->exists();
-
-                                    if (! $sudahAda) {
-                                        PresensiSiswa::create([
-                                            'siswa_id' => $siswaId,
-                                            'tanggal' => $tanggal,
-                                            'statusPresensi' => StatusPresensi::Libur->value,
-                                            'catatan' => $catatan,
-                                        ]);
-                                        $jumlahBerhasil++;
-                                    } else {
-                                        $jumlahDiabaikan++;
-                                    }
-                                }
-                            }
+                            \App\Jobs\SetLiburSiswa::dispatch($data, Auth::id());
 
                             Notification::make()
-                                ->title('Penetapan Libur Selesai')
-                                ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                                ->success()
+                                ->title('Proses Penetapan Libur Dijadwalkan')
+                                ->body('⏳ Penetapan libur sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                                ->info()
                                 ->send();
                         })
                         ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
-                    // TODO: Kirim ke worker
                     // Set Dispen
                     Action::make('set-dispen')
                         ->label('Set Dispen')
@@ -640,61 +533,19 @@ class PresensiSiswaResource extends Resource
 
                             TextArea::make('catatan')
                                 ->label('Keterangan')
-                                ->placeholder('Misalnya: Cuti Menikah, Cuti Melahirkan dll.')
+                                ->placeholder('Misalnya: Dispen Lomba, Dispen Latihan.')
                                 ->required()
                                 ->validationMessages([
                                     'required' => 'Form ini wajib diisi.',
                                 ]),
                         ])
                         ->action(function (array $data) {
-                            $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                            $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                            $catatan = $data['catatan'];
-
-                            $rangeTanggal = collect();
-                            for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                                $rangeTanggal->push($date->format('Y-m-d'));
-                            }
-
-                            $jumlahBerhasil = 0;
-                            $jumlahDiabaikan = 0;
-
-                            if ($data['tipe'] === 'single') {
-                                $siswaIds = [$data['namaSiswa']];
-                            } elseif ($data['tipe'] === 'all') {
-                                $siswaIds = Siswa::where('status', true)->pluck('id')->toArray();
-                            } elseif ($data['tipe'] === 'jabatan') {
-                                $siswaIds = Siswa::whereHas('jabatan', function ($query) use ($data) {
-                                    $query->whereIn('jabatan_id', $data['jabatan']);
-                                })->pluck('id')->toArray();
-                            } else {
-                                $siswaIds = [];
-                            }
-
-                            foreach ($siswaIds as $siswaId) {
-                                foreach ($rangeTanggal as $tanggal) {
-                                    $sudahAda = PresensiSiswa::where('siswa_id', $siswaId)
-                                        ->whereDate('tanggal', $tanggal)
-                                        ->exists();
-
-                                    if (! $sudahAda) {
-                                        PresensiSiswa::create([
-                                            'siswa_id' => $siswaId,
-                                            'tanggal' => $tanggal,
-                                            'statusPresensi' => StatusPresensi::Dispen->value,
-                                            'catatan' => $catatan,
-                                        ]);
-                                        $jumlahBerhasil++;
-                                    } else {
-                                        $jumlahDiabaikan++;
-                                    }
-                                }
-                            }
+                            \App\Jobs\SetDispenSiswa::dispatch($data, Auth::id());
 
                             Notification::make()
-                                ->title('Penetapan Dispen Selesai')
-                                ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                                ->success()
+                                ->title('Proses Penetapan Dispen Dijadwalkan')
+                                ->body('⏳ Penetapan dispen sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                                ->info()
                                 ->send();
                         })
                         ->visible(fn() => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
