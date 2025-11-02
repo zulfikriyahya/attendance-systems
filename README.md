@@ -169,4 +169,9 @@ Jl. Raya Labuan Km. 5.7 - Kaduhejo, Pandeglang, Banten
 # Worker khusus WhatsApp (HANYA 1 worker!)
 php artisan queue:work --queue=whatsapp --sleep=1 --tries=3 --timeout=3600 --max-jobs=1000
 php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --daemon
+# Worker 1: Untuk WhatsApp (lambat, 1 worker)
+php artisan queue:work --queue=whatsapp --sleep=1 --tries=3 --timeout=300
+
+# Worker 2: Untuk job lainnya (cepat, bisa multiple)
+php artisan queue:work --queue=default --sleep=0 --tries=3 --timeout=300
 ```

@@ -126,10 +126,9 @@
         $rekap = [
             'Hadir' => $presensis->where('statusPresensi', 'Hadir')->count(),
             'Terlambat' => $presensis->where('statusPresensi', 'Terlambat')->count(),
-            'Dinas Luar' => $presensis->where('statusPresensi', 'Dinas Luar')->count(),
+            'Dispen' => $presensis->where('statusPresensi', 'Dispen')->count(),
             'Sakit' => $presensis->where('statusPresensi', 'Sakit')->count(),
             'Izin' => $presensis->where('statusPresensi', 'Izin')->count(),
-            'Cuti' => $presensis->where('statusPresensi', 'Cuti')->count(),
             'Alfa' => $presensis->where('statusPresensi', 'Alfa')->count(),
             'Pulang' => $presensis->where('statusPulang', 'Pulang')->count(),
             'Pulang Sebelum Waktunya' => $presensis->where('statusPulang', 'Pulang Sebelum Waktunya')->count(),
@@ -154,7 +153,6 @@
         @else
             <img src="{{ public_path('images/default.png') }}" alt="Default Logo" style="max-height: 80px;">
         @endif
-
     </div>
 
     <h2>Laporan Presensi Pegawai</h2>
@@ -167,13 +165,13 @@
                     <td>: {{ $pegawai->user->name }}</td>
                 </tr>
                 <tr>
-                    <td><strong>NIP</strong></td>
+                    <td><strong>NIP/NIK</strong></td>
                     <td>: {{ $pegawai->nip ?? '-' }}</td>
                 </tr>
-                <tr>
-                    <td><strong>Jabatan</strong></td>
-                    <td>: {{ optional($pegawai->jabatan)->nama }}</td>
-                </tr>
+                {{-- <tr>
+                    <td><strong>Kelas</strong></td>
+                    <td>: {{ $pegawai->kelas->nama }}</td>
+                </tr> --}}
                 <tr>
                     <td><strong>Bulan</strong></td>
                     <td>: {{ $bulanText }}</td>

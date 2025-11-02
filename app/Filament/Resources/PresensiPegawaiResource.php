@@ -141,7 +141,6 @@ class PresensiPegawaiResource extends Resource
     {
         return $table
             ->headerActions([
-                // TODO: Kirim ke worker
                 // Set Hadir Pegawai
                 Action::make('set-hadir')
                     ->label('Set Hadir')
@@ -275,79 +274,16 @@ class PresensiPegawaiResource extends Resource
                             ]),
                     ])
                     ->action(function (array $data) {
-                        $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                        $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                        $catatan = $data['catatan'];
-                        $jamDatang = $data['jamDatang'];
-                        $jamPulang = $data['jamPulang'];
-
-                        $rangeTanggal = collect();
-                        for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                            $rangeTanggal->push($date->format('Y-m-d'));
-                        }
-
-                        $jumlahBerhasil = 0;
-                        $jumlahDiabaikan = 0;
-
-                        if ($data['tipe'] === 'single') {
-                            $pegawaiIds = [$data['namaPegawai']];
-                        } elseif ($data['tipe'] === 'all') {
-                            $pegawaiIds = Pegawai::where('status', true)->pluck('id')->toArray();
-                        } elseif ($data['tipe'] === 'jabatan') {
-                            $pegawaiIds = Pegawai::whereHas('jabatan', function ($query) use ($data) {
-                                $query->whereIn('jabatan_id', $data['jabatan']);
-                            })->pluck('id')->toArray();
-                        } else {
-                            $pegawaiIds = [];
-                        }
-
-                        $instansi = Instansi::first();
-
-                        foreach ($pegawaiIds as $pegawaiId) {
-                            foreach ($rangeTanggal as $tanggal) {
-                                $carbonDate = Carbon::parse($tanggal);
-
-                                // Cek pengecualian hari
-                                if ($instansi->status === 'Negeri') {
-                                    if ($carbonDate->isSaturday() || $carbonDate->isSunday()) {
-                                        continue; // skip
-                                    }
-                                } elseif ($instansi->status === 'Swasta') {
-                                    if ($carbonDate->isSaturday()) {
-                                        continue; // skip
-                                    }
-                                }
-
-                                $sudahAda = PresensiPegawai::where('pegawai_id', $pegawaiId)
-                                    ->whereDate('tanggal', $tanggal)
-                                    ->exists();
-
-                                if (! $sudahAda) {
-                                    PresensiPegawai::create([
-                                        'pegawai_id' => $pegawaiId,
-                                        'tanggal' => $tanggal,
-                                        'statusPresensi' => StatusPresensi::Hadir->value,
-                                        'statusPulang' => StatusPulang::Pulang->value,
-                                        'jamDatang' => $jamDatang,
-                                        'jamPulang' => $jamPulang,
-                                        'catatan' => $catatan,
-                                    ]);
-                                    $jumlahBerhasil++;
-                                } else {
-                                    $jumlahDiabaikan++;
-                                }
-                            }
-                        }
+                        \App\Jobs\SetHadirPegawai::dispatch($data, Auth::id());
 
                         Notification::make()
-                            ->title('Penetapan Hadir Selesai')
-                            ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                            ->success()
+                            ->title('Proses Penetapan Hadir Dijadwalkan')
+                            ->body('⏳ Penetapan hadir sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                            ->info()
                             ->send();
                     })
                     ->visible(Auth::user()->hasRole('super_admin') && Pegawai::all()->count() > 0),
 
-                // TODO: Kirim ke worker
                 // Set Libur Pegawai
                 Action::make('set-libur')
                     ->label('Set Libur')
@@ -469,59 +405,16 @@ class PresensiPegawaiResource extends Resource
                             ]),
                     ])
                     ->action(function (array $data) {
-                        $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                        $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                        $catatan = $data['catatan'];
-
-                        $rangeTanggal = collect();
-                        for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                            $rangeTanggal->push($date->format('Y-m-d'));
-                        }
-
-                        $jumlahBerhasil = 0;
-                        $jumlahDiabaikan = 0;
-
-                        if ($data['tipe'] === 'single') {
-                            $pegawaiIds = [$data['namaPegawai']];
-                        } elseif ($data['tipe'] === 'all') {
-                            $pegawaiIds = Pegawai::where('status', true)->pluck('id')->toArray();
-                        } elseif ($data['tipe'] === 'jabatan') {
-                            $pegawaiIds = Pegawai::whereHas('jabatan', function ($query) use ($data) {
-                                $query->whereIn('jabatan_id', $data['jabatan']);
-                            })->pluck('id')->toArray();
-                        } else {
-                            $pegawaiIds = [];
-                        }
-
-                        foreach ($pegawaiIds as $pegawaiId) {
-                            foreach ($rangeTanggal as $tanggal) {
-                                $sudahAda = PresensiPegawai::where('pegawai_id', $pegawaiId)
-                                    ->whereDate('tanggal', $tanggal)
-                                    ->exists();
-
-                                if (! $sudahAda) {
-                                    PresensiPegawai::create([
-                                        'pegawai_id' => $pegawaiId,
-                                        'tanggal' => $tanggal,
-                                        'statusPresensi' => StatusPresensi::Libur->value,
-                                        'catatan' => $catatan,
-                                    ]);
-                                    $jumlahBerhasil++;
-                                } else {
-                                    $jumlahDiabaikan++;
-                                }
-                            }
-                        }
+                        \App\Jobs\SetLiburPegawai::dispatch($data, Auth::id());
 
                         Notification::make()
-                            ->title('Penetapan Libur Selesai')
-                            ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                            ->success()
+                            ->title('Proses Penetapan Libur Dijadwalkan')
+                            ->body('⏳ Penetapan libur sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                            ->info()
                             ->send();
                     })
                     ->visible(Auth::user()->hasRole('super_admin') && Pegawai::all()->count() > 0),
 
-                // TODO: Kirim ke worker
                 // Set Cuti
                 Action::make('set-cuti')
                     ->label('Set Cuti')
@@ -643,59 +536,16 @@ class PresensiPegawaiResource extends Resource
                             ]),
                     ])
                     ->action(function (array $data) {
-                        $tanggalMulai = Carbon::parse($data['tanggalMulai']);
-                        $tanggalSelesai = Carbon::parse($data['tanggalSelesai']);
-                        $catatan = $data['catatan'];
-
-                        $rangeTanggal = collect();
-                        for ($date = $tanggalMulai->copy(); $date->lte($tanggalSelesai); $date->addDay()) {
-                            $rangeTanggal->push($date->format('Y-m-d'));
-                        }
-
-                        $jumlahBerhasil = 0;
-                        $jumlahDiabaikan = 0;
-
-                        if ($data['tipe'] === 'single') {
-                            $pegawaiIds = [$data['namaPegawai']];
-                        } elseif ($data['tipe'] === 'all') {
-                            $pegawaiIds = Pegawai::where('status', true)->pluck('id')->toArray();
-                        } elseif ($data['tipe'] === 'jabatan') {
-                            $pegawaiIds = Pegawai::whereHas('jabatan', function ($query) use ($data) {
-                                $query->whereIn('jabatan_id', $data['jabatan']);
-                            })->pluck('id')->toArray();
-                        } else {
-                            $pegawaiIds = [];
-                        }
-
-                        foreach ($pegawaiIds as $pegawaiId) {
-                            foreach ($rangeTanggal as $tanggal) {
-                                $sudahAda = PresensiPegawai::where('pegawai_id', $pegawaiId)
-                                    ->whereDate('tanggal', $tanggal)
-                                    ->exists();
-
-                                if (! $sudahAda) {
-                                    PresensiPegawai::create([
-                                        'pegawai_id' => $pegawaiId,
-                                        'tanggal' => $tanggal,
-                                        'statusPresensi' => StatusPresensi::Cuti->value,
-                                        'catatan' => $catatan,
-                                    ]);
-                                    $jumlahBerhasil++;
-                                } else {
-                                    $jumlahDiabaikan++;
-                                }
-                            }
-                        }
+                        \App\Jobs\SetCutiPegawai::dispatch($data, Auth::id());
 
                         Notification::make()
-                            ->title('Penetapan Cuti Selesai')
-                            ->body("🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.")
-                            ->success()
+                            ->title('Proses Penetapan Cuti Dijadwalkan')
+                            ->body('⏳ Penetapan cuti sedang diproses di background. Anda akan menerima notifikasi setelah selesai.')
+                            ->info()
                             ->send();
                     })
                     ->visible(Auth::user()->hasRole('super_admin') && Pegawai::all()->count() > 0),
 
-                // TODO: Kirim ke worker
                 // Ekspor Semua Laporan Pegawai Berdasarkan Bulan
                 Action::make('export')
                     ->label('Ekspor')
