@@ -126,7 +126,7 @@
         $rekap = [
             'Hadir' => $presensis->where('statusPresensi', 'Hadir')->count(),
             'Terlambat' => $presensis->where('statusPresensi', 'Terlambat')->count(),
-            'Dispen' => $presensis->where('statusPresensi', 'Dispen')->count(),
+            'Cuti' => $presensis->where('statusPresensi', 'Cuti')->count(),
             'Sakit' => $presensis->where('statusPresensi', 'Sakit')->count(),
             'Izin' => $presensis->where('statusPresensi', 'Izin')->count(),
             'Alfa' => $presensis->where('statusPresensi', 'Alfa')->count(),
