@@ -120,8 +120,8 @@ sudo systemctl enable --now cron
 
 ## Login Admin Default
 
-| Email                                             | Password |
-| ------------------------------------------------- | -------- |
+| Email                                                             | Password |
+| ----------------------------------------------------------------- | -------- |
 | [admin@mtsn1pandeglang.sch.id](mailto:adm@mtsn1pandeglang.sch.id) | P@ssw0rd |
 
 > **Segera ganti kredensial ini setelah login pertama.**
@@ -166,26 +166,7 @@ Jl. Raya Labuan Km. 5.7 - Kaduhejo, Pandeglang, Banten
 ---
 
 ```bash
-# Monitor queue
-php artisan whatsapp:monitor
-
-# Clear cache
-php artisan whatsapp:monitor --clear-cache
-
-# Health check
-php artisan whatsapp:maintenance health-check
-
-# View statistics
-php artisan whatsapp:maintenance stats --hours=6
-
-# Clear failed jobs
-php artisan whatsapp:maintenance clear-failed --force
-
-# Retry failed jobs
-php artisan whatsapp:maintenance retry-failed --limit=50
-
-# Manage workers
-php artisan whatsapp:worker start --workers=5
-php artisan whatsapp:worker status
-php artisan whatsapp:worker restart
+# Worker khusus WhatsApp (HANYA 1 worker!)
+php artisan queue:work --queue=whatsapp --sleep=1 --tries=3 --timeout=3600 --max-jobs=1000
+php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --daemon
 ```

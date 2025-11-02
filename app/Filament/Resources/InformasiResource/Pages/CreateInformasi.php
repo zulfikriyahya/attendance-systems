@@ -4,6 +4,7 @@ namespace App\Filament\Resources\InformasiResource\Pages;
 
 use App\Filament\Resources\InformasiResource;
 use App\Jobs\BroadcastInformasi;
+use App\Jobs\SendDatabaseNotification;
 use App\Models\Informasi;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -23,36 +24,23 @@ class CreateInformasi extends CreateRecord
         $record = Informasi::create($data);
 
         if ($record->status === 'Publish') {
-            // 🔔 Notifikasi Filament ke user login
+            // 🔔 Notifikasi langsung ke user yang sedang login
             Notification::make()
                 ->title('Informasi Baru: ' . $record->judul)
                 ->body('Ada informasi baru yang telah dipublikasikan.')
                 ->success()
                 ->send();
 
-            // TODO: Kirim ke worker
-            // 🔔 Notifikasi DB ke semua user aktif
-            Notification::make()
-                ->title('Informasi Baru: ' . $record->judul)
-                ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
-                ->success()
-                ->sendToDatabase(
-                    User::query()
-                        ->where('status', true)
-                        ->where(function ($query) use ($record) {
-                            $query->whereHas('pegawai', fn($q) => $q->where('jabatan_id', $record->jabatan_id))
-                                ->orWhereHas('siswa', fn($q) => $q->where('jabatan_id', $record->jabatan_id));
-                        })
-                        ->get()
-                );
+            // 📨 Dispatch job untuk notifikasi database (background)
+            SendDatabaseNotification::dispatch($record);
 
-            // 📲 Dispatch job untuk broadcast WhatsApp
+            // 📲 Dispatch job untuk broadcast WhatsApp (background)
             BroadcastInformasi::dispatch($record);
 
-            // Optional: Tambahkan notifikasi bahwa broadcast sedang diproses
+            // 💡 Feedback ke user bahwa proses sedang berjalan
             Notification::make()
-                ->title('Broadcast WhatsApp Dijadwalkan')
-                ->body('Pesan WhatsApp akan segera dikirim ke penerima.')
+                ->title('Proses Notifikasi Dijadwalkan')
+                ->body('Notifikasi database dan WhatsApp sedang dikirim di background.')
                 ->info()
                 ->send();
         }

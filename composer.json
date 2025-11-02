@@ -18,6 +18,7 @@
         "flowframe/laravel-trend": "^0.4.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
+        "laravel/horizon": "^5.38",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "pxlrbt/filament-excel": "^2.4",

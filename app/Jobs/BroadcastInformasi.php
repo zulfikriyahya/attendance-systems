@@ -77,6 +77,7 @@ class BroadcastInformasi implements ShouldQueue
             $nama = $student->user?->name ?? $student->nama ?? 'Siswa';
             $instansi = $student->jabatan?->instansi?->nama ?? 'Instansi';
 
+            // Hitung delay berdasarkan counter untuk menghindari rate limit
             $delay = $delayService->calculateBulkDelay($notifCounter, 'informasi');
 
             SendWhatsappMessage::dispatch(
@@ -90,9 +91,16 @@ class BroadcastInformasi implements ShouldQueue
                     'lampiran' => $this->informasi->lampiran,
                     'isSiswa' => true,
                 ]
-            )->delay($delay);
+            )
+                ->delay($delay)
+                ->onQueue('whatsapp'); // Gunakan queue khusus untuk WhatsApp
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter} messages queued");
+            }
         }
 
         // Proses pengiriman ke pegawai
@@ -100,6 +108,7 @@ class BroadcastInformasi implements ShouldQueue
             $nama = $employee->user?->name ?? $employee->nama ?? 'Pegawai';
             $instansi = $employee->jabatan?->instansi?->nama ?? 'Instansi';
 
+            // Hitung delay berdasarkan counter untuk menghindari rate limit
             $delay = $delayService->calculateBulkDelay($notifCounter, 'informasi');
 
             SendWhatsappMessage::dispatch(
@@ -113,19 +122,29 @@ class BroadcastInformasi implements ShouldQueue
                     'lampiran' => $this->informasi->lampiran,
                     'isSiswa' => false,
                 ]
-            )->delay($delay);
+            )
+                ->delay($delay)
+                ->onQueue('whatsapp'); // Gunakan queue khusus untuk WhatsApp
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter} messages queued");
+            }
         }
 
-        // Log broadcast
+        // Log broadcast dengan estimasi waktu selesai
+        $maxDelayMinutes = $delayService->calculateBulkDelay($notifCounter - 1, 'informasi')->diffInMinutes(now());
+
         logger()->info('Informasi WhatsApp broadcast dispatched', [
             'informasi_id' => $this->informasi->id,
             'judul' => $this->informasi->judul,
             'total_recipients' => $totalRecipients,
             'siswa' => $siswa->count(),
             'pegawai' => $pegawai->count(),
-            'max_delay_minutes' => $delayService->calculateBulkDelay($notifCounter - 1, 'informasi')->diffInMinutes(now()),
+            'max_delay_minutes' => $maxDelayMinutes,
+            'estimated_completion' => now()->addMinutes($maxDelayMinutes)->format('Y-m-d H:i:s'),
         ]);
     }
 
