@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Instansi;
 use App\Models\Jurusan;
-use Illuminate\Database\Seeder;
+use App\Models\Instansi;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 
 class JurusanSeeder extends Seeder
 {
@@ -36,3 +36,25 @@ class JurusanSeeder extends Seeder
         $this->command->info('Seeder Jurusan berhasil dijalankan.');
     }
 }
+
+// <?php
+
+// namespace Database\Seeders;
+
+// use App\Models\ProvinsiSeeder;
+// use Illuminate\Database\Seeder;
+// use Illuminate\Support\Str;
+
+// class ProvinsiSeeder extends Seeder
+// {
+//     public function run(): void
+//     {
+//         Provinsi::create(
+//             [
+//                 'id' => Str::uuid(),
+//                 'kode'=> '',
+//                 'nama'=> '',
+//             ],
+//     );
+//     }
+// }
