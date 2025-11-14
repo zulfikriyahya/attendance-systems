@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class WhatsappService
 {
@@ -306,7 +306,7 @@ class WhatsappService
         string $nama,
         string $nomorPengajuan,
         string $instansi,
-        int $pengajuanId,
+        string $pengajuanId,
         string $notificationType, // 'proses' atau 'selesai'
         ?float $biaya = null
     ): array {
@@ -324,7 +324,7 @@ class WhatsappService
         ———————————————————
         Halo {$nama},
         Pengajuan kartu Anda dengan nomor *{$nomorPengajuan}* telah selesai diproses.
-        🏢 Silakan ambil di Ruang PTSP
+        🏢 Silakan ambil di Ruang PTSP pada jam kerja Madrasah.
         💸 Biaya pembuatan kartu: Rp. *{$biayaFormatted}*,-
 
         Terima kasih! 🙏
