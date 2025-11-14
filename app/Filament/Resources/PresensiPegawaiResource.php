@@ -2,52 +2,51 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jabatan;
-use App\Models\Pegawai;
-use App\Models\Instansi;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
+use App\Enums\StatusPulang;
+use App\Exports\PresensiPegawaiExport;
+use App\Filament\Resources\PresensiPegawaiResource\Pages;
+use App\Models\Jabatan;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Form;
+use Filament\Notifications\Actions\Action as NotificationAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Radio;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Filament\Forms\Components\Select;
-use App\Exports\PresensiPegawaiExport;
-use Filament\Forms\Components\Section;
-use Illuminate\Support\Facades\Schema;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TimePicker;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PresensiPegawaiResource\Pages;
-use Filament\Notifications\Actions\Action as NotificationAction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PresensiPegawaiResource extends Resource
 {
@@ -109,13 +108,13 @@ class PresensiPegawaiResource extends Resource
                         Select::make('statusPresensi')
                             ->label('Status Presensi')
                             ->native(false)
-                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn($case) => [$case->value => $case->value])->toArray())
+                            ->options(collect(StatusPresensi::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray())
                             ->required(),
 
                         Select::make('statusPulang')
                             ->label('Status Pulang')
                             ->native(false)
-                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn($case) => [$case->value => $case->value])->toArray()),
+                            ->options(collect(StatusPulang::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value])->toArray()),
 
                         FileUpload::make('berkasLampiran')
                             ->label('Berkas Lampiran')
@@ -126,7 +125,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->options(
                                 collect(StatusApproval::cases())
-                                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+                                    ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
                                     ->toArray()
                             ),
 
@@ -172,13 +171,13 @@ class PresensiPegawaiResource extends Resource
                                     ->get()
                                     ->pluck('user.name', 'id')
                             )
-                            ->when(Pegawai::count() > 10, fn($field) => $field->searchable())
+                            ->when(Pegawai::count() > 10, fn ($field) => $field->searchable())
                             ->preload()
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Pegawai')
-                            ->required(fn(callable $get) => $get('tipe') === 'single')
-                            ->visible(fn(callable $get) => $get('tipe') === 'single'),
+                            ->required(fn (callable $get) => $get('tipe') === 'single')
+                            ->visible(fn (callable $get) => $get('tipe') === 'single'),
 
                         Select::make('jabatan')
                             ->label('Pilih Jabatan')
@@ -190,8 +189,8 @@ class PresensiPegawaiResource extends Resource
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Jabatan')
-                            ->required(fn(callable $get) => $get('tipe') === 'jabatan')
-                            ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
+                            ->required(fn (callable $get) => $get('tipe') === 'jabatan')
+                            ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
 
                         DatePicker::make('tanggalMulai')
                             ->label('Tanggal Mulai')
@@ -199,7 +198,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -212,7 +211,7 @@ class PresensiPegawaiResource extends Resource
                                             ->orWhere('statusPresensi', StatusPresensi::Izin);
                                     })
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -226,7 +225,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -239,7 +238,7 @@ class PresensiPegawaiResource extends Resource
                                             ->orWhere('statusPresensi', StatusPresensi::Izin);
                                     })
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -315,13 +314,13 @@ class PresensiPegawaiResource extends Resource
                                     ->get()
                                     ->pluck('user.name', 'id')
                             )
-                            ->when(Pegawai::count() > 10, fn($field) => $field->searchable())
+                            ->when(Pegawai::count() > 10, fn ($field) => $field->searchable())
                             ->preload()
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Pegawai')
-                            ->required(fn(callable $get) => $get('tipe') === 'single')
-                            ->visible(fn(callable $get) => $get('tipe') === 'single'),
+                            ->required(fn (callable $get) => $get('tipe') === 'single')
+                            ->visible(fn (callable $get) => $get('tipe') === 'single'),
 
                         Select::make('jabatan')
                             ->label('Pilih Jabatan')
@@ -333,8 +332,8 @@ class PresensiPegawaiResource extends Resource
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Jabatan')
-                            ->required(fn(callable $get) => $get('tipe') === 'jabatan')
-                            ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
+                            ->required(fn (callable $get) => $get('tipe') === 'jabatan')
+                            ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
 
                         DatePicker::make('tanggalMulai')
                             ->label('Tanggal Mulai')
@@ -344,7 +343,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -358,7 +357,7 @@ class PresensiPegawaiResource extends Resource
                                     })
 
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -374,7 +373,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -388,7 +387,7 @@ class PresensiPegawaiResource extends Resource
                                     })
 
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -446,13 +445,13 @@ class PresensiPegawaiResource extends Resource
                                     ->get()
                                     ->pluck('user.name', 'id')
                             )
-                            ->when(Pegawai::count() > 10, fn($field) => $field->searchable())
+                            ->when(Pegawai::count() > 10, fn ($field) => $field->searchable())
                             ->preload()
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Pegawai')
-                            ->required(fn(callable $get) => $get('tipe') === 'single')
-                            ->visible(fn(callable $get) => $get('tipe') === 'single'),
+                            ->required(fn (callable $get) => $get('tipe') === 'single')
+                            ->visible(fn (callable $get) => $get('tipe') === 'single'),
 
                         Select::make('jabatan')
                             ->label('Pilih Jabatan')
@@ -464,8 +463,8 @@ class PresensiPegawaiResource extends Resource
                             ->reactive()
                             ->native(false)
                             ->placeholder('Pilih Jabatan')
-                            ->required(fn(callable $get) => $get('tipe') === 'jabatan')
-                            ->visible(fn(callable $get) => $get('tipe') === 'jabatan'),
+                            ->required(fn (callable $get) => $get('tipe') === 'jabatan')
+                            ->visible(fn (callable $get) => $get('tipe') === 'jabatan'),
 
                         DatePicker::make('tanggalMulai')
                             ->label('Tanggal Mulai')
@@ -475,7 +474,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -489,7 +488,7 @@ class PresensiPegawaiResource extends Resource
                                     })
 
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -505,7 +504,7 @@ class PresensiPegawaiResource extends Resource
                             ->native(false)
                             ->reactive()
                             ->disabledDates(
-                                fn(callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
+                                fn (callable $get) => PresensiPegawai::where('pegawai_id', $get('namaPegawai'))
                                     ->where(function ($query) {
                                         $query->where('statusPresensi', StatusPresensi::Libur)
                                             ->orWhere('statusPresensi', StatusPresensi::Cuti)
@@ -519,7 +518,7 @@ class PresensiPegawaiResource extends Resource
                                     })
 
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray()
                             )
                             ->required()
@@ -557,7 +556,7 @@ class PresensiPegawaiResource extends Resource
                         Select::make('bulan')
                             ->label('Bulan')
                             ->options(
-                                collect(range(1, 12))->mapWithKeys(fn($m) => [
+                                collect(range(1, 12))->mapWithKeys(fn ($m) => [
                                     str_pad($m, 2, '0', STR_PAD_LEFT) => Carbon::create()->month($m)->translatedFormat('F'),
                                 ])->toArray()
                             )
@@ -590,7 +589,7 @@ class PresensiPegawaiResource extends Resource
                     ->form([
                         Select::make('bulan')
                             ->label('Bulan')
-                            ->options(collect(range(1, 12))->mapWithKeys(fn($m) => [
+                            ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
                                 $m => Carbon::create()->month($m)->translatedFormat('F'),
                             ])->toArray())
                             ->required(),
@@ -617,10 +616,10 @@ class PresensiPegawaiResource extends Resource
 
                             // Ambil daftar pegawai yang masih pending (maksimal 5 untuk ditampilkan)
                             $daftarPegawai = $pendingApprovals->take(5)
-                                ->map(fn($record) => "• {$record->pegawai->user->name}")
+                                ->map(fn ($record) => "• {$record->pegawai->user->name}")
                                 ->join("\n");
 
-                            $sisaData = $jumlahPending > 5 ? "\n... dan " . ($jumlahPending - 5) . ' pegawai lainnya.' : '';
+                            $sisaData = $jumlahPending > 5 ? "\n... dan ".($jumlahPending - 5).' pegawai lainnya.' : '';
 
                             // Tampilkan notifikasi error
                             Notification::make()
@@ -698,7 +697,7 @@ class PresensiPegawaiResource extends Resource
                     ->form([
                         Select::make('bulan')
                             ->label('Bulan')
-                            ->options(collect(range(1, 12))->mapWithKeys(fn($m) => [
+                            ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
                                 $m => Carbon::create()->month($m)->translatedFormat('F'),
                             ])->toArray())
                             ->default(now()->month)
@@ -712,7 +711,7 @@ class PresensiPegawaiResource extends Resource
                             ->minValue(2020)
                             ->maxValue(now()->year)
                             ->required()
-                            ->helperText('Masukkan tahun laporan (2020 - ' . now()->year . ')'),
+                            ->helperText('Masukkan tahun laporan (2020 - '.now()->year.')'),
                     ])
                     ->action(function (array $data) {
                         $bulan = (int) $data['bulan'];
@@ -783,12 +782,12 @@ class PresensiPegawaiResource extends Resource
 
                             // Ambil maksimal 5 tanggal untuk ditampilkan
                             $daftarTanggal = $pendingApprovals->take(5)
-                                ->map(fn($record) => '• ' . $record->tanggal->translatedFormat('d F Y') .
+                                ->map(fn ($record) => '• '.$record->tanggal->translatedFormat('d F Y').
                                     " ({$record->statusPresensi->label()})")
                                 ->join("\n");
 
                             $sisaData = $jumlahPending > 5 ?
-                                "\n... dan " . ($jumlahPending - 5) . ' pengajuan lainnya.' : '';
+                                "\n... dan ".($jumlahPending - 5).' pengajuan lainnya.' : '';
 
                             Notification::make()
                                 ->title('Laporan Tidak Dapat Dicetak')
@@ -909,13 +908,13 @@ class PresensiPegawaiResource extends Resource
                             ->label('Jenis Ketidakhadiran')
                             ->options(
                                 collect(StatusPresensi::cases())
-                                    ->filter(fn($case) => in_array($case, [
+                                    ->filter(fn ($case) => in_array($case, [
                                         StatusPresensi::Izin,
                                         StatusPresensi::Cuti,
                                         StatusPresensi::DinasLuar,
                                         StatusPresensi::Sakit,
                                     ]))
-                                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+                                    ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
                                     ->toArray()
                             )
                             ->required()
@@ -951,7 +950,7 @@ class PresensiPegawaiResource extends Resource
                                             ->orWhere('statusPresensi', StatusPresensi::Izin);
                                     })
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray();
                             })
                             ->required()
@@ -962,7 +961,7 @@ class PresensiPegawaiResource extends Resource
                         DatePicker::make('tanggalSelesai')
                             ->label('Tanggal Selesai')
                             ->displayFormat('l, d F Y')
-                            ->minDate(fn(callable $get) => $get('tanggalMulai') ? Carbon::parse($get('tanggalMulai')) : now())
+                            ->minDate(fn (callable $get) => $get('tanggalMulai') ? Carbon::parse($get('tanggalMulai')) : now())
                             ->maxDate(now()->addMonth(3))
                             ->native(false)
                             ->reactive()
@@ -986,7 +985,7 @@ class PresensiPegawaiResource extends Resource
                                             ->orWhere('statusPresensi', StatusPresensi::Izin);
                                     })
                                     ->pluck('tanggal')
-                                    ->map(fn($tanggal) => Carbon::parse($tanggal)->toDateString())
+                                    ->map(fn ($tanggal) => Carbon::parse($tanggal)->toDateString())
                                     ->toArray();
                             })
                             ->required()
@@ -1008,7 +1007,7 @@ class PresensiPegawaiResource extends Resource
                             ->maxSize(2048) // 2MB
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                             ->helperText('Format yang diterima: PDF, JPG, PNG. Maksimal 2MB.')
-                            ->required(fn(callable $get) => in_array($get('statusPresensi'), [
+                            ->required(fn (callable $get) => in_array($get('statusPresensi'), [
                                 StatusPresensi::Sakit->value,
                                 StatusPresensi::Cuti->value,
                                 StatusPresensi::Izin->value,
@@ -1156,9 +1155,9 @@ class PresensiPegawaiResource extends Resource
                 TextColumn::make('statusPresensi')
                     ->label('Status Presensi')
                     ->sortable()
-                    ->formatStateUsing(fn(StatusPresensi $state) => $state->label())
+                    ->formatStateUsing(fn (StatusPresensi $state) => $state->label())
                     ->badge()
-                    ->color(fn(StatusPresensi $state): string => match ($state) {
+                    ->color(fn (StatusPresensi $state): string => match ($state) {
                         StatusPresensi::Hadir => 'success',
                         StatusPresensi::Alfa => 'danger',
                         StatusPresensi::Libur => 'gray',
@@ -1169,9 +1168,9 @@ class PresensiPegawaiResource extends Resource
                 TextColumn::make('statusPulang')
                     ->label('Status Pulang')
                     ->sortable()
-                    ->formatStateUsing(fn(StatusPulang $state) => $state->label())
+                    ->formatStateUsing(fn (StatusPulang $state) => $state->label())
                     ->badge()
-                    ->color(fn(StatusPulang $state): string => match ($state) {
+                    ->color(fn (StatusPulang $state): string => match ($state) {
                         StatusPulang::Pulang => 'success',
                         StatusPulang::Mangkir => 'danger',
                         default => 'warning',
@@ -1180,9 +1179,9 @@ class PresensiPegawaiResource extends Resource
                 TextColumn::make('statusApproval')
                     ->label('Status Persetujuan')
                     ->sortable()
-                    ->formatStateUsing(fn(StatusApproval $state) => $state->label())
+                    ->formatStateUsing(fn (StatusApproval $state) => $state->label())
                     ->badge()
-                    ->color(fn(StatusApproval $state): string => match ($state) {
+                    ->color(fn (StatusApproval $state): string => match ($state) {
                         StatusApproval::Approved => 'success',
                         StatusApproval::Pending => 'warning',
                         StatusApproval::Rejected => 'danger',
@@ -1287,7 +1286,7 @@ class PresensiPegawaiResource extends Resource
                         ->label('Setujui')
                         ->color('success')
                         ->icon('heroicon-o-check-circle')
-                        ->visible(fn($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
+                        ->visible(fn ($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
                         ->requiresConfirmation()
                         ->action(function ($record) {
                             $record->update([
@@ -1321,7 +1320,7 @@ class PresensiPegawaiResource extends Resource
                         ->label('Tolak')
                         ->color('danger')
                         ->icon('heroicon-o-x-circle')
-                        ->visible(fn($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
+                        ->visible(fn ($record) => Auth::user()->hasRole('super_admin') && $record->statusApproval?->value === StatusApproval::Pending->value)
                         ->form([
                             Textarea::make('alasanPenolakan')
                                 ->label('Alasan Penolakan')
@@ -1374,7 +1373,7 @@ class PresensiPegawaiResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-minus-circle')
                     ->color(Color::Red)
-                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
                 ForceDeleteBulkAction::make()
                     ->label('Force Delete')
                     ->button()
@@ -1382,7 +1381,7 @@ class PresensiPegawaiResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-trash')
                     ->color(Color::Red)
-                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
                 RestoreBulkAction::make()
                     ->label('Restore')
                     ->button()
@@ -1390,7 +1389,7 @@ class PresensiPegawaiResource extends Resource
                     ->size('xs')
                     ->icon('heroicon-o-arrow-path')
                     ->color(Color::Blue)
-                    ->visible(fn() => Auth::user()->hasRole(['super_admin'])),
+                    ->visible(fn () => Auth::user()->hasRole(['super_admin'])),
             ]);
     }
 

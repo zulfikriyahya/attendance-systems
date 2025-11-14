@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PresensiPegawai;
 use App\Models\Pegawai;
+use App\Models\PresensiPegawai;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -28,7 +28,7 @@ class LaporanAllPegawaiController extends Controller
                     ->orWhereIn('id', $pegawaiIdsDenganPresensi);
             })
             ->get()
-            ->sortBy(fn($pegawai) => $pegawai->user->name);
+            ->sortBy(fn ($pegawai) => $pegawai->user->name);
 
         $pdf = Pdf::loadView('exports.presensi-pegawai-batch', [
             'pegawais' => $pegawais,

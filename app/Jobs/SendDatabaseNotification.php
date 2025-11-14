@@ -16,6 +16,7 @@ class SendDatabaseNotification implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $backoff = 30;
 
     /**
@@ -34,8 +35,8 @@ class SendDatabaseNotification implements ShouldQueue
         $users = User::query()
             ->where('status', true)
             ->where(function ($query) {
-                $query->whereHas('pegawai', fn($q) => $q->where('jabatan_id', $this->informasi->jabatan_id))
-                    ->orWhereHas('siswa', fn($q) => $q->where('jabatan_id', $this->informasi->jabatan_id));
+                $query->whereHas('pegawai', fn ($q) => $q->where('jabatan_id', $this->informasi->jabatan_id))
+                    ->orWhereHas('siswa', fn ($q) => $q->where('jabatan_id', $this->informasi->jabatan_id));
             })
             ->get();
 
@@ -44,12 +45,13 @@ class SendDatabaseNotification implements ShouldQueue
                 'informasi_id' => $this->informasi->id,
                 'jabatan_id' => $this->informasi->jabatan_id,
             ]);
+
             return;
         }
 
         // Kirim notifikasi database ke semua user
         Notification::make()
-            ->title('Informasi Baru: ' . $this->informasi->judul)
+            ->title('Informasi Baru: '.$this->informasi->judul)
             ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
             ->success()
             ->sendToDatabase($users);

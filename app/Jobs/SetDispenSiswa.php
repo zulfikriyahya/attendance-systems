@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Enums\StatusPresensi;
-use App\Models\Siswa;
 use App\Models\PresensiSiswa;
+use App\Models\Siswa;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
@@ -19,7 +19,9 @@ class SetDispenSiswa implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $timeout = 300;
+
     public $failOnTimeout = true;
 
     public function __construct(
@@ -61,7 +63,7 @@ class SetDispenSiswa implements ShouldQueue
                     ->whereDate('tanggal', $tanggal)
                     ->exists();
 
-                if (!$sudahAda) {
+                if (! $sudahAda) {
                     PresensiSiswa::create([
                         'siswa_id' => $siswaId,
                         'tanggal' => $tanggal,

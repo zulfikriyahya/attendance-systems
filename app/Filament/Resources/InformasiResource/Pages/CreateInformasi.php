@@ -26,7 +26,7 @@ class CreateInformasi extends CreateRecord
         if ($record->status === 'Publish') {
             // 🔔 Notifikasi langsung ke user yang sedang login
             Notification::make()
-                ->title('Informasi Baru: ' . $record->judul)
+                ->title('Informasi Baru: '.$record->judul)
                 ->body('Ada informasi baru yang telah dipublikasikan.')
                 ->success()
                 ->send();

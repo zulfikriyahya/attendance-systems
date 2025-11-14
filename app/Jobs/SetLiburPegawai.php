@@ -19,7 +19,9 @@ class SetLiburPegawai implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $timeout = 300;
+
     public $failOnTimeout = true;
 
     public function __construct(
@@ -61,7 +63,7 @@ class SetLiburPegawai implements ShouldQueue
                     ->whereDate('tanggal', $tanggal)
                     ->exists();
 
-                if (!$sudahAda) {
+                if (! $sudahAda) {
                     PresensiPegawai::create([
                         'pegawai_id' => $pegawaiId,
                         'tanggal' => $tanggal,

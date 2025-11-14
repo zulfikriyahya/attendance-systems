@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPulang;
 use App\Enums\StatusPresensi;
+use App\Enums\StatusPulang;
 use App\Models\Instansi;
 use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
@@ -21,7 +21,9 @@ class SetHadirPegawai implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $timeout = 300; // 5 menit
+
     public $failOnTimeout = true;
 
     /**
@@ -88,7 +90,7 @@ class SetHadirPegawai implements ShouldQueue
                     ->whereDate('tanggal', $tanggal)
                     ->exists();
 
-                if (!$sudahAda) {
+                if (! $sudahAda) {
                     PresensiPegawai::create([
                         'pegawai_id' => $pegawaiId,
                         'tanggal' => $tanggal,

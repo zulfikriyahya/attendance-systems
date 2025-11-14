@@ -2,11 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPulang;
 use App\Enums\StatusPresensi;
+use App\Enums\StatusPulang;
 use App\Models\Instansi;
-use App\Models\Siswa;
 use App\Models\PresensiSiswa;
+use App\Models\Siswa;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
@@ -22,7 +22,9 @@ class SetHadirSiswa implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $timeout = 600; // 10 menit
+
     public $failOnTimeout = true;
 
     // Database batch size untuk insert
@@ -62,6 +64,7 @@ class SetHadirSiswa implements ShouldQueue
                 '⚠️ Tidak ada siswa atau tanggal yang valid untuk diproses.',
                 'warning'
             );
+
             return;
         }
 
@@ -82,7 +85,7 @@ class SetHadirSiswa implements ShouldQueue
         $jumlahDiabaikan = (count($siswaIds) * $rangeTanggal->count()) - count($dataToInsert);
 
         // Batch insert dengan chunking
-        if (!empty($dataToInsert)) {
+        if (! empty($dataToInsert)) {
             $jumlahBerhasil = $this->batchInsert($dataToInsert);
         }
 
@@ -162,7 +165,8 @@ class SetHadirSiswa implements ShouldQueue
             ->get()
             ->mapWithKeys(function ($item) {
                 // Create unique key: siswaId_tanggal
-                $key = $item->siswa_id . '_' . Carbon::parse($item->tanggal)->format('Y-m-d');
+                $key = $item->siswa_id.'_'.Carbon::parse($item->tanggal)->format('Y-m-d');
+
                 return [$key => true];
             });
     }
@@ -183,7 +187,7 @@ class SetHadirSiswa implements ShouldQueue
 
         foreach ($siswaIds as $siswaId) {
             foreach ($rangeTanggal as $tanggal) {
-                $key = $siswaId . '_' . $tanggal;
+                $key = $siswaId.'_'.$tanggal;
 
                 // Skip jika sudah ada
                 if ($existingRecords->has($key)) {
@@ -229,7 +233,7 @@ class SetHadirSiswa implements ShouldQueue
     private function sendNotification(string $title, string $body, string $status = 'success'): void
     {
         $user = User::find($this->userId);
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
