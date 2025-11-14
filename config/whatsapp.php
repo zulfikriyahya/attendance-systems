@@ -189,16 +189,4 @@ return [
             'include_response' => env('WHATSAPP_LOG_RESPONSE', true),
         ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Development & Testing
-    |--------------------------------------------------------------------------
-    */
-
-    'testing' => [
-        'enabled' => env('WHATSAPP_TESTING_MODE', false),
-        'mock_responses' => env('WHATSAPP_MOCK_RESPONSES', true),
-        'test_numbers' => env('WHATSAPP_TEST_NUMBERS', ''),
-    ],
 ];

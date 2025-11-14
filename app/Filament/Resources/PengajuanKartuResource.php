@@ -2,44 +2,45 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
-use App\Models\Instansi;
-use App\Models\PengajuanKartu;
-use App\Models\User;
-use App\Services\WhatsappService;
 use Carbon\Carbon;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\User;
+use App\Models\Instansi;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
+use App\Services\WhatsappService;
 use Filament\Support\Colors\Color;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use App\Jobs\SendPengajuanKartuNotification;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
+use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
 
 class PengajuanKartuResource extends Resource
 {
@@ -401,137 +402,86 @@ class PengajuanKartuResource extends Resource
                         ->size('sm')
                         ->icon('heroicon-o-arrow-path'),
                 ]),
-                Action::make('approve')
-                    ->label('Setujui')
-                    ->button()
-                    ->outlined()
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->visible(
-                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
-                            $record->status === 'Pending'
-                    )
-                    ->action(function (PengajuanKartu $record) {
-                        $record->update(['status' => 'Proses']);
+                
+Action::make('approve')
+    ->label('Setujui')
+    ->button()
+    ->outlined()
+    ->icon('heroicon-o-check-circle')
+    ->color('success')
+    ->requiresConfirmation()
+    ->visible(
+        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+            $record->status === 'Pending'
+    )
+    ->action(function (PengajuanKartu $record) {
+        $record->update(['status' => 'Proses']);
 
-                        Notification::make()
-                            ->title('Status Diperbarui')
-                            ->body('Pengajuan telah disetujui dan status diubah ke Proses.')
-                            ->success()
-                            ->send();
+        // Notifikasi ke admin
+        Notification::make()
+            ->title('Status Diperbarui')
+            ->body('Pengajuan telah disetujui dan status diubah ke Proses.')
+            ->success()
+            ->send();
 
-                        // Notifikasi ke user
-                        Notification::make()
-                            ->title('Pengajuan kartu Anda sedang diproses.')
-                            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' sedang diproses.')
-                            ->success()
-                            ->sendToDatabase($record->user);
+        // Notifikasi database ke user
+        Notification::make()
+            ->title('Pengajuan kartu Anda sedang diproses.')
+            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' sedang diproses.')
+            ->success()
+            ->sendToDatabase($record->user);
 
-                        // Kirim ke WhatsApp
-                        $phoneNumber = null;
-                        $userName = $record->user->name;
+        // Kirim WhatsApp via Job dengan tipe 'proses'
+        SendPengajuanKartuNotification::dispatch($record, 'proses')
+            ->onQueue('whatsapp');
 
-                        // Cek apakah user adalah siswa atau pegawai
-                        if ($record->user->siswa) {
-                            $phoneNumber = $record->user->siswa->telepon;
-                        } elseif ($record->user->pegawai) {
-                            $phoneNumber = $record->user->pegawai->telepon;
-                        }
+        logger()->info('Pengajuan kartu approved', [
+            'pengajuan_id' => $record->id,
+            'nomor_pengajuan' => $record->nomorPengajuanKartu,
+            'user_id' => $record->user->id,
+        ]);
+    }),
 
-                        if ($phoneNumber) {
-                            $whatsappService = new WhatsappService;
-                            $tahunIni = date('Y');
-                            $namaInstansi = Instansi::all()->first()->nama;
-                            $instansi = strtoupper($namaInstansi);
-                            $url = config('app.url').'/admin/pengajuan-kartu/'.$record->id;
-                            $message = <<<TEXT
-                            *PTSP {$instansi}*
-                            
-                            ———————————————————
-                            🪪 *Kartu Presensi Sedang Diproses*
-                            ———————————————————
-                            Halo {$userName},
-                            Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* sedang diproses.
-                            Mohon menunggu kabar selanjutnya.
-                            
-                            Terima kasih! 🙏
-                            ———————————————————
-                            Tautan : {$url}
-                            ———————————————————
-                            
-                            *© 2022 - {$tahunIni} {$instansi}*
-                            TEXT;
-                            $whatsappService->send($phoneNumber, $message);
-                        }
-                    }),
+Action::make('complete')
+    ->label('Selesaikan')
+    ->button()
+    ->outlined()
+    ->icon('heroicon-o-check-badge')
+    ->color('success')
+    ->requiresConfirmation()
+    ->visible(
+        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
+            $record->status === 'Proses'
+    )
+    ->action(function (PengajuanKartu $record) {
+        $record->update(['status' => 'Selesai']);
 
-                Action::make('complete')
-                    ->label('Selesaikan')
-                    ->button()
-                    ->outlined()
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->visible(
-                        fn (PengajuanKartu $record) => Auth::user()->hasRole('super_admin') &&
-                            $record->status === 'Proses'
-                    )
-                    ->action(function (PengajuanKartu $record) {
-                        $record->update(['status' => 'Selesai']);
+        // Notifikasi ke admin
+        Notification::make()
+            ->title('Pengajuan Selesai')
+            ->body('Pengajuan kartu telah diselesaikan.')
+            ->success()
+            ->send();
 
-                        Notification::make()
-                            ->title('Pengajuan Selesai')
-                            ->body('Pengajuan kartu telah diselesaikan.')
-                            ->success()
-                            ->send();
+        // Notifikasi database ke user
+        $biayaFormatted = number_format($record->biaya, 0, ',', '.');
+        Notification::make()
+            ->title('Kartu Siap Diambil di Ruang PTSP')
+            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' telah selesai diproses. (Biaya pembuatan kartu Rp. '.$biayaFormatted.')')
+            ->success()
+            ->sendToDatabase($record->user);
 
-                        // Notifikasi ke user
-                        Notification::make()
-                            ->title('Kartu Siap Diambil di Ruang PTSP')
-                            ->body('Pengajuan kartu Anda dengan nomor '.$record->nomorPengajuanKartu.' telah selesai diproses. (Biaya pembuatan kartu Rp. '.number_format($record->biaya, 0, ',', '.').')')
-                            ->success()
-                            ->sendToDatabase($record->user);
+        // Kirim WhatsApp via Job dengan tipe 'selesai'
+        SendPengajuanKartuNotification::dispatch($record, 'selesai')
+            ->onQueue('whatsapp');
 
-                        // Kirim ke WhatsApp
-                        $phoneNumber = null;
-                        $userName = $record->user->name;
-
-                        // Cek apakah user adalah siswa atau pegawai
-                        if ($record->user->siswa) {
-                            $phoneNumber = $record->user->siswa->telepon;
-                        } elseif ($record->user->pegawai) {
-                            $phoneNumber = $record->user->pegawai->telepon;
-                        }
-
-                        if ($phoneNumber) {
-                            $whatsappService = new WhatsappService;
-                            $biaya = number_format($record->biaya, 0, ',', '.');
-                            $tahunIni = date('Y');
-                            $namaInstansi = Instansi::all()->first()->nama;
-                            $instansi = strtoupper($namaInstansi);
-                            $url = config('app.url');
-                            $message = <<<TEXT
-                            *PTSP {$instansi}*
-                            
-                            ———————————————————
-                            🪪 *Kartu Siap Diambil di Ruang PTSP*
-                            ———————————————————
-                            Halo {$userName},
-                            Pengajuan kartu Anda dengan nomor *{$record->nomorPengajuanKartu}* telah selesai diproses.
-                            🏢 Silakan ambil di Ruang PTSP
-                            💸 Biaya pembuatan kartu: Rp. *{$biaya}*,-
-                            
-                            Terima kasih! 🙏
-                            ———————————————————
-                            Tautan : {$url}/admin/pengajuan-kartu/{$record->id}
-                            ———————————————————
-                            
-                            *© 2022 - {$tahunIni} {$instansi}*
-                            TEXT;
-                            $whatsappService->send($phoneNumber, $message);
-                        }
-                    }),
+        logger()->info('Pengajuan kartu completed', [
+            'pengajuan_id' => $record->id,
+            'nomor_pengajuan' => $record->nomorPengajuanKartu,
+            'user_id' => $record->user->id,
+            'biaya' => $record->biaya,
+        ]);
+    }),
 
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([

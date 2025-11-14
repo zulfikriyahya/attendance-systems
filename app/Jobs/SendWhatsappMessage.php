@@ -1,29 +1,49 @@
 <?php
-
+// Jobs/SendWhatsappMessage.php
 namespace App\Jobs;
 
-use App\Services\WhatsappService;
 use Illuminate\Bus\Queueable;
+use App\Services\WhatsappService;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class SendWhatsappMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $nomor;
-
-    public string $type; // 'presensi', 'presensi_bulk', 'informasi'
-
+    public string $type; // 'presensi', 'presensi_bulk', 'informasi', 'pengajuan_kartu'
     public array $data;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     * Menggunakan exponential backoff agar tidak mengganggu antrian normal
+     *
+     * @var array
+     */
+    public $backoff;
 
     public function __construct(string $nomor, string $type, array $data)
     {
         $this->nomor = $nomor;
         $this->type = $type;
         $this->data = $data;
+
+        // Ambil retry config dari whatsapp config
+        $this->tries = config('whatsapp.queue.retry_attempts', 3);
+        
+        // Exponential backoff: makin lama makin panjang delay-nya
+        // Retry 1: 2 menit, Retry 2: 5 menit, Retry 3: 10 menit
+        $this->backoff = [120, 300, 600];
     }
 
     public function handle(WhatsappService $whatsapp): void
@@ -47,8 +67,7 @@ class SendWhatsappMessage implements ShouldQueue
                     $result = $whatsapp->sendPresensi(
                         $this->nomor,
                         $this->data['jenis'],
-                        // $this->data['status'],
-                        'Tidak terdeteksi melakukan presensi. (_Apabila kartu Anda hilang atau mengalami kerusakan, mohon segera menghubungi kami untuk mendapatkan bantuan lebih lanjut._)',
+                        $this->data['status'],
                         $this->data['waktu'],
                         $this->data['nama'],
                         $this->data['isSiswa'],
@@ -69,18 +88,60 @@ class SendWhatsappMessage implements ShouldQueue
                     );
                     break;
 
+                case 'pengajuan_kartu':
+                    $result = $whatsapp->sendPengajuanKartu(
+                        $this->nomor,
+                        $this->data['nama'],
+                        $this->data['nomor_pengajuan'],
+                        $this->data['instansi'],
+                        $this->data['pengajuan_id'],
+                        $this->data['notification_type'], // 'proses' atau 'selesai'
+                        $this->data['biaya'] ?? null
+                    );
+                    break;
+
                 default:
                     throw new \InvalidArgumentException("Unknown message type: {$this->type}");
             }
 
             // Log jika gagal
-            if (! $result['status']) {
+            if (!$result['status']) {
                 $this->logError($result['error'] ?? 'Unknown error');
             }
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
+            
+            // Log retry attempt untuk monitoring
+            if ($this->attempts() < $this->tries) {
+                logger()->warning('WhatsApp message will be retried', [
+                    'nomor' => $this->nomor,
+                    'type' => $this->type,
+                    'attempt' => $this->attempts(),
+                    'max_attempts' => $this->tries,
+                    'next_retry_in_seconds' => $this->backoff[$this->attempts() - 1] ?? 600,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+            
             throw $e; // Re-throw untuk queue retry mechanism
         }
+    }
+
+    /**
+     * Handle a job failure (setelah semua retry habis)
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('WhatsApp message failed after all retries', [
+            'nomor' => $this->nomor,
+            'type' => $this->type,
+            'data' => $this->data,
+            'attempts' => $this->attempts(),
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+
+        // Optional: Bisa tambahkan notifikasi ke admin atau save ke failed_jobs table
     }
 
     private function logError(string $error): void
@@ -90,6 +151,7 @@ class SendWhatsappMessage implements ShouldQueue
             'type' => $this->type,
             'data' => $this->data,
             'error' => $error,
+            'attempt' => $this->attempts(),
         ]);
     }
 }
