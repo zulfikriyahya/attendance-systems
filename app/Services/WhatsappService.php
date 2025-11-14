@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class WhatsappService
 {
@@ -85,11 +85,13 @@ class WhatsappService
 
             if ($error) {
                 $this->logError('CURL Error', $nomor, $error, ['duration_ms' => $duration]);
+
                 return $this->buildErrorResponse($error, $nomor);
             }
 
             if ($httpCode >= 400) {
                 $this->logError('HTTP Error', $nomor, "HTTP {$httpCode}", ['duration_ms' => $duration, 'response' => $response]);
+
                 return $this->buildErrorResponse("HTTP {$httpCode}", $nomor);
             }
 
@@ -97,6 +99,7 @@ class WhatsappService
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->logError('JSON Decode Error', $nomor, json_last_error_msg(), ['duration_ms' => $duration, 'raw_response' => $response]);
+
                 return $this->buildErrorResponse('Invalid JSON response', $nomor);
             }
 
@@ -206,7 +209,7 @@ class WhatsappService
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
         $tahunIni = date('Y');
         $urlInformasi = config('app.url').'/admin/informasi';
-        
+
         // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 200;
         $isiSingkat = strlen($isi) > $maxLength
@@ -271,9 +274,10 @@ class WhatsappService
             'file_exists' => file_exists($filePath),
             'nomor' => $nomor,
         ]);
-        
+
         if (! file_exists($filePath)) {
             $this->logError('Attachment Not Found', $nomor, "File not found: {$lampiran}");
+
             return array_merge($mainResult, ['attachment_error' => 'File not found']);
         }
 
@@ -283,6 +287,7 @@ class WhatsappService
 
         if (! in_array($extension, $allowedTypes)) {
             $this->logError('Invalid File Type', $nomor, "File type not allowed: {$extension}");
+
             return array_merge($mainResult, ['attachment_error' => 'File type not allowed']);
         }
 
@@ -293,25 +298,25 @@ class WhatsappService
         return array_merge($mainResult, ['attachment_result' => $attachmentResult]);
     }
 
-/**
- * Send pengajuan kartu notification
- */
-public function sendPengajuanKartu(
-    string $nomor,
-    string $nama,
-    string $nomorPengajuan,
-    string $instansi,
-    int $pengajuanId,
-    string $notificationType, // 'proses' atau 'selesai'
-    ?float $biaya = null
-): array {
-    $tahunIni = date('Y');
-    $url = config('app.url') . '/admin/pengajuan-kartu/' . $pengajuanId;
+    /**
+     * Send pengajuan kartu notification
+     */
+    public function sendPengajuanKartu(
+        string $nomor,
+        string $nama,
+        string $nomorPengajuan,
+        string $instansi,
+        int $pengajuanId,
+        string $notificationType, // 'proses' atau 'selesai'
+        ?float $biaya = null
+    ): array {
+        $tahunIni = date('Y');
+        $url = config('app.url').'/admin/pengajuan-kartu/'.$pengajuanId;
 
-    // Generate message berdasarkan tipe notifikasi
-    if ($notificationType === 'selesai') {
-        $biayaFormatted = number_format($biaya, 0, ',', '.');
-        $pesan = <<<TEXT
+        // Generate message berdasarkan tipe notifikasi
+        if ($notificationType === 'selesai') {
+            $biayaFormatted = number_format($biaya, 0, ',', '.');
+            $pesan = <<<TEXT
         *PTSP {$instansi}*
 
         ———————————————————
@@ -329,9 +334,9 @@ public function sendPengajuanKartu(
 
         *© 2022 - {$tahunIni} {$instansi}*
         TEXT;
-    } else {
-        // Default: 'proses'
-        $pesan = <<<TEXT
+        } else {
+            // Default: 'proses'
+            $pesan = <<<TEXT
         *PTSP {$instansi}*
 
         ———————————————————
@@ -348,31 +353,31 @@ public function sendPengajuanKartu(
 
         *© 2022 - {$tahunIni} {$instansi}*
         TEXT;
+        }
+
+        // Send dengan type 'pengajuan_kartu' untuk tracking
+        $result = $this->send($nomor, $pesan, null, 'pengajuan_kartu');
+
+        // Track pengajuan-specific metrics
+        $this->trackPengajuanMetrics($nomorPengajuan, $notificationType, $result['status'] ?? false);
+
+        return $result;
     }
 
-    // Send dengan type 'pengajuan_kartu' untuk tracking
-    $result = $this->send($nomor, $pesan, null, 'pengajuan_kartu');
+    /**
+     * Track pengajuan kartu metrics
+     */
+    protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, bool $success): void
+    {
+        $key = 'whatsapp_pengajuan_stats_'.date('Y-m-d');
+        $stats = Cache::get($key, []);
 
-    // Track pengajuan-specific metrics
-    $this->trackPengajuanMetrics($nomorPengajuan, $notificationType, $result['status'] ?? false);
+        $stats['total'] = ($stats['total'] ?? 0) + 1;
+        $stats['by_type'][$type] = ($stats['by_type'][$type] ?? 0) + 1;
+        $stats['success'] = ($stats['success'] ?? 0) + ($success ? 1 : 0);
 
-    return $result;
-}
-
-/**
- * Track pengajuan kartu metrics
- */
-protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, bool $success): void
-{
-    $key = 'whatsapp_pengajuan_stats_' . date('Y-m-d');
-    $stats = Cache::get($key, []);
-
-    $stats['total'] = ($stats['total'] ?? 0) + 1;
-    $stats['by_type'][$type] = ($stats['by_type'][$type] ?? 0) + 1;
-    $stats['success'] = ($stats['success'] ?? 0) + ($success ? 1 : 0);
-
-    Cache::put($key, $stats, now()->addDays(7));
-}
+        Cache::put($key, $stats, now()->addDays(7));
+    }
 
     /**
      * Apply automatic delay between messages to prevent burst traffic
@@ -382,18 +387,18 @@ protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, b
     {
         // Get rate per minute from config based on type
         $ratePerMinute = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
-        
+
         // Calculate base delay in milliseconds: 60000ms / rate = delay per message
         $baseDelayMs = (int) (60000 / $ratePerMinute);
-        
+
         // Add random variation ±20% to make it more natural
         $variation = $baseDelayMs * 0.2; // 20% variation
         $minDelay = (int) ($baseDelayMs - $variation);
         $maxDelay = (int) ($baseDelayMs + $variation);
-        
+
         // Random delay between min and max
         $randomDelayMs = random_int($minDelay, $maxDelay);
-        
+
         usleep($randomDelayMs * 1000); // Convert to microseconds
     }
 
@@ -404,9 +409,9 @@ protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, b
     {
         $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
         $limit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
-        
+
         $current = Cache::get($keyMinute, 0);
-        
+
         return $current >= $limit;
     }
 
@@ -417,7 +422,7 @@ protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, b
     {
         $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
         Cache::increment($keyMinute, 1);
-        
+
         // Set expiry 2 menit untuk cleanup otomatis
         if (Cache::get($keyMinute) === 1) {
             Cache::put($keyMinute, 1, now()->addMinutes(2));

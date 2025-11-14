@@ -1,5 +1,7 @@
 <?php
+
 // Services/WhatsappDelayService.php
+
 namespace App\Services;
 
 use Carbon\Carbon;
@@ -77,10 +79,10 @@ class WhatsappDelayService
         $config = config("whatsapp.rate_limits.bulk.types.{$type}");
 
         // Default config jika type tidak ditemukan
-        if (!$config) {
+        if (! $config) {
             $config = [
                 'priority' => 3,
-                'extra_delay' => [60, 180]
+                'extra_delay' => [60, 180],
             ];
         }
 
@@ -97,8 +99,8 @@ class WhatsappDelayService
 
         // Priority offset dari config
         $extraDelay = $config['extra_delay'] ?? [0, 0];
-        $priorityOffset = is_array($extraDelay) 
-            ? rand($extraDelay[0], $extraDelay[1]) 
+        $priorityOffset = is_array($extraDelay)
+            ? rand($extraDelay[0], $extraDelay[1])
             : $extraDelay;
 
         $totalDelaySeconds = $baseDelaySeconds + $slotDelaySeconds + $randomSpread + $priorityOffset;
@@ -132,8 +134,8 @@ class WhatsappDelayService
         $randomSpread = rand(0, 60);
 
         // Extra delay dari config
-        $priorityOffset = is_array($extraDelay) 
-            ? rand($extraDelay[0], $extraDelay[1]) 
+        $priorityOffset = is_array($extraDelay)
+            ? rand($extraDelay[0], $extraDelay[1])
             : $extraDelay;
 
         $totalDelaySeconds = $baseDelaySeconds + $slotDelaySeconds + $randomSpread + $priorityOffset;
@@ -150,12 +152,12 @@ class WhatsappDelayService
      */
     public function cleanupExpiredCache(): int
     {
-        $pattern = "whatsapp_hourly_*";
+        $pattern = 'whatsapp_hourly_*';
         $deleted = 0;
-        
+
         // Note: Ini simplified version, untuk production gunakan Redis SCAN
         // atau jadwalkan cleanup via Laravel command
-        
+
         return $deleted;
     }
 }

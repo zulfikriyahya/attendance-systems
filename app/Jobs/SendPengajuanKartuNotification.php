@@ -1,20 +1,22 @@
 <?php
+
 // Jobs/SendPengajuanKartuNotification.php
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Models\PengajuanKartu;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendPengajuanKartuNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries;
+
     public $backoff;
 
     /**
@@ -34,7 +36,7 @@ class SendPengajuanKartuNotification implements ShouldQueue
     public function handle(): void
     {
         $record = $this->pengajuanKartu;
-        
+
         // Cek apakah ada nomor telepon
         $phoneNumber = null;
         $userName = $record->user->name;
@@ -50,13 +52,14 @@ class SendPengajuanKartuNotification implements ShouldQueue
         }
 
         // Jika tidak ada nomor telepon, skip
-        if (!$phoneNumber) {
+        if (! $phoneNumber) {
             logger()->warning('No phone number found for pengajuan kartu', [
                 'pengajuan_id' => $record->id,
                 'user_id' => $record->user->id,
                 'user_name' => $userName,
                 'type' => $this->notificationType,
             ]);
+
             return;
         }
 

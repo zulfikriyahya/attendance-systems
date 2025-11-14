@@ -1,20 +1,24 @@
 <?php
+
 // Jobs/SendWhatsappMessage.php
+
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Services\WhatsappService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendWhatsappMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $nomor;
+
     public string $type; // 'presensi', 'presensi_bulk', 'informasi', 'pengajuan_kartu'
+
     public array $data;
 
     /**
@@ -40,7 +44,7 @@ class SendWhatsappMessage implements ShouldQueue
 
         // Ambil retry config dari whatsapp config
         $this->tries = config('whatsapp.queue.retry_attempts', 3);
-        
+
         // Exponential backoff: makin lama makin panjang delay-nya
         // Retry 1: 2 menit, Retry 2: 5 menit, Retry 3: 10 menit
         $this->backoff = [120, 300, 600];
@@ -105,12 +109,12 @@ class SendWhatsappMessage implements ShouldQueue
             }
 
             // Log jika gagal
-            if (!$result['status']) {
+            if (! $result['status']) {
                 $this->logError($result['error'] ?? 'Unknown error');
             }
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
-            
+
             // Log retry attempt untuk monitoring
             if ($this->attempts() < $this->tries) {
                 logger()->warning('WhatsApp message will be retried', [
@@ -122,7 +126,7 @@ class SendWhatsappMessage implements ShouldQueue
                     'error' => $e->getMessage(),
                 ]);
             }
-            
+
             throw $e; // Re-throw untuk queue retry mechanism
         }
     }
