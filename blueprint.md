@@ -1911,6 +1911,7 @@ class SetKetidakhadiran extends Command
 }
 ```
 
+sudo composer update
 sudo php artisan config:clear
 sudo php artisan cache:clear
 sudo php artisan view:clear
@@ -1920,9 +1921,6 @@ sudo php artisan queue:flush
 sudo php artisan optimize:clear
 sudo php artisan optimize
 sudo php artisan filament:optimize
-
-sudo chown -R www-data:www-data /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
-sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 
 sudo systemctl stop presensi-dhpusat.service
 sudo systemctl stop presensi-man1.service

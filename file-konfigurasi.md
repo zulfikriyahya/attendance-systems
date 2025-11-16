@@ -11,8 +11,8 @@ sudo nano /etc/systemd/system/presensi-mtsn1.service
 Description=WORKER MTSN1
 After=network.target
 [Service]
-User=www-data
-Group=www-data
+User=www
+Group=www
 Restart=always
 RestartSec=10
 ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
@@ -30,7 +30,7 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-mtsn1.service
-sudo chown -R www-data:www-data /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
+sudo chown -R www:www /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 ```
 
@@ -47,8 +47,8 @@ sudo nano /etc/systemd/system/presensi-man1.service
 Description=WORKER MAN1
 After=network.target
 [Service]
-User=www-data
-Group=www-data
+User=www
+Group=www
 Restart=always
 RestartSec=10
 ExecStart=/usr/bin/php /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
@@ -66,7 +66,7 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-man1.service
-sudo chown -R www-data:www-data /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/storage
+sudo chown -R www:www /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/storage
 ```
 
@@ -83,8 +83,8 @@ sudo nano /etc/systemd/system/presensi-dhpusat.service
 Description=WORKER DH PUSAT
 After=network.target
 [Service]
-User=www-data
-Group=www-data
+User=www
+Group=www
 Restart=always
 RestartSec=10
 ExecStart=/usr/bin/php /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
@@ -102,6 +102,30 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-dhpusat.service
-sudo chown -R www-data:www-data /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
+sudo chown -R www:www /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
 ```
+
+sudo composer update
+sudo php artisan config:clear
+sudo php artisan cache:clear
+sudo php artisan view:clear
+sudo php artisan queue:clear
+sudo php artisan queue:clear --queue=whatsapp
+sudo php artisan queue:flush
+sudo php artisan optimize:clear
+sudo php artisan optimize
+sudo php artisan filament:optimize
+
+sudo systemctl stop presensi-dhpusat.service
+sudo systemctl stop presensi-man1.service
+sudo systemctl stop presensi-mtsn1.service
+sudo systemctl disable presensi-dhpusat.service
+sudo systemctl disable presensi-man1.service
+sudo systemctl disable presensi-mtsn1.service
+sudo systemctl enable --now presensi-dhpusat.service
+sudo systemctl enable --now presensi-man1.service
+sudo systemctl enable --now presensi-mtsn1.service
+sudo systemctl status presensi-dhpusat.service
+sudo systemctl status presensi-man1.service
+sudo systemctl status presensi-mtsn1.service
