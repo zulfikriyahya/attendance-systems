@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use App\Models\Informasi;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
+use App\Models\User;
 use Filament\Notifications\Notification;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendDatabaseNotification implements ShouldQueue
 {

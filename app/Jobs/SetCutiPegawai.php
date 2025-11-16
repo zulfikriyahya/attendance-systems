@@ -2,17 +2,17 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Pegawai;
 use App\Enums\StatusPresensi;
-use Illuminate\Bus\Queueable;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
-use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SetCutiPegawai implements ShouldQueue
 {

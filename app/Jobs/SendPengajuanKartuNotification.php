@@ -4,12 +4,12 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Models\PengajuanKartu;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SendPengajuanKartuNotification implements ShouldQueue
 {
@@ -36,20 +36,12 @@ class SendPengajuanKartuNotification implements ShouldQueue
     public function handle(): void
     {
         $record = $this->pengajuanKartu;
+        $user = $record->user;
 
-        // Cek apakah ada nomor telepon
-        $phoneNumber = null;
-        $userName = $record->user->name;
-        $isSiswa = false;
-
-        // Cek apakah user adalah siswa atau pegawai
-        if ($record->user->siswa) {
-            $phoneNumber = $record->user->siswa->telepon;
-            $isSiswa = true;
-        } elseif ($record->user->pegawai) {
-            $phoneNumber = $record->user->pegawai->telepon;
-            $isSiswa = false;
-        }
+        // Use User helper methods
+        $phoneNumber = $user->phone; // Magic attribute
+        $userName = $user->name;
+        $isSiswa = $user->isSiswa();
 
         // Jika tidak ada nomor telepon, skip
         if (! $phoneNumber) {
@@ -64,8 +56,7 @@ class SendPengajuanKartuNotification implements ShouldQueue
         }
 
         // Ambil data instansi
-        $namaInstansi = \App\Models\Instansi::first()->nama ?? 'Instansi';
-        $instansi = strtoupper($namaInstansi);
+        $instansi = strtoupper($user->instansi_name);
 
         // Dispatch job WhatsApp sesuai tipe notifikasi
         SendWhatsappMessage::dispatch(

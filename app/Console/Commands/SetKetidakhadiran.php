@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Jobs\ProcessKetidakhadiran;
+use Illuminate\Console\Command;
 
 class SetKetidakhadiran extends Command
 {

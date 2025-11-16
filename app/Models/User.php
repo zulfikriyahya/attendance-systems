@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Filament\Panel;
-use Spatie\Permission\Traits\HasRoles;
-use Filament\Models\Contracts\HasAvatar;
-use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Filament\Models\Contracts\HasAvatar;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\HasDatabaseNotifications;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\HasDatabaseNotifications;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
@@ -56,5 +56,39 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function pengajuanKartu(): HasOne
     {
         return $this->hasOne(PengajuanKartu::class);
+    }
+
+    /**
+     * Get phone number from siswa or pegawai
+     */
+    public function getPhoneAttribute(): ?string
+    {
+        return $this->siswa?->telepon ?? $this->pegawai?->telepon;
+    }
+
+    /**
+     * Check if user is siswa
+     */
+    public function isSiswa(): bool
+    {
+        return $this->siswa()->exists();
+    }
+
+    /**
+     * Check if user is pegawai
+     */
+    public function isPegawai(): bool
+    {
+        return $this->pegawai()->exists();
+    }
+
+    /**
+     * Get user's instansi name
+     */
+    public function getInstansiNameAttribute(): string
+    {
+        return $this->siswa?->jabatan?->instansi?->nama
+            ?? $this->pegawai?->jabatan?->instansi?->nama
+            ?? 'Instansi';
     }
 }

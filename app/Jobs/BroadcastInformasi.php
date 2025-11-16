@@ -4,15 +4,15 @@
 
 namespace App\Jobs;
 
-use App\Models\Siswa;
-use App\Models\Pegawai;
 use App\Models\Informasi;
-use Illuminate\Bus\Queueable;
+use App\Models\Pegawai;
+use App\Models\Siswa;
 use App\Services\WhatsappDelayService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class BroadcastInformasi implements ShouldQueue
 {
@@ -61,8 +61,9 @@ class BroadcastInformasi implements ShouldQueue
 
         // Proses pengiriman ke siswa
         foreach ($siswa as $student) {
-            $nama = $student->user?->name ?? $student->nama ?? 'Siswa';
-            $instansi = $student->jabatan?->instansi?->nama ?? 'Instansi';
+            $user = $student->user;
+            $nama = $user?->name ?? $student->nama ?? 'Siswa';
+            $instansi = $user?->instansi_name ?? 'Instansi';
 
             // Hitung delay SEBELUM dispatch
             $delay = $delayService->calculateInformasiDelay($notifCounter);
@@ -93,8 +94,9 @@ class BroadcastInformasi implements ShouldQueue
 
         // Proses pengiriman ke pegawai
         foreach ($pegawai as $employee) {
-            $nama = $employee->user?->name ?? $employee->nama ?? 'Pegawai';
-            $instansi = $employee->jabatan?->instansi?->nama ?? 'Instansi';
+            $user = $employee->user;
+            $nama = $user?->name ?? $employee->nama ?? 'Pegawai';
+            $instansi = $user?->instansi_name ?? 'Instansi';
 
             // Hitung delay SEBELUM dispatch
             $delay = $delayService->calculateInformasiDelay($notifCounter);

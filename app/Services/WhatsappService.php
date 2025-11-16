@@ -37,13 +37,10 @@ class WhatsappService
             return $this->buildErrorResponse('Invalid phone number format', $nomor);
         }
 
-        // Rate limiting check with auto delay (per type)
-        if ($this->isRateLimited($type)) {
+        // UNIFIED RATE LIMIT HANDLING
+        if (! $this->handleRateLimit($type)) {
             return $this->buildErrorResponse('Rate limit exceeded', $nomor);
         }
-
-        // Apply automatic delay to prevent burst traffic
-        $this->applyRateLimit($type);
 
         try {
             $postFields = [
@@ -53,7 +50,7 @@ class WhatsappService
 
             if ($filePath && file_exists($filePath)) {
                 $fileSize = filesize($filePath);
-                $maxSize = $this->config['attachments']['max_size'] ?? 16777216; // 16MB
+                $maxSize = $this->config['attachments']['max_size'] ?? 16777216;
 
                 if ($fileSize > $maxSize) {
                     return $this->buildErrorResponse('File too large', $nomor, ['file_size' => $fileSize, 'max_size' => $maxSize]);
@@ -81,7 +78,7 @@ class WhatsappService
             $error = curl_error($curl);
             curl_close($curl);
 
-            $duration = round((microtime(true) - $startTime) * 1000, 2); // milliseconds
+            $duration = round((microtime(true) - $startTime) * 1000, 2);
 
             if ($error) {
                 $this->logError('CURL Error', $nomor, $error, ['duration_ms' => $duration]);
@@ -103,13 +100,7 @@ class WhatsappService
                 return $this->buildErrorResponse('Invalid JSON response', $nomor);
             }
 
-            // Increment rate limit counter after successful send
-            $this->incrementRateLimitCounter($type);
-
-            // Log successful send
             $this->logSuccess($nomor, $duration, $decodedResponse);
-
-            // Update success metrics
             $this->updateMetrics('success', $duration);
 
             return $decodedResponse ?? ['status' => true, 'message' => 'Sent successfully'];
@@ -120,6 +111,29 @@ class WhatsappService
 
             return $this->buildErrorResponse($e->getMessage(), $nomor);
         }
+    }
+
+    /**
+     * Build consistent header & footer untuk semua pesan
+     */
+    protected function buildMessageFrame(string $instansi, string $templateType = 'presensi'): array
+    {
+        $templates = $this->config['templates'][$templateType] ?? [];
+        $tahunIni = date('Y');
+
+        $header = strtoupper(str_replace(
+            '{instansi}',
+            $instansi,
+            $templates['header'] ?? 'PTSP {instansi}'
+        ));
+
+        $footer = strtoupper(str_replace(
+            ['{tahun}', '{instansi}'],
+            [$tahunIni, $instansi],
+            $templates['footer'] ?? '© 2022 - {tahun} {instansi}'
+        ));
+
+        return compact('header', 'footer');
     }
 
     /**
@@ -138,7 +152,6 @@ class WhatsappService
         $templates = $this->config['templates']['presensi'] ?? [];
         $ikon = $jenis === 'Presensi Masuk' ? 'Masuk' : 'Pulang';
         $tanggal = now()->translatedFormat('l, d F Y');
-        $tahunIni = date('Y');
         $urlPresensi = config('app.url').'/admin';
 
         // Get template messages
@@ -161,11 +174,11 @@ class WhatsappService
                         : 'Terima kasih atas dedikasi dan kinerja Anda hari ini.'));
         }
 
-        $header = strtoupper(str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}'));
-        $footer = strtoupper(str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}'));
+        // USE NEW METHOD
+        $frame = $this->buildMessageFrame($instansi, 'presensi');
 
         $pesan = <<<TEXT
-        *{$header}*
+        *{$frame['header']}*
 
         ———————————————————
         *🗃️ Presensi {$ikon}*
@@ -180,15 +193,17 @@ class WhatsappService
 
         {$penutup}
 
-        *{$footer}*
+        *{$frame['footer']}*
         TEXT;
 
-        // Determine type: presensi or bulk
         $type = $isBulk ? 'bulk' : 'presensi';
         $result = $this->send($nomor, $pesan, null, $type);
 
-        // Track presensi-specific metrics
-        $this->trackPresensiMetrics($jenis, $status, $isBulk, $result['status'] ?? false);
+        $this->trackMetrics('presensi', [
+            'by_type' => [$jenis => 1],
+            'by_status' => [$status => 1],
+            'bulk' => $isBulk ? 1 : 0,
+        ], $result['status'] ?? false);
 
         return $result;
     }
@@ -207,16 +222,13 @@ class WhatsappService
     ): array {
         $templates = $this->config['templates']['informasi'] ?? [];
         $tanggalFormatted = now()->translatedFormat('l, d F Y');
-        $tahunIni = date('Y');
         $urlInformasi = config('app.url').'/admin/informasi';
 
-        // Configurable content length
         $maxLength = $templates['max_content_length'] ?? 300;
         $isiSingkat = strlen($isi) > $maxLength
             ? substr($isi, 0, $maxLength).'... (Baca selengkapnya.)'
             : $isi;
 
-        // Get template greetings and closings
         $userType = $isSiswa ? 'siswa' : 'pegawai';
         $title = strtoupper($judul);
         $greeting = $templates['greetings'][$userType]
@@ -225,11 +237,11 @@ class WhatsappService
         $closing = $templates['closing'][$userType]
             ?? ($isSiswa ? 'Terima kasih atas perhatiannya. Tetap semangat belajar!' : 'Terima kasih atas perhatian dan kerjasamanya.');
 
-        $header = strtoupper(str_replace('{instansi}', $instansi, $templates['header'] ?? 'PTSP {instansi}'));
-        $footer = strtoupper(str_replace(['{tahun}', '{instansi}'], [$tahunIni, $instansi], $templates['footer'] ?? '© 2022 - {tahun} {instansi}'));
+        // USE NEW METHOD
+        $frame = $this->buildMessageFrame($instansi, 'informasi');
 
         $pesan = <<<TEXT
-        *{$header}*
+        *{$frame['header']}*
 
         ———————————————————
         📢 *INFORMASI TERBARU*
@@ -246,19 +258,18 @@ class WhatsappService
 
         {$closing}
 
-        *{$footer}*
+        *{$frame['footer']}*
         TEXT;
 
-        // Send main message with 'informasi' type
         $result = $this->send($nomor, $pesan, null, 'informasi');
 
-        // Handle attachment with better validation
         if ($result['status'] && $lampiran) {
             $result = $this->sendAttachment($nomor, $lampiran, $result);
         }
 
-        // Track informasi-specific metrics
-        $this->trackInformasiMetrics($judul, $lampiran !== null, $result['status'] ?? false);
+        $this->trackMetrics('informasi', [
+            'with_attachment' => $lampiran !== null ? 1 : 0,
+        ], $result['status'] ?? false);
 
         return $result;
     }
@@ -307,17 +318,20 @@ class WhatsappService
         string $nomorPengajuan,
         string $instansi,
         string $pengajuanId,
-        string $notificationType, // 'proses' atau 'selesai'
+        string $notificationType,
         ?float $biaya = null
     ): array {
-        $tahunIni = date('Y');
         $url = config('app.url').'/admin/pengajuan-kartu/'.$pengajuanId;
 
-        // Generate message berdasarkan tipe notifikasi
+        // USE NEW METHOD - but untuk pengajuan kartu, kita buat inline karena tidak ada di templates
+        $tahunIni = date('Y');
+        $header = "PTSP {$instansi}";
+        $footer = "© 2022 - {$tahunIni} {$instansi}";
+
         if ($notificationType === 'selesai') {
             $biayaFormatted = number_format($biaya, 0, ',', '.');
             $pesan = <<<TEXT
-        *PTSP {$instansi}*
+        *{$header}*
 
         ———————————————————
         🪪 *Kartu Siap Diambil di Ruang PTSP*
@@ -332,12 +346,11 @@ class WhatsappService
         Tautan : {$url}
         ———————————————————
 
-        *© 2022 - {$tahunIni} {$instansi}*
+        *{$footer}*
         TEXT;
         } else {
-            // Default: 'proses'
             $pesan = <<<TEXT
-        *PTSP {$instansi}*
+        *{$header}*
 
         ———————————————————
         🪪 *Kartu Presensi Sedang Diproses*
@@ -351,82 +364,61 @@ class WhatsappService
         Tautan : {$url}
         ———————————————————
 
-        *© 2022 - {$tahunIni} {$instansi}*
+        *{$footer}*
         TEXT;
         }
 
-        // Send dengan type 'pengajuan_kartu' untuk tracking
         $result = $this->send($nomor, $pesan, null, 'pengajuan_kartu');
-
-        // Track pengajuan-specific metrics
-        $this->trackPengajuanMetrics($nomorPengajuan, $notificationType, $result['status'] ?? false);
+        $this->trackMetrics('pengajuan_kartu', [
+            'by_type' => [$notificationType => 1],
+        ], $result['status'] ?? false);
 
         return $result;
     }
 
     /**
-     * Track pengajuan kartu metrics
+     * Unified rate limit handler
      */
-    protected function trackPengajuanMetrics(string $nomorPengajuan, string $type, bool $success): void
-    {
-        $key = 'whatsapp_pengajuan_stats_'.date('Y-m-d');
-        $stats = Cache::get($key, []);
-
-        $stats['total'] = ($stats['total'] ?? 0) + 1;
-        $stats['by_type'][$type] = ($stats['by_type'][$type] ?? 0) + 1;
-        $stats['success'] = ($stats['success'] ?? 0) + ($success ? 1 : 0);
-
-        Cache::put($key, $stats, now()->addDays(7));
-    }
-
-    /**
-     * Apply automatic delay between messages to prevent burst traffic
-     * Delay based on message type configuration with random variation
-     */
-    protected function applyRateLimit(string $type = 'presensi'): void
-    {
-        // Get rate per minute from config based on type
-        $ratePerMinute = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
-
-        // Calculate base delay in milliseconds: 60000ms / rate = delay per message
-        $baseDelayMs = (int) (60000 / $ratePerMinute);
-
-        // Add random variation ±20% to make it more natural
-        $variation = $baseDelayMs * 0.2; // 20% variation
-        $minDelay = (int) ($baseDelayMs - $variation);
-        $maxDelay = (int) ($baseDelayMs + $variation);
-
-        // Random delay between min and max
-        $randomDelayMs = random_int($minDelay, $maxDelay);
-
-        usleep($randomDelayMs * 1000); // Convert to microseconds
-    }
-
-    /**
-     * Check if service is rate limited (per minute basis, per type)
-     */
-    protected function isRateLimited(string $type = 'presensi'): bool
+    protected function handleRateLimit(string $type = 'presensi'): bool
     {
         $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
         $limit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
 
+        // Check if rate limited
         $current = Cache::get($keyMinute, 0);
+        if ($current >= $limit) {
+            $this->logError('Rate Limit', 'system', "Rate limit exceeded for type: {$type}");
 
-        return $current >= $limit;
+            return false;
+        }
+
+        // Apply delay before sending
+        $ratePerMinute = $limit;
+        $baseDelayMs = (int) (60000 / $ratePerMinute);
+        $variation = $baseDelayMs * 0.2;
+        $minDelay = (int) ($baseDelayMs - $variation);
+        $maxDelay = (int) ($baseDelayMs + $variation);
+        $randomDelayMs = random_int($minDelay, $maxDelay);
+
+        usleep($randomDelayMs * 1000);
+
+        // ✅ FIXED: Better increment with auto-expiry
+        Cache::add($keyMinute, 0, now()->addMinutes(2)); // Create if not exists with TTL
+        Cache::increment($keyMinute, 1);
+
+        return true;
     }
 
     /**
-     * Increment rate limit counter per type
+     * ✅ NEW: Check rate limit status (for monitoring)
      */
-    protected function incrementRateLimitCounter(string $type = 'presensi'): void
+    protected function checkRateLimit(string $type = 'presensi'): bool
     {
         $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
-        Cache::increment($keyMinute, 1);
+        $limit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
+        $current = Cache::get($keyMinute, 0);
 
-        // Set expiry 2 menit untuk cleanup otomatis
-        if (Cache::get($keyMinute) === 1) {
-            Cache::put($keyMinute, 1, now()->addMinutes(2));
-        }
+        return $current >= $limit;
     }
 
     /**
@@ -569,33 +561,25 @@ class WhatsappService
     }
 
     /**
-     * Track presensi-specific metrics
+     * Generic metrics tracker untuk semua tipe pesan
      */
-    protected function trackPresensiMetrics(string $jenis, string $status, bool $isBulk, bool $success): void
+    protected function trackMetrics(string $category, array $incrementData, bool $success): void
     {
-        $key = 'whatsapp_presensi_stats_'.date('Y-m-d');
+        $key = "whatsapp_{$category}_stats_".date('Y-m-d');
         $stats = Cache::get($key, []);
 
         $stats['total'] = ($stats['total'] ?? 0) + 1;
-        $stats['by_type'][$jenis] = ($stats['by_type'][$jenis] ?? 0) + 1;
-        $stats['by_status'][$status] = ($stats['by_status'][$status] ?? 0) + 1;
-        $stats['bulk'] = ($stats['bulk'] ?? 0) + ($isBulk ? 1 : 0);
         $stats['success'] = ($stats['success'] ?? 0) + ($success ? 1 : 0);
 
-        Cache::put($key, $stats, now()->addDays(7));
-    }
-
-    /**
-     * Track informasi-specific metrics
-     */
-    protected function trackInformasiMetrics(string $judul, bool $hasAttachment, bool $success): void
-    {
-        $key = 'whatsapp_informasi_stats_'.date('Y-m-d');
-        $stats = Cache::get($key, []);
-
-        $stats['total'] = ($stats['total'] ?? 0) + 1;
-        $stats['with_attachment'] = ($stats['with_attachment'] ?? 0) + ($hasAttachment ? 1 : 0);
-        $stats['success'] = ($stats['success'] ?? 0) + ($success ? 1 : 0);
+        foreach ($incrementData as $field => $value) {
+            if (is_array($value)) {
+                foreach ($value as $subField => $subValue) {
+                    $stats[$field][$subField] = ($stats[$field][$subField] ?? 0) + $subValue;
+                }
+            } else {
+                $stats[$field] = ($stats[$field] ?? 0) + $value;
+            }
+        }
 
         Cache::put($key, $stats, now()->addDays(7));
     }
@@ -620,7 +604,7 @@ class WhatsappService
             'avg_response_time' => $success['avg_duration'],
             'total_requests' => $total,
             'error_count' => $errors['count'],
-            'is_rate_limited' => $this->isRateLimited('presensi'),
+            'is_rate_limited' => $this->checkRateLimit('presensi'), // ✅ FIXED
         ];
     }
 }

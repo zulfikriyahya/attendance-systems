@@ -107,16 +107,16 @@ sudo chmod -R 775 /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
 ```
 
 ```bash
-sudo composer update
-sudo php artisan config:clear
-sudo php artisan cache:clear
-sudo php artisan view:clear
-sudo php artisan queue:clear
-sudo php artisan queue:clear --queue=whatsapp
-sudo php artisan queue:flush
-sudo php artisan optimize:clear
-sudo php artisan optimize
-sudo php artisan filament:optimize
+composer update
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan queue:clear
+php artisan queue:clear --queue=whatsapp,default
+php artisan queue:flush
+php artisan optimize:clear
+php artisan optimize
+php artisan filament:optimize
 
 sudo systemctl stop presensi-dhpusat.service
 sudo systemctl stop presensi-man1.service

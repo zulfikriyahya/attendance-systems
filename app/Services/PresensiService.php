@@ -72,8 +72,9 @@ class PresensiService
                     ->whereDate('tanggal', $today)
                     ->first();
 
-                $nama = $user->user?->name ?? $user->nama ?? 'Tidak dikenal';
-                $instansi = $user->jabatan?->instansi?->nama ?? 'Instansi';
+                $userModel = $user->user;
+                $nama = $userModel?->name ?? $user->nama ?? 'Tidak dikenal';
+                $instansi = $userModel?->instansi_name ?? 'Instansi';
 
                 // Presensi Masuk
                 if (! $presensi) {

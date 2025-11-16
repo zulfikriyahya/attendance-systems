@@ -91,8 +91,9 @@ class ProcessKetidakhadiran implements ShouldQueue
                         'statusPresensi' => StatusPresensi::Alfa,
                     ]);
 
-                    $nama = $pegawai->user?->name ?? $pegawai->nama;
-                    $instansi = $pegawai->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
+                    $user = $pegawai->user;
+                    $nama = $user?->name ?? $pegawai->nama;
+                    $instansi = $user?->instansi_name ?? 'MTs Negeri 1 Pandeglang';
 
                     // Use centralized delay service
                     $delay = $this->delayService->calculateBulkDelay($notifCounter, 'alfa');
@@ -135,8 +136,9 @@ class ProcessKetidakhadiran implements ShouldQueue
                         'statusPresensi' => StatusPresensi::Alfa,
                     ]);
 
-                    $nama = $siswa->user?->name ?? $siswa->nama;
-                    $instansi = $siswa->jabatan->instansi?->nama ?? 'MTs Negeri 1 Pandeglang';
+                    $user = $siswa->user;
+                    $nama = $user?->name ?? $siswa->nama;
+                    $instansi = $user?->instansi_name ?? 'MTs Negeri 1 Pandeglang';
 
                     // Use centralized delay service
                     $delay = $this->delayService->calculateBulkDelay($notifCounter, 'alfa');
