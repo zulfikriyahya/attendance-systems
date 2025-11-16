@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessKetidakhadiran;
 use Illuminate\Console\Command;
+use App\Jobs\ProcessKetidakhadiran;
 
 class SetKetidakhadiran extends Command
 {
@@ -14,6 +14,6 @@ class SetKetidakhadiran extends Command
     public function handle(): void
     {
         ProcessKetidakhadiran::dispatch();
-        $this->info('📌 Job ProcessKetidakhadiran sudah dikirim ke queue.');
+        $this->info('Job ProcessKetidakhadiran sudah dikirim ke queue.');
     }
 }

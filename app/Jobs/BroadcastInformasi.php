@@ -1,18 +1,16 @@
 <?php
 
-// Jobs/BroadcastInformasi.php
-
 namespace App\Jobs;
 
-use App\Models\Informasi;
-use App\Models\Pegawai;
 use App\Models\Siswa;
-use App\Services\WhatsappDelayService;
+use App\Models\Pegawai;
+use App\Models\Informasi;
 use Illuminate\Bus\Queueable;
+use App\Services\WhatsappDelayService;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class BroadcastInformasi implements ShouldQueue
 {
