@@ -113,18 +113,6 @@ class SendWhatsappMessage implements ShouldQueue
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
 
-            // Log retry attempt untuk monitoring
-            if ($this->attempts() < $this->tries) {
-                logger()->warning('WhatsApp message will be retried', [
-                    'nomor' => $this->nomor,
-                    'type' => $this->type,
-                    'attempt' => $this->attempts(),
-                    'max_attempts' => $this->tries,
-                    'next_retry_in_seconds' => $this->backoff[$this->attempts() - 1] ?? 600,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-
             throw $e; // Re-throw untuk queue retry mechanism
         }
     }

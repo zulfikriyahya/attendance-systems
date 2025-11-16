@@ -44,16 +44,6 @@ class BroadcastInformasi implements ShouldQueue
 
         $totalRecipients = $siswa->count() + $pegawai->count();
 
-        // Jika tidak ada penerima, return
-        if ($totalRecipients === 0) {
-            logger()->warning('No recipients found for informasi broadcast', [
-                'informasi_id' => $this->informasi->id,
-                'judul' => $this->informasi->judul,
-            ]);
-
-            return;
-        }
-
         $notifCounter = 0;
         $now = now(); // Ambil waktu sekali di awal
 

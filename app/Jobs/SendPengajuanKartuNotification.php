@@ -49,18 +49,6 @@ class SendPengajuanKartuNotification implements ShouldQueue
             $isSiswa = false;
         }
 
-        // Jika tidak ada nomor telepon, skip
-        if (! $phoneNumber) {
-            logger()->warning('No phone number found for pengajuan kartu', [
-                'pengajuan_id' => $record->id,
-                'user_id' => $record->user->id,
-                'user_name' => $userName,
-                'type' => $this->notificationType,
-            ]);
-
-            return;
-        }
-
         // Ambil data instansi
         $namaInstansi = \App\Models\Instansi::first()->nama ?? 'Instansi';
         $instansi = strtoupper($namaInstansi);
