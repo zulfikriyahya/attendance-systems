@@ -89,20 +89,25 @@ class KelasResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('jurusan.instansi.logoInstansi')
+                    ->disabledClick()
                     ->label('Logo Instansi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('jurusan.instansi.nama')
+                    ->disabledClick()
                     ->label('Nama Instansi')
                     ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('nama')
+                    ->disabledClick()
                     ->label('Kelas')
                     ->badge()
                     ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('jurusan.nama')
+                    ->disabledClick()
                     ->label('Jurusan')
                     ->searchable(Kelas::all()->count() > 10),
                 TextColumn::make('deskripsi')
+                    ->disabledClick()
                     ->label('Deskripsi')
                     ->wrap(),
             ])

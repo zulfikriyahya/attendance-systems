@@ -28,7 +28,6 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -202,20 +201,26 @@ class SiswaResource extends Resource
             ->columns([
                 ImageColumn::make('user.avatar')
                     ->label('Foto')
+                    ->disabledClick()
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('user.name')
                     ->label('Nama Lengkap')
+                    ->disabledClick()
                     ->searchable($searchable),
-                BadgeColumn::make('jabatan.nama')
+                TextColumn::make('jabatan.nama')
                     ->label('Jabatan')
+                    ->disabledClick()
                     ->color('primary')
+                    ->badge()
                     ->searchable($searchable),
                 TextColumn::make('nisn')
                     ->label('NISN')
+                    ->disabledClick()
                     ->searchable($searchable),
                 TextColumn::make('jenisKelamin')
                     ->label('Jenis Kelamin')
+                    ->disabledClick()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Pria' => 'success',
@@ -226,13 +231,17 @@ class SiswaResource extends Resource
                         'Wanita' => 'heroicon-o-user',
                     }),
                 TextColumn::make('telepon')
+                    ->disabledClick()
                     ->label('Telepon'),
                 TextColumn::make('rfid')
+                    ->disabledClick()
                     ->label('RFID')
                     ->copyable()
                     ->searchable($searchable),
-                BadgeColumn::make('kelas')
+                TextColumn::make('kelas')
+                    ->disabledClick()
                     ->label('Kelas')
+                    ->badge()
                     ->getStateUsing(function ($record) {
                         return collect($record->kelasSiswas)
                             ->map(fn ($ks) => $ks->kelasTahunPelajaran?->kelas?->nama)
@@ -242,6 +251,7 @@ class SiswaResource extends Resource
                             ->all();
                     }),
                 ToggleColumn::make('status')
+                    ->disabledClick()
                     ->label('Status'),
             ])
             ->paginationPageOptions([5, 10, 25])

@@ -61,8 +61,8 @@
             </button>
 
             <ul class="nav-links">
-                <li><a href="#features">Fitur</a></li>
-                <li><a href="#docs">Dokumentasi</a></li>
+                <li><a href="https://docs.mtsn1pandeglang.sch.id/#keunggulan-utama" target="_blank">Fitur</a></li>
+                <li><a href="https://docs.mtsn1pandeglang.sch.id" target="_blank">Dokumentasi</a></li>
                 <li><a href="#testimonials">Testimoni</a></li>
             </ul>
         </nav>

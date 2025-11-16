@@ -25,7 +25,6 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -193,23 +192,30 @@ class UserResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('avatar')
+                    ->disabledClick()
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('name')
+                    ->disabledClick()
                     ->label('Nama Lengkap')
                     ->searchable($searchable),
                 TextColumn::make('username')
+                    ->disabledClick()
                     ->searchable($searchable),
                 TextColumn::make('email')
+                    ->disabledClick()
                     ->searchable($searchable),
                 TextColumn::make('email_verified_at')
+                    ->disabledClick()
                     ->label('Verifikasi Email')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->visible(Auth::user()->hasRole('super_admin') && User::all()->count() > 10),
-                BadgeColumn::make('roles.name')
+                TextColumn::make('roles.name')
+                    ->disabledClick()
                     ->label('Peran')
+                    ->badge()
                     ->formatStateUsing(
                         fn ($state, $record) => $record->roles
                             ->pluck('name')
@@ -218,6 +224,7 @@ class UserResource extends Resource
                     )
                     ->searchable($searchable),
                 ToggleColumn::make('status')
+                    ->disabledClick()
                     ->label('Status'),
             ])
             ->paginationPageOptions([5, 10, 25])

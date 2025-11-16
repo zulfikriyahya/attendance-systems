@@ -1130,29 +1130,35 @@ class PresensiPegawaiResource extends Resource
             ])
             ->columns([
                 ImageColumn::make('pegawai.user.avatar')
+                    ->disabledClick()
                     ->label('Foto')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
 
                 TextColumn::make('pegawai.user.name')
+                    ->disabledClick()
                     ->label('Nama Lengkap')
                     ->searchable(PresensiPegawai::count() > 10),
 
                 TextColumn::make('tanggal')
+                    ->disabledClick()
                     ->label('Tanggal')
                     ->sortable('desc')
                     ->date('l, d F Y'),
 
                 TextColumn::make('jamDatang')
+                    ->disabledClick()
                     ->label('Jam Datang')
                     ->sortable('desc')
                     ->dateTime('H:i:s'),
 
                 TextColumn::make('jamPulang')
+                    ->disabledClick()
                     ->label('Jam Pulang')
                     ->dateTime('H:i:s'),
 
                 TextColumn::make('statusPresensi')
+                    ->disabledClick()
                     ->label('Status Presensi')
                     ->sortable()
                     ->formatStateUsing(fn (StatusPresensi $state) => $state->label())
@@ -1166,6 +1172,7 @@ class PresensiPegawaiResource extends Resource
                     }),
 
                 TextColumn::make('statusPulang')
+                    ->disabledClick()
                     ->label('Status Pulang')
                     ->sortable()
                     ->formatStateUsing(fn (StatusPulang $state) => $state->label())
@@ -1177,6 +1184,7 @@ class PresensiPegawaiResource extends Resource
                     }),
 
                 TextColumn::make('statusApproval')
+                    ->disabledClick()
                     ->label('Status Persetujuan')
                     ->sortable()
                     ->formatStateUsing(fn (StatusApproval $state) => $state->label())
@@ -1189,6 +1197,7 @@ class PresensiPegawaiResource extends Resource
                     }),
 
                 TextColumn::make('catatan')
+                    ->disabledClick()
                     ->wrap()
                     ->label('Keterangan'),
             ])

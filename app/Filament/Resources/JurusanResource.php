@@ -83,14 +83,17 @@ class JurusanResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('instansi.logoInstansi')
+                    ->disabledClick()
                     ->label('Logo Instansi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
 
                 TextColumn::make('instansi.nama')
+                    ->disabledClick()
                     ->searchable(Jurusan::all()->count() > 10),
 
                 TextColumn::make('nama')
+                    ->disabledClick()
                     ->badge()
                     ->searchable(Jurusan::all()->count() > 10),
             ])

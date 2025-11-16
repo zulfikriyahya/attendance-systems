@@ -202,21 +202,26 @@ class PegawaiResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('user.avatar')
+                    ->disabledClick()
                     ->label('Foto')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('user.name')
+                    ->disabledClick()
                     ->label('Nama Lengkap')
                     ->searchable($searchable),
                 TextColumn::make('jabatan.nama')
+                    ->disabledClick()
                     ->label('Jabatan')
                     ->badge()
                     ->color('primary')
                     ->searchable($searchable),
                 TextColumn::make('nip')
                     ->label('NIP')
+                    ->disabledClick()
                     ->searchable($searchable),
                 TextColumn::make('jenisKelamin')
+                    ->disabledClick()
                     ->label('Jenis Kelamin')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -228,12 +233,15 @@ class PegawaiResource extends Resource
                         'Wanita' => 'heroicon-o-user',
                     }),
                 TextColumn::make('telepon')
+                    ->disabledClick()
                     ->label('Telepon'),
                 TextColumn::make('rfid')
+                    ->disabledClick()
                     ->label('RFID')
                     ->copyable()
                     ->searchable($searchable),
                 ToggleColumn::make('status')
+                    ->disabledClick()
                     ->label('Status'),
             ])
             ->paginationPageOptions([5, 10, 25])

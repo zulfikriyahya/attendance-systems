@@ -15,6 +15,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -43,6 +44,13 @@ class AdminPanelProvider extends PanelProvider
                 'Data Pegawai',
                 'Data Siswa',
                 'Kartu Presensi',
+            ])
+            ->navigationItems([
+                NavigationItem::make('Dokumentasi')
+                    ->url('https://docs.mtsn1pandeglang.sch.id', shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-book-open')
+                    // ->group('External')
+                    ->sort(3),
             ])
             ->login(LoginCustom::class)
             // ->passwordReset()

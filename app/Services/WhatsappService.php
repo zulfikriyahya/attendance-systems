@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class WhatsappService
 {
@@ -211,7 +211,7 @@ class WhatsappService
         $urlInformasi = config('app.url').'/admin/informasi';
 
         // Configurable content length
-        $maxLength = $templates['max_content_length'] ?? 200;
+        $maxLength = $templates['max_content_length'] ?? 300;
         $isiSingkat = strlen($isi) > $maxLength
             ? substr($isi, 0, $maxLength).'... (Baca selengkapnya.)'
             : $isi;

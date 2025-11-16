@@ -138,23 +138,30 @@ class JadwalPresensiResource extends Resource
             ->headerActions([])
             ->columns([
                 ImageColumn::make('instansi.logoInstansi')
+                    ->disabledClick()
                     ->label('Logo Instansi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('instansi.nama')
+                    ->disabledClick()
                     ->label('Nama Instansi'),
                 TextColumn::make('nama')
+                    ->disabledClick()
                     ->label('Nama Jadwal')
                     ->sortable(),
                 TextColumn::make('hari')
+                    ->disabledClick()
                     ->sortable(),
                 TextColumn::make('jamDatang')
+                    ->disabledClick()
                     ->label('Jam Datang')
                     ->suffix(' WIB'),
                 TextColumn::make('jamPulang')
+                    ->disabledClick()
                     ->label('Jam Pulang')
                     ->suffix(' WIB'),
                 ToggleColumn::make('status')
+                    ->disabledClick()
                     ->label('Status')
                     ->disabled(! Auth::user()->hasRole('super_admin'))
                     ->tooltip(fn ($state) => $state !== true ? 'Aktifkan!' : 'Nonaktifkan!'),

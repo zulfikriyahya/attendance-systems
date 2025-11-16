@@ -143,9 +143,11 @@ class InformasiResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('jabatan.nama')
+                    ->disabledClick()
                     ->badge()
                     ->label('Kepada'),
                 TextColumn::make('judul')
+                    ->disabledClick()
                     ->label('Judul')
                     ->searchable(Informasi::all()->count() > 10)
                     ->limit(15)
@@ -159,9 +161,11 @@ class InformasiResource extends Resource
                     })
                     ->weight(FontWeight::Medium),
                 TextColumn::make('tanggal')
+                    ->disabledClick()
                     ->label('Tanggal')
                     ->dateTime('l, d F Y'),
                 TextColumn::make('isi')
+                    ->disabledClick()
                     ->label('Uraian')
                     ->limit(15)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -173,8 +177,10 @@ class InformasiResource extends Resource
                         return $state;
                     }),
                 ImageColumn::make('lampiran')
+                    ->disabledClick()
                     ->label('Lampiran'),
                 TextColumn::make('status')
+                    ->disabledClick()
                     ->label('Status')
                     ->badge()
                     ->colors([

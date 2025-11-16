@@ -2,43 +2,43 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
+use App\Jobs\SendPengajuanKartuNotification;
 use App\Models\PengajuanKartu;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
-use App\Jobs\SendPengajuanKartuNotification;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
-use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
+use Illuminate\Support\Facades\Auth;
 
 class PengajuanKartuResource extends Resource
 {
@@ -309,6 +309,7 @@ class PengajuanKartuResource extends Resource
             ])
             ->columns([
                 TextColumn::make('nomorPengajuanKartu')
+                    ->disabledClick()
                     ->label('Nomor Pengajuan')
                     ->searchable(PengajuanKartu::all()->count() > 10)
                     ->sortable()
@@ -316,16 +317,19 @@ class PengajuanKartuResource extends Resource
                     ->copyable(),
 
                 TextColumn::make('user.name')
+                    ->disabledClick()
                     ->label('Nama User')
                     ->searchable(PengajuanKartu::all()->count() > 10)
                     ->sortable(),
 
                 TextColumn::make('tanggalPengajuanKartu')
+                    ->disabledClick()
                     ->label('Tanggal Pengajuan')
                     ->date('l, d F Y')
                     ->sortable(),
 
                 TextColumn::make('alasanPengajuanKartu')
+                    ->disabledClick()
                     ->label('Alasan Pengajuan')
                     ->badge()
                     ->colors([
@@ -336,6 +340,7 @@ class PengajuanKartuResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('status')
+                    ->disabledClick()
                     ->label('Status')
                     ->badge()
                     ->colors([
@@ -345,6 +350,7 @@ class PengajuanKartuResource extends Resource
                     ])
                     ->sortable(),
                 ToggleColumn::make('statusAmbil')
+                    ->disabledClick()
                     ->label('Penyerahan')
                     ->disabled(fn ($record) => $record->status !== 'Selesai' && Auth::user()->hasRole('super_admin'))
                     ->tooltip(fn ($record) => $record->status !== 'Selesai' ? 'Sudah selesai, tidak bisa diubah' : null)

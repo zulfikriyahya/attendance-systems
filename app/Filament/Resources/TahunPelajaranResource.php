@@ -128,25 +128,31 @@ class TahunPelajaranResource extends Resource
             ->columns([
                 ImageColumn::make('instansi.logoInstansi')
                     ->label('Logo Instansi')
+                    ->disabledClick()
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('instansi.nama')
                     ->label('Nama Instansi')
+                    ->disabledClick()
                     ->searchable(TahunPelajaran::all()->count() > 10),
                 TextColumn::make('nama')
                     ->label('Tahun Pelajaran')
+                    ->disabledClick()
                     ->badge()
                     ->searchable(TahunPelajaran::all()->count() > 10),
                 TextColumn::make('mulai')
                     ->label('Tanggal Mulai')
+                    ->disabledClick()
                     ->date('d F Y')
                     ->sortable(),
                 TextColumn::make('selesai')
                     ->label('Tanggal Selesai')
+                    ->disabledClick()
                     ->date('d F Y')
                     ->sortable(),
                 ToggleColumn::make('status')
                     ->label('Status')
+                    ->disabledClick()
                     ->disabled(! Auth::user()->hasRole('super_admin'))
                     ->tooltip(fn ($state) => $state !== true ? 'Aktifkan!' : 'Nonaktifkan!'),
             ])

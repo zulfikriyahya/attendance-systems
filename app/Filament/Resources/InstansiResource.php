@@ -218,36 +218,47 @@ class InstansiResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('logoInstitusi')
+                    ->disabledClick()
                     ->label('Logo Institusi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 ImageColumn::make('logoInstansi')
+                    ->disabledClick()
                     ->label('Logo Instansi')
                     ->circular()
                     ->defaultImageUrl('/images/default.png'),
                 TextColumn::make('nama')
+                    ->disabledClick()
                     ->label('Nama Instansi')
                     ->searchable($searchable),
                 TextColumn::make('nss')
+                    ->disabledClick()
                     ->label('NSS')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('npsn')
+                    ->disabledClick()
                     ->label('NPSN')
                     ->searchable($searchable)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('telepon')
+                    ->disabledClick()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
+                    ->disabledClick()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('pimpinan')
+                    ->disabledClick()
                     ->label('Nama Pimpinan'),
                 ImageColumn::make('ttePimpinan')
+                    ->disabledClick()
                     ->label('TTE Pimpinan')
                     ->defaultImageUrl('/images/default.png')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('nipPimpinan')
+                    ->disabledClick()
                     ->label('NIP Pimpinan'),
                 TextColumn::make('akreditasi')
+                    ->disabledClick()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'A' => 'info',
@@ -256,12 +267,14 @@ class InstansiResource extends Resource
                         'D' => 'danger',
                     }),
                 TextColumn::make('status')
+                    ->disabledClick()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Negeri' => 'info',
                         'Swasta' => 'success',
                     }),
                 TextColumn::make('website')
+                    ->disabledClick()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->paginationPageOptions([5, 10, 25])

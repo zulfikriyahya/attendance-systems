@@ -86,20 +86,26 @@ class MataPelajaranResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('nama')
+                    ->disabledClick()
                     ->searchable(),
                 TextColumn::make('deskripsi')
+                    ->disabledClick()
                     ->searchable(),
                 IconColumn::make('status')
+                    ->disabledClick()
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->disabledClick()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->disabledClick()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
+                    ->disabledClick()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

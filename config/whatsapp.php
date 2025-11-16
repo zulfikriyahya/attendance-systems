@@ -48,7 +48,7 @@ return [
     */
 
     'queue' => [
-        'default_queue' => env('WHATSAPP_QUEUE', 'default'),
+        'default_queue' => env('WHATSAPP_QUEUE', 'whatsapp'),
         'retry_attempts' => env('WHATSAPP_RETRY_ATTEMPTS', 3),
         'retry_delay' => env('WHATSAPP_RETRY_DELAY', 60), // seconds
     ],
@@ -125,7 +125,7 @@ return [
         'informasi' => [
             'header' => 'PTSP {instansi}',
             'footer' => '© 2022 - {tahun} {instansi}',
-            'max_content_length' => env('WHATSAPP_INFO_MAX_LENGTH', 200),
+            'max_content_length' => env('WHATSAPP_INFO_MAX_LENGTH', 300),
 
             'greetings' => [
                 'siswa' => 'Kepada Bapak/Ibu/Wali Siswa yang terhormat,',
