@@ -40,11 +40,36 @@ class SendDatabaseNotification implements ShouldQueue
             })
             ->get();
 
+        if ($users->isEmpty()) {
+            logger()->warning('No users found for database notification', [
+                'informasi_id' => $this->informasi->id,
+                'jabatan_id' => $this->informasi->jabatan_id,
+            ]);
+
+            return;
+        }
+
         // Kirim notifikasi database ke semua user
         Notification::make()
             ->title('Informasi Baru: '.$this->informasi->judul)
             ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
             ->success()
             ->sendToDatabase($users);
+
+        logger()->info('Database notifications sent', [
+            'informasi_id' => $this->informasi->id,
+            'total_users' => $users->count(),
+        ]);
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to send database notifications', [
+            'informasi_id' => $this->informasi->id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }

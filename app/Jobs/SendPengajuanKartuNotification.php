@@ -1,5 +1,7 @@
 <?php
 
+// Jobs/SendPengajuanKartuNotification.php
+
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
@@ -49,6 +51,18 @@ class SendPengajuanKartuNotification implements ShouldQueue
             $isSiswa = false;
         }
 
+        // Jika tidak ada nomor telepon, skip
+        if (! $phoneNumber) {
+            logger()->warning('No phone number found for pengajuan kartu', [
+                'pengajuan_id' => $record->id,
+                'user_id' => $record->user->id,
+                'user_name' => $userName,
+                'type' => $this->notificationType,
+            ]);
+
+            return;
+        }
+
         // Ambil data instansi
         $namaInstansi = \App\Models\Instansi::first()->nama ?? 'Instansi';
         $instansi = strtoupper($namaInstansi);
@@ -69,5 +83,28 @@ class SendPengajuanKartuNotification implements ShouldQueue
         )
             ->delay(now()->addSeconds(rand(5, 15))) // Small delay untuk natural
             ->onQueue('whatsapp');
+
+        logger()->info('Pengajuan kartu notification dispatched', [
+            'pengajuan_id' => $record->id,
+            'nomor_pengajuan' => $record->nomorPengajuanKartu,
+            'user_name' => $userName,
+            'phone_number' => $phoneNumber,
+            'notification_type' => $this->notificationType,
+        ]);
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to send pengajuan kartu notification', [
+            'pengajuan_id' => $this->pengajuanKartu->id,
+            'nomor_pengajuan' => $this->pengajuanKartu->nomorPengajuanKartu,
+            'user_id' => $this->pengajuanKartu->user->id,
+            'notification_type' => $this->notificationType,
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
     }
 }

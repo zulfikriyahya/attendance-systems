@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\InformasiResource\Pages;
 
-use App\Filament\Resources\InformasiResource;
+use App\Models\User;
+use App\Models\Informasi;
 use App\Jobs\BroadcastInformasi;
 use App\Jobs\SendDatabaseNotification;
-use App\Models\Informasi;
-use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Resources\InformasiResource;
 
 class CreateInformasi extends CreateRecord
 {

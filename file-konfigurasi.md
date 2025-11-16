@@ -15,7 +15,7 @@ User=www-data
 Group=www-data
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsn1pandeglang.sch.id/artisan queue:work --queue=whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
 WorkingDirectory=/www/wwwroot/presensi.mtsn1pandeglang.sch.id
 StandardOutput=append:/var/log/laravel-worker-mtsn1.log
 StandardError=append:/var/log/laravel-worker-mtsn1-error.log
@@ -51,7 +51,7 @@ User=www-data
 Group=www-data
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/artisan queue:work --queue=whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
 WorkingDirectory=/www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id
 StandardOutput=append:/var/log/laravel-worker-man1.log
 StandardError=append:/var/log/laravel-worker-man1-error.log
@@ -87,7 +87,7 @@ User=www-data
 Group=www-data
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/artisan queue:work --queue=whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
 WorkingDirectory=/www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id
 StandardOutput=append:/var/log/laravel-worker-dhpusat.log
 StandardError=append:/var/log/laravel-worker-dhpusat-error.log

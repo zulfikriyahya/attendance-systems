@@ -1,5 +1,7 @@
 <?php
 
+// Jobs/SendWhatsappMessage.php
+
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
@@ -113,7 +115,47 @@ class SendWhatsappMessage implements ShouldQueue
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
 
+            // Log retry attempt untuk monitoring
+            if ($this->attempts() < $this->tries) {
+                logger()->warning('WhatsApp message will be retried', [
+                    'nomor' => $this->nomor,
+                    'type' => $this->type,
+                    'attempt' => $this->attempts(),
+                    'max_attempts' => $this->tries,
+                    'next_retry_in_seconds' => $this->backoff[$this->attempts() - 1] ?? 600,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             throw $e; // Re-throw untuk queue retry mechanism
         }
+    }
+
+    /**
+     * Handle a job failure (setelah semua retry habis)
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('WhatsApp message failed after all retries', [
+            'nomor' => $this->nomor,
+            'type' => $this->type,
+            'data' => $this->data,
+            'attempts' => $this->attempts(),
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+
+        // Optional: Bisa tambahkan notifikasi ke admin atau save ke failed_jobs table
+    }
+
+    private function logError(string $error): void
+    {
+        logger()->error('WhatsApp message failed', [
+            'nomor' => $this->nomor,
+            'type' => $this->type,
+            'data' => $this->data,
+            'error' => $error,
+            'attempt' => $this->attempts(),
+        ]);
     }
 }

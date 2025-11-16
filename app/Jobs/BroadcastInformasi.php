@@ -1,5 +1,7 @@
 <?php
 
+// Jobs/BroadcastInformasi.php
+
 namespace App\Jobs;
 
 use App\Models\Siswa;
@@ -44,6 +46,16 @@ class BroadcastInformasi implements ShouldQueue
 
         $totalRecipients = $siswa->count() + $pegawai->count();
 
+        // Jika tidak ada penerima, return
+        if ($totalRecipients === 0) {
+            logger()->warning('No recipients found for informasi broadcast', [
+                'informasi_id' => $this->informasi->id,
+                'judul' => $this->informasi->judul,
+            ]);
+
+            return;
+        }
+
         $notifCounter = 0;
         $now = now(); // Ambil waktu sekali di awal
 
@@ -72,6 +84,11 @@ class BroadcastInformasi implements ShouldQueue
                 ->onQueue('whatsapp');
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter}/{$totalRecipients} messages queued");
+            }
         }
 
         // Proses pengiriman ke pegawai
@@ -99,10 +116,34 @@ class BroadcastInformasi implements ShouldQueue
                 ->onQueue('whatsapp');
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter}/{$totalRecipients} messages queued");
+            }
         }
 
         // Log broadcast dengan estimasi waktu selesai
         $lastDelay = $delayService->calculateInformasiDelay($notifCounter - 1);
         $maxDelayMinutes = $lastDelay->diffInMinutes($now);
+
+        logger()->info('Informasi WhatsApp broadcast dispatched', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'total_recipients' => $totalRecipients,
+            'siswa' => $siswa->count(),
+            'pegawai' => $pegawai->count(),
+            'max_delay_minutes' => $maxDelayMinutes,
+            'estimated_completion' => $lastDelay->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to broadcast informasi', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }

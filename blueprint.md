@@ -1923,3 +1923,16 @@ sudo php artisan filament:optimize
 
 sudo chown -R www-data:www-data /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
+
+sudo systemctl stop presensi-dhpusat.service
+sudo systemctl stop presensi-man1.service
+sudo systemctl stop presensi-mtsn1.service
+sudo systemctl disable presensi-dhpusat.service
+sudo systemctl disable presensi-man1.service
+sudo systemctl disable presensi-mtsn1.service
+sudo systemctl enable --now presensi-dhpusat.service
+sudo systemctl enable --now presensi-man1.service
+sudo systemctl enable --now presensi-mtsn1.service
+sudo systemctl status presensi-dhpusat.service
+sudo systemctl status presensi-man1.service
+sudo systemctl status presensi-mtsn1.service
