@@ -55,10 +55,5 @@ class SendDatabaseNotification implements ShouldQueue
             ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
             ->success()
             ->sendToDatabase($users);
-
-        logger()->info('Database notifications sent', [
-            'informasi_id' => $this->informasi->id,
-            'total_users' => $users->count(),
-        ]);
     }
 }

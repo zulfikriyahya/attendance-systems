@@ -95,16 +95,6 @@ class SetHadirSiswa implements ShouldQueue
             "🟢 {$jumlahBerhasil} data berhasil disimpan. 🔴 {$jumlahDiabaikan} data diabaikan.",
             'success'
         );
-
-        // Logging
-        logger()->info('Set Hadir Siswa completed', [
-            'user_id' => $this->userId,
-            'berhasil' => $jumlahBerhasil,
-            'diabaikan' => $jumlahDiabaikan,
-            'total_siswa' => count($siswaIds),
-            'total_hari' => $rangeTanggal->count(),
-            'periode' => "{$tanggalMulai->format('Y-m-d')} - {$tanggalSelesai->format('Y-m-d')}",
-        ]);
     }
 
     /**

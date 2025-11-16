@@ -85,11 +85,5 @@ class SetCutiPegawai implements ShouldQueue
                 ->success()
                 ->sendToDatabase($user);
         }
-
-        logger()->info('Set Cuti Pegawai completed', [
-            'user_id' => $this->userId,
-            'berhasil' => $jumlahBerhasil,
-            'diabaikan' => $jumlahDiabaikan,
-        ]);
     }
 }

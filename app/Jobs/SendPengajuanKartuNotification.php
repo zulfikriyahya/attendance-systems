@@ -81,13 +81,5 @@ class SendPengajuanKartuNotification implements ShouldQueue
         )
             ->delay(now()->addSeconds(rand(5, 15))) // Small delay untuk natural
             ->onQueue('whatsapp');
-
-        logger()->info('Pengajuan kartu notification dispatched', [
-            'pengajuan_id' => $record->id,
-            'nomor_pengajuan' => $record->nomorPengajuanKartu,
-            'user_name' => $userName,
-            'phone_number' => $phoneNumber,
-            'notification_type' => $this->notificationType,
-        ]);
     }
 }

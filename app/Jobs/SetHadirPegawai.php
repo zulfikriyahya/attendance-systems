@@ -116,13 +116,5 @@ class SetHadirPegawai implements ShouldQueue
                 ->success()
                 ->sendToDatabase($user);
         }
-
-        logger()->info('Set Hadir Pegawai completed', [
-            'user_id' => $this->userId,
-            'berhasil' => $jumlahBerhasil,
-            'diabaikan' => $jumlahDiabaikan,
-            'total_pegawai' => count($pegawaiIds),
-            'periode' => "{$tanggalMulai->format('Y-m-d')} - {$tanggalSelesai->format('Y-m-d')}",
-        ]);
     }
 }

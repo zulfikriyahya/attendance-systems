@@ -85,11 +85,5 @@ class SetLiburSiswa implements ShouldQueue
                 ->success()
                 ->sendToDatabase($user);
         }
-
-        logger()->info('Set Libur Siswa completed', [
-            'user_id' => $this->userId,
-            'berhasil' => $jumlahBerhasil,
-            'diabaikan' => $jumlahDiabaikan,
-        ]);
     }
 }

@@ -2,43 +2,43 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
-use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
-use App\Jobs\SendPengajuanKartuNotification;
-use App\Models\PengajuanKartu;
-use App\Models\User;
 use Carbon\Carbon;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use App\Models\User;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use App\Models\PengajuanKartu;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\TrashedFilter;
+use App\Jobs\SendPengajuanKartuNotification;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
+use App\Filament\Resources\PengajuanKartuResource\Pages\EditPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ViewPengajuanKartu;
+use App\Filament\Resources\PengajuanKartuResource\Pages\ListPengajuanKartus;
+use App\Filament\Resources\PengajuanKartuResource\Pages\CreatePengajuanKartu;
 
 class PengajuanKartuResource extends Resource
 {
@@ -438,12 +438,6 @@ class PengajuanKartuResource extends Resource
                         // Kirim WhatsApp via Job dengan tipe 'proses'
                         SendPengajuanKartuNotification::dispatch($record, 'proses')
                             ->onQueue('whatsapp');
-
-                        logger()->info('Pengajuan kartu approved', [
-                            'pengajuan_id' => $record->id,
-                            'nomor_pengajuan' => $record->nomorPengajuanKartu,
-                            'user_id' => $record->user->id,
-                        ]);
                     }),
 
                 Action::make('complete')
@@ -478,13 +472,6 @@ class PengajuanKartuResource extends Resource
                         // Kirim WhatsApp via Job dengan tipe 'selesai'
                         SendPengajuanKartuNotification::dispatch($record, 'selesai')
                             ->onQueue('whatsapp');
-
-                        logger()->info('Pengajuan kartu completed', [
-                            'pengajuan_id' => $record->id,
-                            'nomor_pengajuan' => $record->nomorPengajuanKartu,
-                            'user_id' => $record->user->id,
-                            'biaya' => $record->biaya,
-                        ]);
                     }),
 
             ], position: ActionsPosition::BeforeColumns)
