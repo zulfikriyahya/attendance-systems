@@ -37,8 +37,13 @@ class WhatsappService
             return $this->buildErrorResponse('Invalid phone number format', $nomor);
         }
 
-        // UNIFIED RATE LIMIT HANDLING
-        if (! $this->handleRateLimit($type)) {
+        // NEW: Circuit Breaker Check
+        if (! $this->checkCircuitBreaker()) {
+            return $this->buildErrorResponse('Service temporarily unavailable due to high error rate', $nomor);
+        }
+
+        // UPDATED: Rate Limit dengan nomor parameter
+        if (! $this->handleRateLimit($type, $nomor)) {
             return $this->buildErrorResponse('Rate limit exceeded', $nomor);
         }
 
@@ -82,12 +87,14 @@ class WhatsappService
 
             if ($error) {
                 $this->logError('CURL Error', $nomor, $error, ['duration_ms' => $duration]);
+                $this->recordError(); // NEW: Record for circuit breaker
 
                 return $this->buildErrorResponse($error, $nomor);
             }
 
             if ($httpCode >= 400) {
                 $this->logError('HTTP Error', $nomor, "HTTP {$httpCode}", ['duration_ms' => $duration, 'response' => $response]);
+                $this->recordError(); // NEW: Record for circuit breaker
 
                 return $this->buildErrorResponse("HTTP {$httpCode}", $nomor);
             }
@@ -107,6 +114,7 @@ class WhatsappService
         } catch (Exception $e) {
             $duration = round((microtime(true) - $startTime) * 1000, 2);
             $this->logError('Exception', $nomor, $e->getMessage(), ['duration_ms' => $duration, 'trace' => $e->getTraceAsString()]);
+            $this->recordError(); // NEW: Record for circuit breaker
             $this->updateMetrics('error', $duration);
 
             return $this->buildErrorResponse($e->getMessage(), $nomor);
@@ -377,48 +385,265 @@ class WhatsappService
     }
 
     /**
-     * Unified rate limit handler
+     * Multi-tier rate limit handler
+     *
+     * @param  string  $type  Type of message (presensi, bulk, informasi)
+     * @param  string  $nomor  Phone number for per-number limiting
      */
-    protected function handleRateLimit(string $type = 'presensi'): bool
+    protected function handleRateLimit(string $type = 'presensi', string $nomor = ''): bool
     {
-        $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
-        $limit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
+        $now = now();
 
-        // Check if rate limited
-        $current = Cache::get($keyMinute, 0);
-        if ($current >= $limit) {
-            $this->logError('Rate Limit', 'system', "Rate limit exceeded for type: {$type}");
+        // ============================================================
+        // TIER 1: Check Global Daily Limit
+        // ============================================================
+        $dailyKey = 'whatsapp_global_daily_'.$now->format('Y-m-d');
+        $dailyLimit = $this->config['rate_limits']['global']['daily'] ?? 5000;
+        $dailyCount = Cache::get($dailyKey, 0);
+
+        if ($dailyCount >= $dailyLimit) {
+            $this->logError('Rate Limit - Global Daily', 'system',
+                "Global daily limit exceeded: {$dailyCount}/{$dailyLimit}",
+                ['date' => $now->format('Y-m-d')]
+            );
 
             return false;
         }
 
-        // Apply delay before sending
-        $ratePerMinute = $limit;
+        // ============================================================
+        // TIER 2: Check Global Hourly Limit
+        // ============================================================
+        $hourlyKey = 'whatsapp_global_hourly_'.$now->format('Y-m-d-H');
+        $hourlyLimit = $this->config['rate_limits']['global']['hourly'] ?? 500;
+        $hourlyCount = Cache::get($hourlyKey, 0);
+
+        if ($hourlyCount >= $hourlyLimit) {
+            $this->logError('Rate Limit - Global Hourly', 'system',
+                "Global hourly limit exceeded: {$hourlyCount}/{$hourlyLimit}",
+                ['hour' => $now->format('Y-m-d H:00')]
+            );
+
+            return false;
+        }
+
+        // ============================================================
+        // TIER 3: Check Type-Specific Daily Limit
+        // ============================================================
+        $typeDailyKey = "whatsapp_{$type}_daily_".$now->format('Y-m-d');
+        $typeDailyLimit = $this->config['rate_limits'][$type]['messages_per_day'] ?? 3000;
+        $typeDailyCount = Cache::get($typeDailyKey, 0);
+
+        if ($typeDailyCount >= $typeDailyLimit) {
+            $this->logError('Rate Limit - Type Daily', 'system',
+                "Type '{$type}' daily limit exceeded: {$typeDailyCount}/{$typeDailyLimit}",
+                ['type' => $type, 'date' => $now->format('Y-m-d')]
+            );
+
+            return false;
+        }
+
+        // ============================================================
+        // TIER 4: Check Type-Specific Hourly Limit
+        // ============================================================
+        $typeHourlyKey = "whatsapp_{$type}_hourly_".$now->format('Y-m-d-H');
+        $typeHourlyLimit = $this->config['rate_limits'][$type]['messages_per_hour'] ?? 300;
+        $typeHourlyCount = Cache::get($typeHourlyKey, 0);
+
+        if ($typeHourlyCount >= $typeHourlyLimit) {
+            $this->logError('Rate Limit - Type Hourly', 'system',
+                "Type '{$type}' hourly limit exceeded: {$typeHourlyCount}/{$typeHourlyLimit}",
+                ['type' => $type, 'hour' => $now->format('Y-m-d H:00')]
+            );
+
+            return false;
+        }
+
+        // ============================================================
+        // TIER 5: Check Per-Minute Limit (existing)
+        // ============================================================
+        $minuteKey = "whatsapp_rate_limit_{$type}_".$now->format('Y-m-d-H-i');
+        $minuteLimit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
+        $minuteCount = Cache::get($minuteKey, 0);
+
+        if ($minuteCount >= $minuteLimit) {
+            $this->logError('Rate Limit - Per Minute', 'system',
+                "Type '{$type}' per-minute limit exceeded: {$minuteCount}/{$minuteLimit}",
+                ['type' => $type, 'minute' => $now->format('Y-m-d H:i')]
+            );
+
+            return false;
+        }
+
+        // ============================================================
+        // TIER 6: Check Per-Number Limit (if nomor provided)
+        // ============================================================
+        if (! empty($nomor)) {
+            // Per-number hourly check
+            $numberHourlyKey = "whatsapp_number_{$nomor}_hourly_".$now->format('Y-m-d-H');
+            $numberHourlyLimit = $this->config['rate_limits']['per_number']['hourly'] ?? 2;
+            $numberHourlyCount = Cache::get($numberHourlyKey, 0);
+
+            if ($numberHourlyCount >= $numberHourlyLimit) {
+                $this->logError('Rate Limit - Per Number Hourly', $nomor,
+                    "Per-number hourly limit exceeded: {$numberHourlyCount}/{$numberHourlyLimit}",
+                    ['hour' => $now->format('Y-m-d H:00')]
+                );
+
+                return false;
+            }
+
+            // Per-number daily check
+            $numberDailyKey = "whatsapp_number_{$nomor}_daily_".$now->format('Y-m-d');
+            $numberDailyLimit = $this->config['rate_limits']['per_number']['daily'] ?? 5;
+            $numberDailyCount = Cache::get($numberDailyKey, 0);
+
+            if ($numberDailyCount >= $numberDailyLimit) {
+                $this->logError('Rate Limit - Per Number Daily', $nomor,
+                    "Per-number daily limit exceeded: {$numberDailyCount}/{$numberDailyLimit}",
+                    ['date' => $now->format('Y-m-d')]
+                );
+
+                return false;
+            }
+        }
+
+        // ============================================================
+        // Apply Random Delay (natural behavior)
+        // ============================================================
+        $ratePerMinute = $minuteLimit;
         $baseDelayMs = (int) (60000 / $ratePerMinute);
-        $variation = $baseDelayMs * 0.2;
+        $variation = $baseDelayMs * 0.2; // ±20% variation
         $minDelay = (int) ($baseDelayMs - $variation);
         $maxDelay = (int) ($baseDelayMs + $variation);
         $randomDelayMs = random_int($minDelay, $maxDelay);
 
-        usleep($randomDelayMs * 1000);
+        usleep($randomDelayMs * 1000); // Convert to microseconds
 
-        // ✅ FIXED: Better increment with auto-expiry
-        Cache::add($keyMinute, 0, now()->addMinutes(2)); // Create if not exists with TTL
-        Cache::increment($keyMinute, 1);
+        // ============================================================
+        // Increment All Counters
+        // ============================================================
+
+        // Global counters
+        Cache::add($dailyKey, 0, $now->copy()->endOfDay()->addMinutes(5));
+        Cache::increment($dailyKey, 1);
+
+        Cache::add($hourlyKey, 0, $now->copy()->endOfHour()->addMinutes(5));
+        Cache::increment($hourlyKey, 1);
+
+        // Type-specific counters
+        Cache::add($typeDailyKey, 0, $now->copy()->endOfDay()->addMinutes(5));
+        Cache::increment($typeDailyKey, 1);
+
+        Cache::add($typeHourlyKey, 0, $now->copy()->endOfHour()->addMinutes(5));
+        Cache::increment($typeHourlyKey, 1);
+
+        Cache::add($minuteKey, 0, now()->addMinutes(2));
+        Cache::increment($minuteKey, 1);
+
+        // Per-number counters (if applicable)
+        if (! empty($nomor)) {
+            Cache::add($numberHourlyKey, 0, $now->copy()->endOfHour()->addMinutes(5));
+            Cache::increment($numberHourlyKey, 1);
+
+            Cache::add($numberDailyKey, 0, $now->copy()->endOfDay()->addMinutes(5));
+            Cache::increment($numberDailyKey, 1);
+        }
 
         return true;
     }
 
     /**
-     * ✅ NEW: Check rate limit status (for monitoring)
+     * Circuit Breaker - Stop sementara jika terlalu banyak error
+     *
+     * @return bool True if safe to proceed, false if circuit is open
      */
-    protected function checkRateLimit(string $type = 'presensi'): bool
+    protected function checkCircuitBreaker(): bool
     {
-        $keyMinute = "whatsapp_rate_limit_{$type}_".date('Y-m-d-H-i');
-        $limit = $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20;
-        $current = Cache::get($keyMinute, 0);
+        if (! ($this->config['circuit_breaker']['enabled'] ?? true)) {
+            return true; // Circuit breaker disabled
+        }
 
-        return $current >= $limit;
+        $now = now();
+        $errorKey = 'whatsapp_errors_'.$now->format('Y-m-d-H');
+        $errorThreshold = $this->config['circuit_breaker']['error_threshold'] ?? 50;
+        $errorCount = Cache::get($errorKey, 0);
+
+        // Check if circuit is open
+        if ($errorCount >= $errorThreshold) {
+            $circuitKey = 'whatsapp_circuit_breaker_open';
+
+            // Check if already in cooldown
+            if (Cache::has($circuitKey)) {
+                $this->logError('Circuit Breaker', 'system',
+                    "Circuit breaker is OPEN. Service paused. Error count: {$errorCount}/{$errorThreshold}"
+                );
+
+                return false;
+            }
+
+            // Open circuit for cooldown period
+            $cooldownMinutes = $this->config['circuit_breaker']['cooldown_minutes'] ?? 30;
+            Cache::put($circuitKey, true, now()->addMinutes($cooldownMinutes));
+
+            $this->logError('Circuit Breaker', 'system',
+                "Circuit breaker ACTIVATED. Too many errors: {$errorCount}/{$errorThreshold}. Cooldown: {$cooldownMinutes} minutes",
+                ['cooldown_until' => now()->addMinutes($cooldownMinutes)->toIso8601String()]
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Record error for circuit breaker
+     * Call this whenever there's an error
+     */
+    protected function recordError(): void
+    {
+        if (! ($this->config['circuit_breaker']['enabled'] ?? true)) {
+            return;
+        }
+
+        $errorKey = 'whatsapp_errors_'.now()->format('Y-m-d-H');
+
+        Cache::add($errorKey, 0, now()->endOfHour()->addMinutes(5));
+        Cache::increment($errorKey, 1);
+    }
+
+    /**
+     * Check if any rate limit is active (for monitoring)
+     *
+     * @return array Status of all rate limits
+     */
+    protected function checkRateLimitStatus(string $type = 'presensi'): array
+    {
+        $now = now();
+
+        return [
+            'global_daily' => [
+                'current' => Cache::get('whatsapp_global_daily_'.$now->format('Y-m-d'), 0),
+                'limit' => $this->config['rate_limits']['global']['daily'] ?? 5000,
+            ],
+            'global_hourly' => [
+                'current' => Cache::get('whatsapp_global_hourly_'.$now->format('Y-m-d-H'), 0),
+                'limit' => $this->config['rate_limits']['global']['hourly'] ?? 500,
+            ],
+            'type_hourly' => [
+                'current' => Cache::get("whatsapp_{$type}_hourly_".$now->format('Y-m-d-H'), 0),
+                'limit' => $this->config['rate_limits'][$type]['messages_per_hour'] ?? 300,
+            ],
+            'type_minute' => [
+                'current' => Cache::get("whatsapp_rate_limit_{$type}_".$now->format('Y-m-d-H-i'), 0),
+                'limit' => $this->config['rate_limits'][$type]['messages_per_minute'] ?? 20,
+            ],
+            'circuit_breaker' => [
+                'errors' => Cache::get('whatsapp_errors_'.$now->format('Y-m-d-H'), 0),
+                'threshold' => $this->config['circuit_breaker']['error_threshold'] ?? 50,
+                'is_open' => Cache::has('whatsapp_circuit_breaker_open'),
+            ],
+        ];
     }
 
     /**
@@ -585,12 +810,13 @@ class WhatsappService
     }
 
     /**
-     * Get service health status
+     * Get comprehensive service health status
      */
     public function getHealthStatus(): array
     {
-        $successKey = 'whatsapp_metrics_success_'.date('Y-m-d-H');
-        $errorKey = 'whatsapp_metrics_error_'.date('Y-m-d-H');
+        $now = now();
+        $successKey = 'whatsapp_metrics_success_'.$now->format('Y-m-d-H');
+        $errorKey = 'whatsapp_metrics_error_'.$now->format('Y-m-d-H');
 
         $success = Cache::get($successKey, ['count' => 0, 'avg_duration' => 0]);
         $errors = Cache::get($errorKey, ['count' => 0]);
@@ -598,13 +824,63 @@ class WhatsappService
         $total = $success['count'] + $errors['count'];
         $successRate = $total > 0 ? round(($success['count'] / $total) * 100, 2) : 100;
 
+        // Get rate limit status
+        $rateLimits = $this->checkRateLimitStatus('presensi');
+
+        // Calculate percentage used for each limit
+        $globalDailyUsage = $rateLimits['global_daily']['limit'] > 0
+            ? round(($rateLimits['global_daily']['current'] / $rateLimits['global_daily']['limit']) * 100, 2)
+            : 0;
+
+        $globalHourlyUsage = $rateLimits['global_hourly']['limit'] > 0
+            ? round(($rateLimits['global_hourly']['current'] / $rateLimits['global_hourly']['limit']) * 100, 2)
+            : 0;
+
+        // Determine overall status
+        $status = 'healthy';
+        if ($successRate < 80 || $rateLimits['circuit_breaker']['is_open']) {
+            $status = 'unhealthy';
+        } elseif ($successRate < 95 || $globalHourlyUsage > 80) {
+            $status = 'degraded';
+        }
+
         return [
-            'status' => $successRate >= 95 ? 'healthy' : ($successRate >= 80 ? 'degraded' : 'unhealthy'),
-            'success_rate' => $successRate,
-            'avg_response_time' => $success['avg_duration'],
-            'total_requests' => $total,
-            'error_count' => $errors['count'],
-            'is_rate_limited' => $this->checkRateLimit('presensi'), // ✅ FIXED
+            'status' => $status,
+            'timestamp' => $now->toIso8601String(),
+
+            // Performance metrics
+            'performance' => [
+                'success_rate' => $successRate,
+                'avg_response_time' => $success['avg_duration'],
+                'total_requests' => $total,
+                'error_count' => $errors['count'],
+            ],
+
+            // Rate limit status
+            'rate_limits' => [
+                'global_daily' => [
+                    'used' => $rateLimits['global_daily']['current'],
+                    'limit' => $rateLimits['global_daily']['limit'],
+                    'percentage' => $globalDailyUsage,
+                ],
+                'global_hourly' => [
+                    'used' => $rateLimits['global_hourly']['current'],
+                    'limit' => $rateLimits['global_hourly']['limit'],
+                    'percentage' => $globalHourlyUsage,
+                ],
+                'current_minute' => [
+                    'used' => $rateLimits['type_minute']['current'],
+                    'limit' => $rateLimits['type_minute']['limit'],
+                ],
+            ],
+
+            // Circuit breaker status
+            'circuit_breaker' => [
+                'enabled' => $this->config['circuit_breaker']['enabled'] ?? true,
+                'is_open' => $rateLimits['circuit_breaker']['is_open'],
+                'error_count' => $rateLimits['circuit_breaker']['errors'],
+                'error_threshold' => $rateLimits['circuit_breaker']['threshold'],
+            ],
         ];
     }
 }

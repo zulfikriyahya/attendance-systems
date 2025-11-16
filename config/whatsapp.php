@@ -8,24 +8,41 @@ return [
     */
 
     'endpoint' => env('WHATSAPP_ENDPOINT', 'https://api.whatsapp.local/send'),
-
     'timeout' => env('WHATSAPP_TIMEOUT', 15),
 
     /*
     |--------------------------------------------------------------------------
-    | Rate Limiting Configuration
+    | Rate Limiting Configuration - Multi-Tier
     |--------------------------------------------------------------------------
     */
 
     'rate_limits' => [
+        // NEW: Global limits (all types combined)
+        'global' => [
+            'hourly' => env('WHATSAPP_HOURLY_LIMIT', 500),
+            'daily' => env('WHATSAPP_DAILY_LIMIT', 5000),
+        ],
+
+        // NEW: Per-number limits (anti-spam)
+        'per_number' => [
+            'hourly' => env('WHATSAPP_PER_NUMBER_HOURLY', 2),
+            'daily' => env('WHATSAPP_PER_NUMBER_DAILY', 5),
+        ],
+
+        // Presensi (real-time)
         'presensi' => [
             'messages_per_minute' => env('WHATSAPP_PRESENSI_RATE', 35),
+            'messages_per_hour' => env('WHATSAPP_PRESENSI_HOURLY', 300),
+            'messages_per_day' => env('WHATSAPP_PRESENSI_DAILY', 3000),
             'max_delay_minutes' => env('WHATSAPP_PRESENSI_MAX_DELAY', 30),
             'priority_statuses' => ['Terlambat', 'Pulang Cepat'],
         ],
 
+        // Bulk (scheduled background)
         'bulk' => [
             'messages_per_minute' => env('WHATSAPP_BULK_RATE', 20),
+            'messages_per_hour' => env('WHATSAPP_BULK_HOURLY', 150),
+            'messages_per_day' => env('WHATSAPP_BULK_DAILY', 1500),
             'max_delay_hours' => env('WHATSAPP_BULK_MAX_DELAY', 2),
             'types' => [
                 'alfa' => ['priority' => 1, 'extra_delay' => 0],
@@ -34,11 +51,26 @@ return [
             ],
         ],
 
+        // Informasi (broadcast)
         'informasi' => [
             'messages_per_minute' => env('WHATSAPP_INFORMASI_RATE', 25),
+            'messages_per_hour' => env('WHATSAPP_INFORMASI_HOURLY', 100),
+            'messages_per_day' => env('WHATSAPP_INFORMASI_DAILY', 1000),
             'max_delay_minutes' => env('WHATSAPP_INFORMASI_MAX_DELAY', 60),
             'extra_delay' => [30, 90],
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Circuit Breaker Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'circuit_breaker' => [
+        'enabled' => env('WHATSAPP_CIRCUIT_BREAKER_ENABLED', true),
+        'error_threshold' => env('WHATSAPP_ERROR_THRESHOLD', 50),
+        'cooldown_minutes' => env('WHATSAPP_CIRCUIT_BREAKER_COOLDOWN', 30),
     ],
 
     /*
@@ -50,7 +82,7 @@ return [
     'queue' => [
         'default_queue' => env('WHATSAPP_QUEUE', 'whatsapp'),
         'retry_attempts' => env('WHATSAPP_RETRY_ATTEMPTS', 3),
-        'retry_delay' => env('WHATSAPP_RETRY_DELAY', 60), // seconds
+        'retry_delay' => env('WHATSAPP_RETRY_DELAY', 60),
     ],
 
     /*
