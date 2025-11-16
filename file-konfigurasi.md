@@ -30,6 +30,8 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-mtsn1.service
+sudo chown -R www-data:www-data /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 ```
 
 ---
@@ -64,6 +66,8 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-man1.service
+sudo chown -R www-data:www-data /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/storage
 ```
 
 ---
@@ -98,4 +102,6 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-dhpusat.service
+sudo chown -R www-data:www-data /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
 ```
