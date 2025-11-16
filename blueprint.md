@@ -1910,27 +1910,3 @@ class SetKetidakhadiran extends Command
     }
 }
 ```
-
-sudo composer update
-sudo php artisan config:clear
-sudo php artisan cache:clear
-sudo php artisan view:clear
-sudo php artisan queue:clear
-sudo php artisan queue:clear --queue=whatsapp
-sudo php artisan queue:flush
-sudo php artisan optimize:clear
-sudo php artisan optimize
-sudo php artisan filament:optimize
-
-sudo systemctl stop presensi-dhpusat.service
-sudo systemctl stop presensi-man1.service
-sudo systemctl stop presensi-mtsn1.service
-sudo systemctl disable presensi-dhpusat.service
-sudo systemctl disable presensi-man1.service
-sudo systemctl disable presensi-mtsn1.service
-sudo systemctl enable --now presensi-dhpusat.service
-sudo systemctl enable --now presensi-man1.service
-sudo systemctl enable --now presensi-mtsn1.service
-sudo systemctl status presensi-dhpusat.service
-sudo systemctl status presensi-man1.service
-sudo systemctl status presensi-mtsn1.service
