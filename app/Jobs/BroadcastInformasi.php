@@ -135,13 +135,4 @@ class BroadcastInformasi implements ShouldQueue
             'estimated_completion' => $lastDelay->format('Y-m-d H:i:s'),
         ]);
     }
-
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Failed to broadcast informasi', [
-            'informasi_id' => $this->informasi->id,
-            'judul' => $this->informasi->judul,
-            'error' => $exception->getMessage(),
-        ]);
-    }
 }

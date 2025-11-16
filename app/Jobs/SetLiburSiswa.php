@@ -2,17 +2,17 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Siswa;
 use App\Enums\StatusPresensi;
 use App\Models\PresensiSiswa;
-use App\Models\Siswa;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Filament\Notifications\Notification;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class SetLiburSiswa implements ShouldQueue
 {
@@ -91,22 +91,5 @@ class SetLiburSiswa implements ShouldQueue
             'berhasil' => $jumlahBerhasil,
             'diabaikan' => $jumlahDiabaikan,
         ]);
-    }
-
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Set Libur Siswa job failed', [
-            'user_id' => $this->userId,
-            'error' => $exception->getMessage(),
-        ]);
-
-        $user = User::find($this->userId);
-        if ($user) {
-            Notification::make()
-                ->title('Penetapan Libur Gagal')
-                ->body('❌ Terjadi kesalahan. Silakan coba lagi.')
-                ->danger()
-                ->sendToDatabase($user);
-        }
     }
 }

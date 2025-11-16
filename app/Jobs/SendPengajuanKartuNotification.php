@@ -90,19 +90,4 @@ class SendPengajuanKartuNotification implements ShouldQueue
             'notification_type' => $this->notificationType,
         ]);
     }
-
-    /**
-     * Handle a job failure.
-     */
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Failed to send pengajuan kartu notification', [
-            'pengajuan_id' => $this->pengajuanKartu->id,
-            'nomor_pengajuan' => $this->pengajuanKartu->nomorPengajuanKartu,
-            'user_id' => $this->pengajuanKartu->user->id,
-            'notification_type' => $this->notificationType,
-            'error' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString(),
-        ]);
-    }
 }

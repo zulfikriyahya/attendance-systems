@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\Informasi;
 use App\Models\User;
-use Filament\Notifications\Notification;
+use App\Models\Informasi;
 use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Filament\Notifications\Notification;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class SendDatabaseNotification implements ShouldQueue
 {
@@ -59,17 +59,6 @@ class SendDatabaseNotification implements ShouldQueue
         logger()->info('Database notifications sent', [
             'informasi_id' => $this->informasi->id,
             'total_users' => $users->count(),
-        ]);
-    }
-
-    /**
-     * Handle a job failure.
-     */
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Failed to send database notifications', [
-            'informasi_id' => $this->informasi->id,
-            'error' => $exception->getMessage(),
         ]);
     }
 }

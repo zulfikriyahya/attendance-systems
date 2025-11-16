@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Models\Instansi;
-use App\Models\PresensiSiswa;
-use App\Models\Siswa;
-use App\Models\User;
 use Carbon\Carbon;
-use Filament\Notifications\Notification;
+use App\Models\User;
+use App\Models\Siswa;
+use App\Models\Instansi;
+use App\Enums\StatusPulang;
+use App\Enums\StatusPresensi;
+use App\Models\PresensiSiswa;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Queue\SerializesModels;
+use Filament\Notifications\Notification;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 
 class SetHadirSiswa implements ShouldQueue
 {
@@ -249,24 +249,5 @@ class SetHadirSiswa implements ShouldQueue
         };
 
         $notification->sendToDatabase($user);
-    }
-
-    /**
-     * Handle a job failure.
-     */
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Set Hadir Siswa job failed', [
-            'user_id' => $this->userId,
-            'data' => $this->data,
-            'error' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString(),
-        ]);
-
-        $this->sendNotification(
-            'Penetapan Hadir Gagal',
-            '❌ Terjadi kesalahan saat memproses penetapan hadir. Silakan coba lagi.',
-            'danger'
-        );
     }
 }

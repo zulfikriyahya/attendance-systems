@@ -2,19 +2,19 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Models\Instansi;
-use App\Models\Pegawai;
-use App\Models\PresensiPegawai;
-use App\Models\User;
 use Carbon\Carbon;
-use Filament\Notifications\Notification;
+use App\Models\User;
+use App\Models\Pegawai;
+use App\Models\Instansi;
+use App\Enums\StatusPulang;
+use App\Enums\StatusPresensi;
 use Illuminate\Bus\Queueable;
+use App\Models\PresensiPegawai;
+use Illuminate\Queue\SerializesModels;
+use Filament\Notifications\Notification;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class SetHadirPegawai implements ShouldQueue
 {
@@ -124,27 +124,5 @@ class SetHadirPegawai implements ShouldQueue
             'total_pegawai' => count($pegawaiIds),
             'periode' => "{$tanggalMulai->format('Y-m-d')} - {$tanggalSelesai->format('Y-m-d')}",
         ]);
-    }
-
-    /**
-     * Handle a job failure.
-     */
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('Set Hadir Pegawai job failed', [
-            'user_id' => $this->userId,
-            'data' => $this->data,
-            'error' => $exception->getMessage(),
-        ]);
-
-        // Notifikasi ke user bahwa job gagal
-        $user = User::find($this->userId);
-        if ($user) {
-            Notification::make()
-                ->title('Penetapan Hadir Gagal')
-                ->body('❌ Terjadi kesalahan saat memproses penetapan hadir. Silakan coba lagi.')
-                ->danger()
-                ->sendToDatabase($user);
-        }
     }
 }

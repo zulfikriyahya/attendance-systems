@@ -128,32 +128,4 @@ class SendWhatsappMessage implements ShouldQueue
             throw $e; // Re-throw untuk queue retry mechanism
         }
     }
-
-    /**
-     * Handle a job failure (setelah semua retry habis)
-     */
-    public function failed(\Throwable $exception): void
-    {
-        logger()->error('WhatsApp message failed after all retries', [
-            'nomor' => $this->nomor,
-            'type' => $this->type,
-            'data' => $this->data,
-            'attempts' => $this->attempts(),
-            'error' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString(),
-        ]);
-
-        // Optional: Bisa tambahkan notifikasi ke admin atau save ke failed_jobs table
-    }
-
-    private function logError(string $error): void
-    {
-        logger()->error('WhatsApp message failed', [
-            'nomor' => $this->nomor,
-            'type' => $this->type,
-            'data' => $this->data,
-            'error' => $error,
-            'attempt' => $this->attempts(),
-        ]);
-    }
 }
