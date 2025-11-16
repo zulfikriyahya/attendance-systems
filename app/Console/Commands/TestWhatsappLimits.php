@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Services\WhatsappService;
 use Illuminate\Console\Command;
+use App\Services\WhatsappService;
 
 class TestWhatsappLimits extends Command
 {
@@ -32,7 +32,7 @@ class TestWhatsappLimits extends Command
 
         for ($i = 1; $i <= $count; $i++) {
             $result = $whatsapp->send(
-                '081234567890', // Test number
+                '0895351856267', // Test number
                 "Test message #{$i} - ".now()->format('H:i:s'),
                 null,
                 $type
