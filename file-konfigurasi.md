@@ -106,6 +106,7 @@ sudo chown -R www:www /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/stora
 sudo chmod -R 775 /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
 ```
 
+```bash
 sudo composer update
 sudo php artisan config:clear
 sudo php artisan cache:clear
@@ -129,3 +130,4 @@ sudo systemctl enable --now presensi-mtsn1.service
 sudo systemctl status presensi-dhpusat.service
 sudo systemctl status presensi-man1.service
 sudo systemctl status presensi-mtsn1.service
+```

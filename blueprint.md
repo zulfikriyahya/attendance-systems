@@ -421,6 +421,16 @@ class BroadcastInformasi implements ShouldQueue
 
         $totalRecipients = $siswa->count() + $pegawai->count();
 
+        // Jika tidak ada penerima, return
+        if ($totalRecipients === 0) {
+            logger()->warning('No recipients found for informasi broadcast', [
+                'informasi_id' => $this->informasi->id,
+                'judul' => $this->informasi->judul,
+            ]);
+
+            return;
+        }
+
         $notifCounter = 0;
         $now = now(); // Ambil waktu sekali di awal
 
@@ -449,6 +459,11 @@ class BroadcastInformasi implements ShouldQueue
                 ->onQueue('whatsapp');
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter}/{$totalRecipients} messages queued");
+            }
         }
 
         // Proses pengiriman ke pegawai
@@ -476,11 +491,35 @@ class BroadcastInformasi implements ShouldQueue
                 ->onQueue('whatsapp');
 
             $notifCounter++;
+
+            // Log setiap 50 pesan untuk monitoring
+            if ($notifCounter % 50 === 0) {
+                logger()->info("Broadcast progress: {$notifCounter}/{$totalRecipients} messages queued");
+            }
         }
 
         // Log broadcast dengan estimasi waktu selesai
         $lastDelay = $delayService->calculateInformasiDelay($notifCounter - 1);
         $maxDelayMinutes = $lastDelay->diffInMinutes($now);
+
+        logger()->info('Informasi WhatsApp broadcast dispatched', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'total_recipients' => $totalRecipients,
+            'siswa' => $siswa->count(),
+            'pegawai' => $pegawai->count(),
+            'max_delay_minutes' => $maxDelayMinutes,
+            'estimated_completion' => $lastDelay->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to broadcast informasi', [
+            'informasi_id' => $this->informasi->id,
+            'judul' => $this->informasi->judul,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }
 # app/Jobs/ProcessKetidakhadiran.php
@@ -769,12 +808,37 @@ class SendDatabaseNotification implements ShouldQueue
             })
             ->get();
 
+        if ($users->isEmpty()) {
+            logger()->warning('No users found for database notification', [
+                'informasi_id' => $this->informasi->id,
+                'jabatan_id' => $this->informasi->jabatan_id,
+            ]);
+
+            return;
+        }
+
         // Kirim notifikasi database ke semua user
         Notification::make()
             ->title('Informasi Baru: '.$this->informasi->judul)
             ->body('Silakan cek informasi terbaru yang telah dipublikasikan.')
             ->success()
             ->sendToDatabase($users);
+
+        logger()->info('Database notifications sent', [
+            'informasi_id' => $this->informasi->id,
+            'total_users' => $users->count(),
+        ]);
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to send database notifications', [
+            'informasi_id' => $this->informasi->id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }
 # app/Jobs/SendPengajuanKartuNotification.php
@@ -818,6 +882,18 @@ class SendPengajuanKartuNotification implements ShouldQueue
             $isSiswa = false;
         }
 
+        // Jika tidak ada nomor telepon, skip
+        if (! $phoneNumber) {
+            logger()->warning('No phone number found for pengajuan kartu', [
+                'pengajuan_id' => $record->id,
+                'user_id' => $record->user->id,
+                'user_name' => $userName,
+                'type' => $this->notificationType,
+            ]);
+
+            return;
+        }
+
         // Ambil data instansi
         $namaInstansi = \App\Models\Instansi::first()->nama ?? 'Instansi';
         $instansi = strtoupper($namaInstansi);
@@ -838,6 +914,29 @@ class SendPengajuanKartuNotification implements ShouldQueue
         )
             ->delay(now()->addSeconds(rand(5, 15))) // Small delay untuk natural
             ->onQueue('whatsapp');
+
+        logger()->info('Pengajuan kartu notification dispatched', [
+            'pengajuan_id' => $record->id,
+            'nomor_pengajuan' => $record->nomorPengajuanKartu,
+            'user_name' => $userName,
+            'phone_number' => $phoneNumber,
+            'notification_type' => $this->notificationType,
+        ]);
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('Failed to send pengajuan kartu notification', [
+            'pengajuan_id' => $this->pengajuanKartu->id,
+            'nomor_pengajuan' => $this->pengajuanKartu->nomorPengajuanKartu,
+            'user_id' => $this->pengajuanKartu->user->id,
+            'notification_type' => $this->notificationType,
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
     }
 }
 
@@ -946,8 +1045,48 @@ class SendWhatsappMessage implements ShouldQueue
         } catch (\Exception $e) {
             $this->logError($e->getMessage());
 
+            // Log retry attempt untuk monitoring
+            if ($this->attempts() < $this->tries) {
+                logger()->warning('WhatsApp message will be retried', [
+                    'nomor' => $this->nomor,
+                    'type' => $this->type,
+                    'attempt' => $this->attempts(),
+                    'max_attempts' => $this->tries,
+                    'next_retry_in_seconds' => $this->backoff[$this->attempts() - 1] ?? 600,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             throw $e; // Re-throw untuk queue retry mechanism
         }
+    }
+
+    /**
+     * Handle a job failure (setelah semua retry habis)
+     */
+    public function failed(\Throwable $exception): void
+    {
+        logger()->error('WhatsApp message failed after all retries', [
+            'nomor' => $this->nomor,
+            'type' => $this->type,
+            'data' => $this->data,
+            'attempts' => $this->attempts(),
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString(),
+        ]);
+
+        // Optional: Bisa tambahkan notifikasi ke admin atau save ke failed_jobs table
+    }
+
+    private function logError(string $error): void
+    {
+        logger()->error('WhatsApp message failed', [
+            'nomor' => $this->nomor,
+            'type' => $this->type,
+            'data' => $this->data,
+            'error' => $error,
+            'attempt' => $this->attempts(),
+        ]);
     }
 }
 ```
