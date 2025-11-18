@@ -124,7 +124,7 @@ Group=www
 Restart=always
 RestartSec=10
 ExecStart=/usr/bin/php /www/wwwroot/presensi.sekolahalampandeglang.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
-WorkingDirectory=/www/wwwroot/presensi.sekolahalampandeglang.sch.id
+WorkingDirectory=/www/wwwroot/presensi.sekolahalampandeglang.id
 StandardOutput=append:/var/log/laravel-worker-sekolahalampandeglang.log
 StandardError=append:/var/log/laravel-worker-sekolahalampandeglang-error.log
 
@@ -138,8 +138,8 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-sekolahalampandeglang.service
-sudo chown -R www:www /www/wwwroot/presensi.sekolahalampandeglang.sch.id/storage
-sudo chmod -R 775 /www/wwwroot/presensi.sekolahalampandeglang.sch.id/storage
+sudo chown -R www:www /www/wwwroot/presensi.sekolahalampandeglang.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi.sekolahalampandeglang.id/storage
 ```
 
 ---
