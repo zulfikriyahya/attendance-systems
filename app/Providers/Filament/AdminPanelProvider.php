@@ -2,31 +2,31 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\EditProfileCustom;
-use App\Filament\Pages\Auth\LoginCustom;
-use App\Filament\Pages\DashboardAdmin;
-use App\Filament\Resources\UserResource;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
-use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
-use Filament\Enums\ThemeMode;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use App\Filament\Pages\DashboardAdmin;
+use Filament\Navigation\NavigationItem;
+use App\Filament\Pages\Auth\LoginCustom;
+use App\Filament\Resources\UserResource;
+use Filament\Http\Middleware\Authenticate;
+use App\Filament\Pages\Auth\EditProfileCustom;
+use Illuminate\Session\Middleware\StartSession;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Filament\Http\Middleware\AuthenticateSession;
+use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -46,6 +46,12 @@ class AdminPanelProvider extends PanelProvider
                 'Kartu Presensi',
             ])
             ->navigationItems([
+                NavigationItem::make('Whatsapp')
+                    ->url('https://wapi-1.zedlabs.id', shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                    // ->group('External')
+                    ->visible(fn (): bool => Auth::user()->hasRole('super_admin'))
+                    ->sort(2),
                 NavigationItem::make('Dokumentasi')
                     ->url('https://docs.mtsn1pandeglang.sch.id', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-book-open')

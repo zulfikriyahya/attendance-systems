@@ -106,12 +106,49 @@ sudo chown -R www:www /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/storage
 ```
 
+---
+
+## Service Sekolah Alam Bahriatul Ulum Pandeglang
+
+```bash
+sudo nano /etc/systemd/system/presensi-sekolahalampandeglang.service
+```
+
+```bash
+[Unit]
+Description=WORKER SEKOLAH ALAM PANDEGLANG
+After=network.target
+[Service]
+User=www
+Group=www
+Restart=always
+RestartSec=10
+ExecStart=/usr/bin/php /www/wwwroot/presensi.sekolahalampandeglang.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+WorkingDirectory=/www/wwwroot/presensi.sekolahalampandeglang.sch.id
+StandardOutput=append:/var/log/laravel-worker-sekolahalampandeglang.log
+StandardError=append:/var/log/laravel-worker-sekolahalampandeglang-error.log
+
+MemoryMax=1024M
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Running Services
+
+```bash
+sudo systemctl enable --now presensi-sekolahalampandeglang.service
+sudo chown -R www:www /www/wwwroot/presensi.sekolahalampandeglang.sch.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi.sekolahalampandeglang.sch.id/storage
+```
+
+---
+
 ```bash
 sudo composer update
 sudo php artisan config:clear
 sudo php artisan cache:clear
 sudo php artisan view:clear
-sudo php artisan queue:clear
 sudo php artisan queue:clear --queue=whatsapp,default
 sudo php artisan queue:flush
 sudo php artisan optimize:clear
