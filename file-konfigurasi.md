@@ -87,8 +87,8 @@ User=www
 Group=www
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
-WorkingDirectory=/www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id
+ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+WorkingDirectory=/www/wwwroot/presensi.mtsdarulhudapusat.sch.id
 StandardOutput=append:/var/log/laravel-worker-dhpusat.log
 StandardError=append:/var/log/laravel-worker-dhpusat-error.log
 
@@ -102,21 +102,21 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-dhpusat.service
-sudo chown -R www:www /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
-sudo chmod -R 775 /www/wwwroot/presensi-dhpusat.mtsn1pandeglang.sch.id/storage
+sudo chown -R www:www /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/storage
+sudo chmod -R 775 /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/storage
 ```
 
 ```bash
-composer update
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan queue:clear
-php artisan queue:clear --queue=whatsapp,default
-php artisan queue:flush
-php artisan optimize:clear
-php artisan optimize
-php artisan filament:optimize
+sudo composer update
+sudo php artisan config:clear
+sudo php artisan cache:clear
+sudo php artisan view:clear
+sudo php artisan queue:clear
+sudo php artisan queue:clear --queue=whatsapp,default
+sudo php artisan queue:flush
+sudo php artisan optimize:clear
+sudo php artisan optimize
+sudo php artisan filament:optimize
 
 sudo systemctl stop presensi-dhpusat.service
 sudo systemctl stop presensi-man1.service

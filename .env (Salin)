@@ -1,0 +1,204 @@
+# ============================================================
+# APLIKASI
+# ============================================================
+APP_NAME="Sekolah Alam Bahriatul Ulum Pandeglang"
+APP_ENV=production
+APP_KEY=base64:Ry4khktrTs8/Z2Ll625TI9e2MSS8ODOCtClxy+sWtmo=
+APP_DEBUG=false
+APP_URL=https://presensi.sekolahalampandeglang.id
+
+APP_LOCALE=id
+APP_FALLBACK_LOCALE=id
+APP_FAKER_LOCALE=id_ID
+
+TIMEZONE="Asia/Jakarta"
+
+APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+
+# PHP_CLI_SERVER_WORKERS=4
+BCRYPT_ROUNDS=12
+
+# ============================================================
+# LOGGING
+# ============================================================
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+# ============================================================
+# DATABASE
+# ============================================================
+DB_CONNECTION=mysql
+DB_HOST=192.168.1.100
+DB_PORT=3306
+DB_DATABASE=presensi_sekolahalampandeglang
+DB_USERNAME=presensi_sekolahalampandeglang
+DB_PASSWORD=18012000
+
+# ============================================================
+# SESSION
+# ============================================================
+SESSION_DRIVER=redis
+SESSION_LIFETIME=525600             # dalam menit (525600 menit = 1 tahun)
+SESSION_EXPIRE_ON_CLOSE=true        # apakah sesi berakhir jika browser ditutup
+SESSION_ENCRYPT=false               # enkripsi data sesi
+SESSION_PATH=/                      # path cookie sesi
+SESSION_DOMAIN=null                 # domain cookie sesi
+
+# ============================================================
+# FILES & QUEUE
+# ============================================================
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=redis
+
+CACHE_STORE=redis
+CACHE_PREFIX=presensi-sekolahalampandeglang_
+
+# ============================================================
+# REDIS (opsional, untuk session/queue/cache yang lebih cepat)
+# ============================================================
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+REDIS_DB=0                         # Database Redis terpisah
+REDIS_CACHE_DB=1
+REDIS_QUEUE_DB=2
+REDIS_PREFIX=presensi-sekolahalampandeglang_
+
+# ============================================================
+# EMAIL
+# ============================================================
+MAIL_MAILER=log
+MAIL_SCHEME=null
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+# ============================================================
+# AWS (opsional)
+# ============================================================
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+# ============================================================
+# FRONTEND
+# ============================================================
+VITE_APP_NAME="${APP_NAME}"
+API_SECRET=P@ndegl@ng_14012000*
+
+# ============================================================
+# KONFIGURASI APLIKASI
+# ============================================================
+BIAYA_KARTU=15000
+
+# ============================================================
+# WHATSAPP SERVICE
+# ============================================================
+WHATSAPP_ENDPOINT=https://wapi-4.zedlabs.id/send-message
+WHATSAPP_TIMEOUT=15
+
+# ============================================================
+# RATE LIMITING - MULTI TIER
+# ============================================================
+# Per-Minute Limits
+WHATSAPP_PRESENSI_RATE=35
+WHATSAPP_BULK_RATE=20
+WHATSAPP_INFORMASI_RATE=25
+WHATSAPP_PRESENSI_MAX_DELAY=30
+WHATSAPP_BULK_MAX_DELAY=2
+WHATSAPP_INFORMASI_MAX_DELAY=60
+
+# Global Limits
+WHATSAPP_HOURLY_LIMIT=500           # Total max per jam (semua tipe combined)
+WHATSAPP_DAILY_LIMIT=5000           # Total max per hari (semua tipe combined)
+
+# Per-Type Hourly Limits
+WHATSAPP_PRESENSI_HOURLY=300        # Max presensi per jam
+WHATSAPP_BULK_HOURLY=150            # Max bulk per jam
+WHATSAPP_INFORMASI_HOURLY=100       # Max informasi per jam
+
+# Per-Type Daily Limits
+WHATSAPP_PRESENSI_DAILY=3000        # Max presensi per hari
+WHATSAPP_BULK_DAILY=1500            # Max bulk per hari
+WHATSAPP_INFORMASI_DAILY=1000       # Max informasi per hari
+
+# Per-Number Limits (anti-spam protection)
+WHATSAPP_PER_NUMBER_HOURLY=2        # Max 2 pesan ke 1 nomor per jam
+WHATSAPP_PER_NUMBER_DAILY=5         # Max 5 pesan ke 1 nomor per hari
+
+# Circuit Breaker
+WHATSAPP_CIRCUIT_BREAKER_ENABLED=true
+WHATSAPP_ERROR_THRESHOLD=50             # Max errors per hour sebelum circuit break
+WHATSAPP_CIRCUIT_BREAKER_COOLDOWN=30    # Cooldown dalam menit
+
+# ============================================================
+# QUEUE
+# ============================================================
+WHATSAPP_QUEUE=whatsapp             # nama antrian WhatsApp
+WHATSAPP_RETRY_ATTEMPTS=3           # jumlah percobaan ulang
+WHATSAPP_RETRY_DELAY=60             # jeda antar retry (detik)
+
+# ============================================================
+# MONITORING
+# ============================================================
+WHATSAPP_MONITORING_ENABLED=true
+WHATSAPP_QUEUE_WARNING=5000         # warning jika antrian >= 5000
+WHATSAPP_QUEUE_CRITICAL=10000       # critical jika antrian >= 10000
+WHATSAPP_FAILED_WARNING=20          # warning jika gagal >= 20
+WHATSAPP_FAILED_CRITICAL=100        # critical jika gagal >= 100
+WHATSAPP_HOURLY_WARNING=2000        # warning jika pesan/jam >= 2000
+WHATSAPP_HOURLY_CRITICAL=3000       # critical jika pesan/jam >= 3000
+WHATSAPP_CACHE_TTL=3600             # waktu simpan cache (detik)
+
+# ============================================================
+# ALERTS (opsional)
+# ============================================================
+WHATSAPP_ALERTS_ENABLED=false       # aktifkan alert/notifikasi
+WHATSAPP_ALERT_WEBHOOK=             # webhook alert
+WHATSAPP_ALERT_EMAILS=              # email tujuan alert
+
+# ============================================================
+# PESAN
+# ============================================================
+WHATSAPP_INFO_MAX_LENGTH=500        # panjang maksimal pesan
+
+# ============================================================
+# VALIDASI NOMOR TELEPON
+# ============================================================
+WHATSAPP_PHONE_VALIDATION=true
+
+# ============================================================
+# LAMPIRAN FILE
+# ============================================================
+WHATSAPP_ATTACHMENTS_ENABLED=true   # aktifkan lampiran file
+WHATSAPP_MAX_FILE_SIZE=16777216     # ukuran maksimal file (byte) → 16MB
+
+# ============================================================
+# LOGGING
+# ============================================================
+WHATSAPP_LOGGING_ENABLED=true
+WHATSAPP_LOG_LEVEL=info
+WHATSAPP_SUCCESS_LOG=single
+WHATSAPP_ERROR_LOG=single
+WHATSAPP_LOG_PAYLOAD=false          # log isi request
+WHATSAPP_LOG_RESPONSE=true          # log response
+
+# ============================================================
+# TESTING (untuk development)
+# ============================================================
+WHATSAPP_TESTING_MODE=false         # jika true, pesan tidak benar-benar dikirim
+WHATSAPP_MOCK_RESPONSES=false       # jika true, gunakan response palsu
+WHATSAPP_TEST_NUMBERS=0895351856267 # daftar nomor untuk testing
+
+LIVEWIRE_UPLOAD_MAX_FILE_SIZE=102400
+LIVEWIRE_TEMPORARY_FILE_UPLOAD_MAX_SIZE=102400
