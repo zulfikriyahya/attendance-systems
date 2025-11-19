@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\TrashedFilter;
+use App\Jobs\GenerateLaporanPresensiSiswaJob;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -581,7 +582,6 @@ class PresensiSiswaResource extends Resource
                     })
                     ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
 
-                // TODO: Kirim ke worker
                 // Cetak Semua Laporan Siswa Berdasarkan Bulan
                 Action::make('print-all')
                     ->label('Cetak')
@@ -589,24 +589,29 @@ class PresensiSiswaResource extends Resource
                     ->icon('heroicon-o-printer')
                     ->outlined()
                     ->requiresConfirmation()
+                    ->modalHeading('Cetak Laporan Presensi Siswa')
+                    ->modalDescription('Laporan akan diproses di latar belakang. Anda akan menerima notifikasi ketika laporan selesai.')
                     ->form([
                         Select::make('bulan')
                             ->label('Bulan')
                             ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
                                 $m => Carbon::create()->month($m)->translatedFormat('F'),
                             ])->toArray())
+                            ->default(now()->month)
                             ->required(),
                         TextInput::make('tahun')
                             ->label('Tahun')
                             ->default(now()->year)
                             ->numeric()
+                            ->minValue(2020)
+                            ->maxValue(now()->year + 1)
                             ->required(),
                     ])
                     ->action(function (array $data) {
                         $bulan = $data['bulan'];
                         $tahun = $data['tahun'];
 
-                        // Validasi: Cek apakah masih ada status approval pending di bulan dan tahun tersebut
+                        // Validasi: Cek apakah masih ada status approval pending
                         $pendingApprovals = PresensiSiswa::whereYear('tanggal', $tahun)
                             ->whereMonth('tanggal', $bulan)
                             ->where('statusApproval', StatusApproval::Pending)
@@ -617,20 +622,18 @@ class PresensiSiswaResource extends Resource
                             $jumlahPending = $pendingApprovals->count();
                             $namaBulan = Carbon::create()->month((int) $bulan)->translatedFormat('F');
 
-                            // Ambil daftar siswa yang masih pending (maksimal 5 untuk ditampilkan)
                             $daftarSiswa = $pendingApprovals->take(5)
                                 ->map(fn ($record) => "• {$record->siswa->user->name}")
                                 ->join("\n");
 
                             $sisaData = $jumlahPending > 5 ? "\n... dan ".($jumlahPending - 5).' siswa lainnya.' : '';
 
-                            // Tampilkan notifikasi error
                             Notification::make()
                                 ->title('Laporan Tidak Dapat Dicetak')
                                 ->body("❌ Masih terdapat {$jumlahPending} pengajuan ketidakhadiran siswa yang belum diproses untuk bulan {$namaBulan} {$tahun}.\n\nDaftar siswa:\n{$daftarSiswa}{$sisaData}\n\nSilakan proses semua pengajuan terlebih dahulu sebelum mencetak laporan.")
                                 ->icon('heroicon-o-exclamation-triangle')
                                 ->color('danger')
-                                ->persistent() // Notifikasi tidak hilang otomatis
+                                ->persistent()
                                 ->actions([
                                     NotificationAction::make('lihat_pending')
                                         ->label('Lihat Pengajuan Pending')
@@ -647,10 +650,10 @@ class PresensiSiswaResource extends Resource
                                 ])
                                 ->send();
 
-                            return; // Stop eksekusi, tidak lanjut ke print
+                            return;
                         }
 
-                        // Validasi tambahan: Cek apakah ada data di bulan tersebut
+                        // Validasi: Cek apakah ada data di bulan tersebut
                         $totalData = PresensiSiswa::whereYear('tanggal', $tahun)
                             ->whereMonth('tanggal', $bulan)
                             ->count();
@@ -668,24 +671,24 @@ class PresensiSiswaResource extends Resource
                             return;
                         }
 
-                        // Jika semua validasi lolos, lanjutkan ke print
+                        // Dispatch Job ke Queue
+                        GenerateLaporanPresensiSiswaJob::dispatch(
+                            bulan: $bulan,
+                            tahun: $tahun,
+                            userId: Auth::id()
+                        );
+
                         $namaBulan = Carbon::create()->month((int) $bulan)->translatedFormat('F');
 
                         Notification::make()
-                            ->title('Menyiapkan Laporan')
-                            ->body("📄 Laporan presensi siswa untuk bulan {$namaBulan} {$tahun} sedang disiapkan...")
-                            ->icon('heroicon-o-document')
+                            ->title('Laporan Sedang Diproses')
+                            ->body("🚀 Laporan presensi siswa untuk bulan {$namaBulan} {$tahun} sedang diproses di latar belakang.\n\nAnda akan menerima notifikasi ketika laporan selesai dan siap diunduh.")
+                            ->icon('heroicon-o-clock')
                             ->color('info')
+                            ->duration(5000)
                             ->send();
-
-                        $url = route('laporan.all.siswa', [
-                            'bulan' => $bulan,
-                            'tahun' => $tahun,
-                        ]);
-
-                        return redirect($url);
                     })
-                    ->visible(fn () => Auth::user()->hasRole('super_admin') && Siswa::all()->count() > 0),
+                    ->visible(Auth::user()->hasAnyRole(['super_admin', 'wali_kelas']) && Siswa::all()->count() > 0),
 
                 // Cetak Laporan Mandiri
                 Action::make('print-my-report')
@@ -1001,14 +1004,14 @@ class PresensiSiswaResource extends Resource
                             ->maxSize(2048) // 2MB
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                             ->helperText('Format yang diterima: PDF, JPG, PNG. Maksimal 2MB.'),
-                            // ->required(fn (callable $get) => in_array($get('statusPresensi'), [
-                            //     StatusPresensi::Sakit->value,
-                            //     StatusPresensi::Izin->value,
-                            //     StatusPresensi::Dispen->value,
-                            // ]))
-                            // ->validationMessages([
-                            //     'required' => 'Lampiran wajib dilampirkan untuk jenis ketidakhadiran ini.',
-                            // ]),
+                        // ->required(fn (callable $get) => in_array($get('statusPresensi'), [
+                        //     StatusPresensi::Sakit->value,
+                        //     StatusPresensi::Izin->value,
+                        //     StatusPresensi::Dispen->value,
+                        // ]))
+                        // ->validationMessages([
+                        //     'required' => 'Lampiran wajib dilampirkan untuk jenis ketidakhadiran ini.',
+                        // ]),
                     ])
                     ->action(function (array $data) {
                         $siswaId = Auth::user()->siswa?->id;

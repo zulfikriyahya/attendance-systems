@@ -2,51 +2,52 @@
 
 namespace App\Filament\Resources;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jabatan;
-use App\Models\Pegawai;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Enums\StatusPulang;
 use App\Enums\StatusApproval;
 use App\Enums\StatusPresensi;
+use App\Enums\StatusPulang;
+use App\Exports\PresensiPegawaiExport;
+use App\Filament\Resources\PresensiPegawaiResource\Pages;
+use App\Jobs\GenerateLaporanPresensiPegawaiJob;
+use App\Models\Jabatan;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Form;
+use Filament\Notifications\Actions\Action as NotificationAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Radio;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Filament\Forms\Components\Select;
-use App\Exports\PresensiPegawaiExport;
-use Filament\Forms\Components\Section;
-use Illuminate\Support\Facades\Schema;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TimePicker;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Enums\ActionsPosition;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PresensiPegawaiResource\Pages;
-use Filament\Notifications\Actions\Action as NotificationAction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PresensiPegawaiResource extends Resource
 {
@@ -578,7 +579,6 @@ class PresensiPegawaiResource extends Resource
                     })
                     ->visible(Auth::user()->hasRole('super_admin') && Pegawai::all()->count() > 0),
 
-                // TODO: Kirim ke worker
                 // Cetak Semua Laporan Pegawai Berdasarkan Bulan
                 Action::make('print-all')
                     ->label('Cetak')
@@ -586,24 +586,29 @@ class PresensiPegawaiResource extends Resource
                     ->icon('heroicon-o-printer')
                     ->outlined()
                     ->requiresConfirmation()
+                    ->modalHeading('Cetak Laporan Presensi Pegawai')
+                    ->modalDescription('Laporan akan diproses di latar belakang. Anda akan menerima notifikasi ketika laporan selesai.')
                     ->form([
                         Select::make('bulan')
                             ->label('Bulan')
                             ->options(collect(range(1, 12))->mapWithKeys(fn ($m) => [
                                 $m => Carbon::create()->month($m)->translatedFormat('F'),
                             ])->toArray())
+                            ->default(now()->month)
                             ->required(),
                         TextInput::make('tahun')
                             ->label('Tahun')
                             ->default(now()->year)
                             ->numeric()
+                            ->minValue(2020)
+                            ->maxValue(now()->year + 1)
                             ->required(),
                     ])
                     ->action(function (array $data) {
                         $bulan = $data['bulan'];
                         $tahun = $data['tahun'];
 
-                        // Validasi: Cek apakah masih ada status approval pending di bulan dan tahun tersebut
+                        // Validasi: Cek apakah masih ada status approval pending
                         $pendingApprovals = PresensiPegawai::whereYear('tanggal', $tahun)
                             ->whereMonth('tanggal', $bulan)
                             ->where('statusApproval', StatusApproval::Pending)
@@ -614,20 +619,18 @@ class PresensiPegawaiResource extends Resource
                             $jumlahPending = $pendingApprovals->count();
                             $namaBulan = Carbon::create()->month((int) $bulan)->translatedFormat('F');
 
-                            // Ambil daftar pegawai yang masih pending (maksimal 5 untuk ditampilkan)
                             $daftarPegawai = $pendingApprovals->take(5)
                                 ->map(fn ($record) => "• {$record->pegawai->user->name}")
                                 ->join("\n");
 
                             $sisaData = $jumlahPending > 5 ? "\n... dan ".($jumlahPending - 5).' pegawai lainnya.' : '';
 
-                            // Tampilkan notifikasi error
                             Notification::make()
                                 ->title('Laporan Tidak Dapat Dicetak')
                                 ->body("❌ Masih terdapat {$jumlahPending} pengajuan ketidakhadiran pegawai yang belum diproses untuk bulan {$namaBulan} {$tahun}.\n\nDaftar pegawai:\n{$daftarPegawai}{$sisaData}\n\nSilakan proses semua pengajuan terlebih dahulu sebelum mencetak laporan.")
                                 ->icon('heroicon-o-exclamation-triangle')
                                 ->color('danger')
-                                ->persistent() // Notifikasi tidak hilang otomatis
+                                ->persistent()
                                 ->actions([
                                     NotificationAction::make('lihat_pending')
                                         ->label('Lihat Pengajuan Pending')
@@ -644,10 +647,10 @@ class PresensiPegawaiResource extends Resource
                                 ])
                                 ->send();
 
-                            return; // Stop eksekusi, tidak lanjut ke print
+                            return;
                         }
 
-                        // Validasi tambahan: Cek apakah ada data di bulan tersebut
+                        // Validasi: Cek apakah ada data di bulan tersebut
                         $totalData = PresensiPegawai::whereYear('tanggal', $tahun)
                             ->whereMonth('tanggal', $bulan)
                             ->count();
@@ -665,22 +668,22 @@ class PresensiPegawaiResource extends Resource
                             return;
                         }
 
-                        // Jika semua validasi lolos, lanjutkan ke print
+                        // Dispatch Job ke Queue
+                        GenerateLaporanPresensiPegawaiJob::dispatch(
+                            bulan: $bulan,
+                            tahun: $tahun,
+                            userId: Auth::id()
+                        );
+
                         $namaBulan = Carbon::create()->month((int) $bulan)->translatedFormat('F');
 
                         Notification::make()
-                            ->title('Menyiapkan Laporan')
-                            ->body("📄 Laporan presensi pegawai untuk bulan {$namaBulan} {$tahun} sedang disiapkan...")
-                            ->icon('heroicon-o-document')
+                            ->title('Laporan Sedang Diproses')
+                            ->body("🚀 Laporan presensi pegawai untuk bulan {$namaBulan} {$tahun} sedang diproses di latar belakang.\n\nAnda akan menerima notifikasi ketika laporan selesai dan siap diunduh.")
+                            ->icon('heroicon-o-clock')
                             ->color('info')
+                            ->duration(5000)
                             ->send();
-
-                        $url = route('laporan.all.pegawai', [
-                            'bulan' => $bulan,
-                            'tahun' => $tahun,
-                        ]);
-
-                        return redirect($url);
                     })
                     ->visible(Auth::user()->hasAnyRole(['super_admin', 'wali_kelas']) && Pegawai::all()->count() > 0),
 
@@ -1007,15 +1010,15 @@ class PresensiPegawaiResource extends Resource
                             ->maxSize(2048) // 2MB
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                             ->helperText('Format yang diterima: PDF, JPG, PNG. Maksimal 2MB.'),
-                            // ->required(fn (callable $get) => in_array($get('statusPresensi'), [
-                            //     StatusPresensi::Sakit->value,
-                            //     StatusPresensi::Cuti->value,
-                            //     StatusPresensi::Izin->value,
-                            //     StatusPresensi::DinasLuar->value,
-                            // ]))
-                            // ->validationMessages([
-                            //     'required' => 'Lampiran wajib dilampirkan untuk jenis ketidakhadiran ini.',
-                            // ]),
+                        // ->required(fn (callable $get) => in_array($get('statusPresensi'), [
+                        //     StatusPresensi::Sakit->value,
+                        //     StatusPresensi::Cuti->value,
+                        //     StatusPresensi::Izin->value,
+                        //     StatusPresensi::DinasLuar->value,
+                        // ]))
+                        // ->validationMessages([
+                        //     'required' => 'Lampiran wajib dilampirkan untuk jenis ketidakhadiran ini.',
+                        // ]),
                     ])
                     ->action(function (array $data) {
                         $pegawaiId = Auth::user()->pegawai?->id;

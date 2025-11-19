@@ -2,19 +2,19 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Pegawai;
-use App\Models\Instansi;
-use App\Enums\StatusPulang;
 use App\Enums\StatusPresensi;
-use Illuminate\Bus\Queueable;
+use App\Enums\StatusPulang;
+use App\Models\Instansi;
+use App\Models\Pegawai;
 use App\Models\PresensiPegawai;
-use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class SetHadirPegawai implements ShouldQueue
 {
@@ -93,7 +93,7 @@ class SetHadirPegawai implements ShouldQueue
                 if (! $sudahAda) {
                     // Generate random jam datang (±15 menit, maksimal 07:00)
                     $jamDatang = $this->generateRandomTime($jamDatangBase, -15, 15, '07:00', 'max');
-                    
+
                     // Generate random jam pulang (±15 menit, minimal 16:00)
                     $jamPulang = $this->generateRandomTime($jamPulangBase, -15, 15, '16:00', 'min');
 
@@ -126,43 +126,43 @@ class SetHadirPegawai implements ShouldQueue
 
     /**
      * Generate random time dengan constraint (termasuk detik random)
-     * 
-     * @param string $baseTime Jam dasar (format HH:mm:ss atau HH:mm)
-     * @param int $minMinutes Offset minimal dalam menit (bisa negatif)
-     * @param int $maxMinutes Offset maksimal dalam menit
-     * @param string $limitTime Jam batas (format HH:mm:ss atau HH:mm)
-     * @param string $limitType 'max' atau 'min'
+     *
+     * @param  string  $baseTime  Jam dasar (format HH:mm:ss atau HH:mm)
+     * @param  int  $minMinutes  Offset minimal dalam menit (bisa negatif)
+     * @param  int  $maxMinutes  Offset maksimal dalam menit
+     * @param  string  $limitTime  Jam batas (format HH:mm:ss atau HH:mm)
+     * @param  string  $limitType  'max' atau 'min'
      * @return string Jam hasil dalam format HH:mm:ss
      */
     private function generateRandomTime(
-        string $baseTime, 
-        int $minMinutes, 
-        int $maxMinutes, 
-        string $limitTime, 
+        string $baseTime,
+        int $minMinutes,
+        int $maxMinutes,
+        string $limitTime,
         string $limitType
     ): string {
         // Parse base time
-        $time = Carbon::createFromFormat('H:i:s', strlen($baseTime) === 5 ? $baseTime . ':00' : $baseTime);
-        
+        $time = Carbon::createFromFormat('H:i:s', strlen($baseTime) === 5 ? $baseTime.':00' : $baseTime);
+
         // Generate random offset dalam menit
         $randomMinutes = rand($minMinutes, $maxMinutes);
-        
+
         // Generate random detik (0-59)
         $randomSeconds = rand(0, 59);
-        
+
         // Apply offset
         $randomTime = $time->copy()->addMinutes($randomMinutes)->seconds($randomSeconds);
-        
+
         // Parse limit time
-        $limit = Carbon::createFromFormat('H:i:s', strlen($limitTime) === 5 ? $limitTime . ':00' : $limitTime);
-        
+        $limit = Carbon::createFromFormat('H:i:s', strlen($limitTime) === 5 ? $limitTime.':00' : $limitTime);
+
         // Apply constraint
         if ($limitType === 'max' && $randomTime->gt($limit)) {
             return $limit->format('H:i:s');
         } elseif ($limitType === 'min' && $randomTime->lt($limit)) {
             return $limit->format('H:i:s');
         }
-        
+
         return $randomTime->format('H:i:s');
     }
 }

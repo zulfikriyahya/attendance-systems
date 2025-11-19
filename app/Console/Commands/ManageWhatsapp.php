@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\WhatsappService;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Artisan;
 
 class ManageWhatsapp extends Command
 {
@@ -73,6 +73,7 @@ class ManageWhatsapp extends Command
                     break;
                 case '0':
                     $this->info("\n👋 Terima kasih! Sampai jumpa.\n");
+
                     return 0;
                 default:
                     $this->error('❌ Pilihan tidak valid!');
@@ -136,7 +137,7 @@ class ManageWhatsapp extends Command
             $health = $service->getHealthStatus();
 
             // Status Badge
-            $statusBadge = match($health['status']) {
+            $statusBadge = match ($health['status']) {
                 'healthy' => '<fg=green>✓ HEALTHY</>',
                 'degraded' => '<fg=yellow>⚠ DEGRADED</>',
                 'unhealthy' => '<fg=red>✗ UNHEALTHY</>',
@@ -151,20 +152,20 @@ class ManageWhatsapp extends Command
             $this->table(
                 ['Metric', 'Value'],
                 [
-                    ['Success Rate', $health['performance']['success_rate'] . '%'],
+                    ['Success Rate', $health['performance']['success_rate'].'%'],
                     ['Total Sent', number_format($health['performance']['total_sent'])],
                     ['Success Count', number_format($health['performance']['success_count'])],
                     ['Error Count', number_format($health['performance']['error_count'])],
-                    ['Avg Response Time', round($health['performance']['avg_response_time'], 2) . ' ms'],
+                    ['Avg Response Time', round($health['performance']['avg_response_time'], 2).' ms'],
                 ]
             );
             $this->newLine();
 
             // Circuit Breaker
-            $circuitStatus = $health['circuit_breaker']['is_open'] 
+            $circuitStatus = $health['circuit_breaker']['is_open']
                 ? '<fg=red>🔴 OPEN (PAUSED)</>'
                 : '<fg=green>✓ CLOSED (ACTIVE)</>';
-            
+
             $this->line('🔒 <fg=cyan>Circuit Breaker:</>');
             $this->line("   Status: {$circuitStatus}");
             $this->line("   Error Count: {$health['circuit_breaker']['error_count']}");
@@ -194,7 +195,7 @@ class ManageWhatsapp extends Command
             $this->line('🌍 <fg=cyan>Global Hourly Limit:</>');
             $hourlyPercentage = $health['rate_limits']['global_hourly']['percentage'];
             $hourlyColor = $hourlyPercentage > 80 ? 'red' : ($hourlyPercentage > 60 ? 'yellow' : 'green');
-            
+
             $this->line("   Used: {$health['rate_limits']['global_hourly']['used']} / {$health['rate_limits']['global_hourly']['limit']}");
             $this->line("   Usage: <fg={$hourlyColor}>{$hourlyPercentage}%</>");
             $this->line("   Remaining: {$health['rate_limits']['global_hourly']['remaining']}");
@@ -204,7 +205,7 @@ class ManageWhatsapp extends Command
             $this->line('📅 <fg=cyan>Global Daily Limit:</>');
             $dailyPercentage = $health['rate_limits']['global_daily']['percentage'];
             $dailyColor = $dailyPercentage > 80 ? 'red' : ($dailyPercentage > 60 ? 'yellow' : 'green');
-            
+
             $this->line("   Used: {$health['rate_limits']['global_daily']['used']} / {$health['rate_limits']['global_daily']['limit']}");
             $this->line("   Usage: <fg={$dailyColor}>{$dailyPercentage}%</>");
             $this->line("   Remaining: {$health['rate_limits']['global_daily']['remaining']}");
@@ -214,19 +215,19 @@ class ManageWhatsapp extends Command
             $this->line('📦 <fg=cyan>Category Daily Limits:</>');
             $categories = ['presensi', 'bulk', 'informasi'];
             $data = [];
-            
+
             foreach ($categories as $cat) {
                 if (isset($health['rate_limits'][$cat])) {
                     $limit = $health['rate_limits'][$cat];
                     $color = $limit['percentage'] > 80 ? 'red' : ($limit['percentage'] > 60 ? 'yellow' : 'green');
                     $status = $limit['percentage'] > 80 ? '🔴' : ($limit['percentage'] > 60 ? '🟡' : '🟢');
-                    
+
                     $data[] = [
                         ucfirst($cat),
                         "{$limit['used']} / {$limit['limit']}",
                         "<fg={$color}>{$limit['percentage']}%</>",
                         $limit['remaining'],
-                        $status
+                        $status,
                     ];
                 }
             }
@@ -267,7 +268,7 @@ class ManageWhatsapp extends Command
             ];
 
             $this->line("📅 Date: <fg=cyan>{$summary['date']}</> ({$summary['day_of_week']})");
-            $this->line("🌍 Global Total: <fg=yellow>" . number_format($summary['global_total']) . "</> / " . number_format($limits['global']));
+            $this->line('🌍 Global Total: <fg=yellow>'.number_format($summary['global_total']).'</> / '.number_format($limits['global']));
             $globalPercentage = $limits['global'] > 0 ? round(($summary['global_total'] / $limits['global']) * 100, 2) : 0;
             $this->line("   Usage: {$globalPercentage}%");
             $this->newLine();
@@ -278,13 +279,13 @@ class ManageWhatsapp extends Command
                 $limit = $limits[$type];
                 $percentage = $limit > 0 ? round(($used / $limit) * 100, 2) : 0;
                 $color = $percentage > 80 ? 'red' : ($percentage > 60 ? 'yellow' : 'green');
-                
+
                 $data[] = [
                     ucfirst($type),
                     number_format($used),
                     number_format($limit),
                     "<fg={$color}>{$percentage}%</>",
-                    number_format($limit - $used)
+                    number_format($limit - $used),
                 ];
             }
 
@@ -322,11 +323,11 @@ class ManageWhatsapp extends Command
                 $icon = '🟡';
             }
 
-            $this->line("📊 Queue Size: <fg={$color}>" . number_format($queueSize) . "</>");
+            $this->line("📊 Queue Size: <fg={$color}>".number_format($queueSize).'</>');
             $this->line("🚦 Status: <fg={$color}>{$icon} {$status}</>");
             $this->newLine();
-            $this->line("⚠️  Warning Threshold: " . number_format($warningThreshold));
-            $this->line("🔴 Critical Threshold: " . number_format($criticalThreshold));
+            $this->line('⚠️  Warning Threshold: '.number_format($warningThreshold));
+            $this->line('🔴 Critical Threshold: '.number_format($criticalThreshold));
 
             if ($queueSize >= $criticalThreshold) {
                 $this->newLine();
@@ -348,15 +349,16 @@ class ManageWhatsapp extends Command
         $this->warn('   Pastikan masalah yang menyebabkan circuit breaker terbuka sudah teratasi!');
         $this->newLine();
 
-        if (!$this->confirm('🔄 Yakin ingin reset Circuit Breaker?', false)) {
+        if (! $this->confirm('🔄 Yakin ingin reset Circuit Breaker?', false)) {
             $this->warn('❌ Dibatalkan.');
+
             return;
         }
 
         try {
             $circuitKey = 'whatsapp_circuit_breaker_open';
             $now = now();
-            $errorKey = 'whatsapp_errors_' . $now->format('Y-m-d-H');
+            $errorKey = 'whatsapp_errors_'.$now->format('Y-m-d-H');
 
             $wasOpen = Cache::has($circuitKey);
             $errorCount = Cache::get($errorKey, 0);
@@ -419,8 +421,9 @@ class ManageWhatsapp extends Command
         $this->warn('⚠️  Ini akan menghapus semua counter usage yang sesuai!');
         $this->newLine();
 
-        if (!$this->confirm('Lanjutkan?', false)) {
+        if (! $this->confirm('Lanjutkan?', false)) {
             $this->warn('❌ Dibatalkan.');
+
             return;
         }
 
@@ -447,8 +450,9 @@ class ManageWhatsapp extends Command
         $this->line('Data 7 hari terakhir akan tetap disimpan.');
         $this->newLine();
 
-        if (!$this->confirm('Jalankan cleanup?', true)) {
+        if (! $this->confirm('Jalankan cleanup?', true)) {
             $this->warn('❌ Dibatalkan.');
+
             return;
         }
 
@@ -481,9 +485,9 @@ class ManageWhatsapp extends Command
 
             $progressBar->finish();
             $this->newLine(2);
-            $this->info("✅ Cache cleanup selesai!");
+            $this->info('✅ Cache cleanup selesai!');
             $this->line("   {$deleted} cache keys berhasil dihapus.");
-            $this->line("   Cleanup date: " . $now->format('Y-m-d H:i:s'));
+            $this->line('   Cleanup date: '.$now->format('Y-m-d H:i:s'));
 
         } catch (\Exception $e) {
             $this->error("❌ Error: {$e->getMessage()}");
@@ -508,14 +512,15 @@ class ManageWhatsapp extends Command
 
         try {
             $logFile = storage_path('logs/laravel.log');
-            
-            if (!file_exists($logFile)) {
+
+            if (! file_exists($logFile)) {
                 $this->warn('⚠️  File log tidak ditemukan.');
+
                 return;
             }
 
             $command = "tail -n {$lines} {$logFile}";
-            
+
             if ($type === 'WhatsApp Related Only') {
                 $command .= " | grep -i 'whatsapp'";
             } elseif ($type !== 'Semua Logs') {
@@ -524,7 +529,7 @@ class ManageWhatsapp extends Command
             }
 
             $output = shell_exec($command);
-            
+
             if (empty($output)) {
                 $this->warn('⚠️  Tidak ada log yang ditemukan.');
             } else {
@@ -543,11 +548,11 @@ class ManageWhatsapp extends Command
 
         try {
             $service = app(WhatsappService::class);
-            
+
             $this->line('⏳ Mengirim test request...');
-            
+
             $health = $service->getHealthStatus();
-            
+
             $this->newLine();
             if ($health['status'] === 'healthy') {
                 $this->info('✅ Koneksi berhasil!');
@@ -580,8 +585,9 @@ class ManageWhatsapp extends Command
             0
         );
 
-        if (!$this->confirm('Lanjutkan test?', false)) {
+        if (! $this->confirm('Lanjutkan test?', false)) {
             $this->warn('❌ Test dibatalkan.');
+
             return;
         }
 
@@ -608,7 +614,7 @@ class ManageWhatsapp extends Command
 
         $this->warn('Press Ctrl+C untuk keluar dari monitor');
         $this->newLine();
-        
+
         sleep(2);
 
         try {
@@ -628,18 +634,19 @@ class ManageWhatsapp extends Command
         $this->line('Job ini akan mengirim pengecekan ketidakhadiran ke queue.');
         $this->newLine();
 
-        if (!$this->confirm('Dispatch job sekarang?', true)) {
+        if (! $this->confirm('Dispatch job sekarang?', true)) {
             $this->warn('❌ Dibatalkan.');
+
             return;
         }
 
         try {
             Artisan::call('presensi:set-ketidakhadiran');
-            
+
             $this->newLine();
             $this->info('✅ Job ProcessKetidakhadiran berhasil di-dispatch!');
             $this->line('   Job akan diproses oleh queue worker.');
-            
+
             // Show current queue size
             $queueSize = Queue::size('whatsapp');
             $this->line("   Current queue size: {$queueSize}");

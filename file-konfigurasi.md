@@ -31,6 +31,7 @@ WantedBy=multi-user.target
 ```bash
 sudo systemctl enable --now presensi-mtsn1.service
 sudo systemctl restart presensi-mtsn1.service
+sudo systemctl status presensi-mtsn1.service
 sudo chown -R www:www /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 ```
