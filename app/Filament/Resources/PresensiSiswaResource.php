@@ -261,7 +261,7 @@ class PresensiSiswaResource extends Resource
                         TimePicker::make('jamPulang')
                             ->label('Jam Pulang')
                             ->seconds(false)
-                            ->default('15:45')
+                            ->default('16:35')
                             ->required()
                             ->validationMessages([
                                 'required' => 'Form ini wajib diisi.',

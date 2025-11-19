@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Enums\StatusPresensi;
-use App\Enums\StatusPulang;
-use App\Models\Instansi;
-use App\Models\PresensiSiswa;
-use App\Models\Siswa;
-use App\Models\User;
 use Carbon\Carbon;
-use Filament\Notifications\Notification;
+use App\Models\User;
+use App\Models\Siswa;
+use App\Models\Instansi;
+use App\Enums\StatusPulang;
+use App\Enums\StatusPresensi;
+use App\Models\PresensiSiswa;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Queue\SerializesModels;
+use Filament\Notifications\Notification;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 
 class SetHadirSiswa implements ShouldQueue
 {
@@ -48,8 +48,8 @@ class SetHadirSiswa implements ShouldQueue
         $tanggalMulai = Carbon::parse($this->data['tanggalMulai']);
         $tanggalSelesai = Carbon::parse($this->data['tanggalSelesai']);
         $catatan = $this->data['catatan'] ?? null;
-        $jamDatang = $this->data['jamDatang'] ?? null;
-        $jamPulang = $this->data['jamPulang'] ?? null;
+        $jamDatangBase = $this->data['jamDatang'] ?? null;
+        $jamPulangBase = $this->data['jamPulang'] ?? null;
 
         // Generate range tanggal (exclude weekends)
         $rangeTanggal = $this->generateRangeTanggal($tanggalMulai, $tanggalSelesai);
@@ -76,8 +76,8 @@ class SetHadirSiswa implements ShouldQueue
             $siswaIds,
             $rangeTanggal,
             $existingRecords,
-            $jamDatang,
-            $jamPulang,
+            $jamDatangBase,
+            $jamPulangBase,
             $catatan
         );
 
@@ -168,8 +168,8 @@ class SetHadirSiswa implements ShouldQueue
         array $siswaIds,
         \Illuminate\Support\Collection $rangeTanggal,
         \Illuminate\Support\Collection $existingRecords,
-        ?string $jamDatang,
-        ?string $jamPulang,
+        ?string $jamDatangBase,
+        ?string $jamPulangBase,
         ?string $catatan
     ): array {
         $dataToInsert = [];
@@ -183,6 +183,10 @@ class SetHadirSiswa implements ShouldQueue
                 if ($existingRecords->has($key)) {
                     continue;
                 }
+
+                // Generate random jam datang dan pulang untuk setiap siswa
+                $jamDatang = $jamDatangBase ? $this->generateRandomTime($jamDatangBase, -15, 15, '07:00', 'max') : null;
+                $jamPulang = $jamPulangBase ? $this->generateRandomTime($jamPulangBase, -15, 15, '16:00', 'min') : null;
 
                 $dataToInsert[] = [
                     'id' => (string) \Illuminate\Support\Str::uuid(),
@@ -200,6 +204,48 @@ class SetHadirSiswa implements ShouldQueue
         }
 
         return $dataToInsert;
+    }
+
+    /**
+     * Generate random time dengan constraint (termasuk detik random)
+     * 
+     * @param string $baseTime Jam dasar (format HH:mm:ss atau HH:mm)
+     * @param int $minMinutes Offset minimal dalam menit (bisa negatif)
+     * @param int $maxMinutes Offset maksimal dalam menit
+     * @param string $limitTime Jam batas (format HH:mm:ss atau HH:mm)
+     * @param string $limitType 'max' atau 'min'
+     * @return string Jam hasil dalam format HH:mm:ss
+     */
+    private function generateRandomTime(
+        string $baseTime, 
+        int $minMinutes, 
+        int $maxMinutes, 
+        string $limitTime, 
+        string $limitType
+    ): string {
+        // Parse base time
+        $time = Carbon::createFromFormat('H:i:s', strlen($baseTime) === 5 ? $baseTime . ':00' : $baseTime);
+        
+        // Generate random offset dalam menit
+        $randomMinutes = rand($minMinutes, $maxMinutes);
+        
+        // Generate random detik (0-59)
+        $randomSeconds = rand(0, 59);
+        
+        // Apply offset
+        $randomTime = $time->copy()->addMinutes($randomMinutes)->seconds($randomSeconds);
+        
+        // Parse limit time
+        $limit = Carbon::createFromFormat('H:i:s', strlen($limitTime) === 5 ? $limitTime . ':00' : $limitTime);
+        
+        // Apply constraint
+        if ($limitType === 'max' && $randomTime->gt($limit)) {
+            return $limit->format('H:i:s');
+        } elseif ($limitType === 'min' && $randomTime->lt($limit)) {
+            return $limit->format('H:i:s');
+        }
+        
+        return $randomTime->format('H:i:s');
     }
 
     /**
