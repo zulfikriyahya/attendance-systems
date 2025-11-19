@@ -22,7 +22,7 @@ class SetHadirPegawai implements ShouldQueue
 
     public $tries = 3;
 
-    public $timeout = 300; // 5 menit
+    public $timeout = 3600; // 60 menit
 
     public $failOnTimeout = true;
 

@@ -23,7 +23,7 @@ class SetHadirSiswa implements ShouldQueue
 
     public $tries = 3;
 
-    public $timeout = 600; // 10 menit
+    public $timeout = 3600; // 60 menit
 
     public $failOnTimeout = true;
 

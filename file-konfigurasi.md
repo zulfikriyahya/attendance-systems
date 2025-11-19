@@ -15,7 +15,7 @@ User=www
 Group=www
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=3600 --memory=768
 WorkingDirectory=/www/wwwroot/presensi.mtsn1pandeglang.sch.id
 StandardOutput=append:/var/log/laravel-worker-mtsn1.log
 StandardError=append:/var/log/laravel-worker-mtsn1-error.log
@@ -30,6 +30,7 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl enable --now presensi-mtsn1.service
+sudo systemctl restart presensi-mtsn1.service
 sudo chown -R www:www /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 sudo chmod -R 775 /www/wwwroot/presensi.mtsn1pandeglang.sch.id/storage
 ```
@@ -51,7 +52,7 @@ User=www
 Group=www
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=3600 --memory=768
 WorkingDirectory=/www/wwwroot/presensi-mapansa.mtsn1pandeglang.sch.id
 StandardOutput=append:/var/log/laravel-worker-man1.log
 StandardError=append:/var/log/laravel-worker-man1-error.log
@@ -87,7 +88,7 @@ User=www
 Group=www
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi.mtsdarulhudapusat.sch.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=3600 --memory=768
 WorkingDirectory=/www/wwwroot/presensi.mtsdarulhudapusat.sch.id
 StandardOutput=append:/var/log/laravel-worker-dhpusat.log
 StandardError=append:/var/log/laravel-worker-dhpusat-error.log
@@ -123,7 +124,7 @@ User=www
 Group=www
 Restart=always
 RestartSec=10
-ExecStart=/usr/bin/php /www/wwwroot/presensi.sekolahalampandeglang.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=120 --memory=768
+ExecStart=/usr/bin/php /www/wwwroot/presensi.sekolahalampandeglang.id/artisan queue:work --queue=default,whatsapp --sleep=5 --tries=3 --max-time=36000 --timeout=3600 --memory=768
 WorkingDirectory=/www/wwwroot/presensi.sekolahalampandeglang.id
 StandardOutput=append:/var/log/laravel-worker-sekolahalampandeglang.log
 StandardError=append:/var/log/laravel-worker-sekolahalampandeglang-error.log
