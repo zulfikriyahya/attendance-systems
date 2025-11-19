@@ -21,7 +21,7 @@ class GenerateLaporanPresensiSiswaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 3600; // 60 menit timeout
+    public $timeout = 10800; // 180 menit timeout
 
     public $tries = 3; // Retry 3 kali jika gagal
 
